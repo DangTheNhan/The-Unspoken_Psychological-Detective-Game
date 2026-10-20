@@ -1,18 +1,30 @@
 import { GAME_EVENTS } from '../constants/gameEvents'
 import { AUTOSAVE } from '../constants/gameplay'
 import { createAutosaveScheduler } from '../systems/autosave'
+import { translate } from '../systems/i18n'
 import { EventBus } from './EventBus'
 import { GameSession } from './GameSession'
+import { createSettingsStore } from './settingsStore'
 
 const REGISTRY_KEY = 'runtime'
 
 /**
- * Runtime = các dịch vụ dùng chung cho mọi scene (session + autosave).
+ * Runtime = các dịch vụ dùng chung cho mọi scene (session + autosave + thiết lập + ngôn ngữ).
  * Lưu trong game.registry; scene lấy qua getRuntime(this) — không dùng biến global.
  */
 export function createRuntime() {
   let session = new GameSession()
   let started = false
+  // React báo qua SAVE_AVAILABILITY (useGameBridge); mặc định false tới khi nhận được tin
+  let saveAvailable = false
+
+  const settings = createSettingsStore({
+    onChange: (next) => EventBus.emit(GAME_EVENTS.SETTINGS_CHANGED, next),
+  })
+  const onSaveAvailability = ({ hasSave } = {}) => {
+    saveAvailable = Boolean(hasSave)
+  }
+  EventBus.on(GAME_EVENTS.SAVE_AVAILABILITY, onSaveAvailability)
 
   const requestSave = (reason) => {
     if (!started) return // chưa vào ván chơi (đang ở MainMenu) -> không lưu
@@ -24,6 +36,16 @@ export function createRuntime() {
   return {
     get session() {
       return session
+    },
+    /** Kho thiết lập người chơi (core/settingsStore.js): settings.get() / settings.set(next). */
+    settings,
+    /** Trình duyệt có bản lưu không (để mờ "Tiếp tục điều tra", hỏi trước khi ghi đè). */
+    get saveAvailable() {
+      return saveAvailable
+    },
+    /** Chuỗi giao diện theo ngôn ngữ đang chọn: runtime.t('menu.newGame'). */
+    t(key, params) {
+      return translate(settings.get().language, key, params)
     },
     startNewGame() {
       session = new GameSession()
@@ -52,6 +74,7 @@ export function createRuntime() {
     destroy() {
       autosave.stop()
       started = false
+      EventBus.off(GAME_EVENTS.SAVE_AVAILABILITY, onSaveAvailability)
     },
   }
 }

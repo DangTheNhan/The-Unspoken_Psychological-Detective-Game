@@ -7,7 +7,7 @@ import { ROUTES } from './routePaths'
 
 // Tách chunk: Phaser (~1.3 MB) chỉ tải khi vào trang chơi; Admin chỉ tải khi vào trang quản trị
 const GamePlayPage = lazy(() =>
-  import('@/features/game/pages/GamePlayPage').then((m) => ({ default: m.GamePlayPage })),
+  import('@/features/play/pages/GamePlayPage').then((m) => ({ default: m.GamePlayPage })),
 )
 const AdminDashboardPage = lazy(() =>
   import('@/features/admin/pages/AdminDashboardPage').then((m) => ({

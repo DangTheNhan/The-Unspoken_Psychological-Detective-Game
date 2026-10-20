@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "assertions": 6255,
+  "nodes": 1257,
+  "statements": 43,
+  "evidence": 12,
+  "unreachableNodes": [],
+  "brokenTargets": [],
+  "tested": [
+    "structural data contract",
+    "UTF-8 JSON parsing",
+    "unique node/reference IDs",
+    "verbatim speech provenance",
+    "graph including Press/Present handlers",
+    "five-core exit + valid return for towel/box",
+    "Phase1 optional question first acquired in Phase3",
+    "nonlinear NPC and R4 order",
+    "wrong/support Present scoring",
+    "professional report victim link",
+    "incomplete/wrong/correct Final",
+    "actual checkpoint restoration",
+    "Phase4 late optional evidence fallbacks",
+    "preserved provenance when optional items collected early",
+    "end-to-end Chapter1 to explicit CH2 boundary"
+  ],
+  "notTested": [
+    "existing user Phaser/React code unavailable",
+    "actual UI event de-duplication and file IO to be implemented in engine",
+    "hotspot coordinates and visual assets need mapping to existing demo"
+  ]
+}

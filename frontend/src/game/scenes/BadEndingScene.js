@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { GAME_EVENTS } from '../constants/gameEvents'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
+import { getRuntime } from '../core/runtime'
 import { TextButton } from '../ui/TextButton'
 import { COLORS, TEXT_STYLES } from '../ui/theme'
 
@@ -21,7 +22,8 @@ export class BadEndingScene extends Phaser.Scene {
       .text(width / 2, height * 0.35, 'Bad Ending', { ...TEXT_STYLES.title, color: '#d9534f' })
       .setOrigin(0.5)
 
-    new TextButton(this, width / 2, height * 0.6, 'Tải lại checkpoint gần nhất', () => {
+    const label = getRuntime(this).t('badEnding.reload')
+    new TextButton(this, width / 2, height * 0.6, label, () => {
       EventBus.emit(GAME_EVENTS.CHECKPOINT_RELOAD_REQUESTED)
       this.scene.start(SCENE_KEYS.MAIN_MENU)
     })

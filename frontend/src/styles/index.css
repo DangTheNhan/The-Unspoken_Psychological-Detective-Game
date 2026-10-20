@@ -1,5 +1,64 @@
 @import 'tailwindcss';
 
+/*
+ * Font của menu game (DEC-012) — file trong public/assets/fonts/ (xem README.md ở đó).
+ * local() trước: máy đã cài font thì dùng luôn. Thiếu file -> trình duyệt dùng font dự phòng
+ * khai báo trong src/game/ui/theme.js (FONTS).
+ */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('JetBrains Mono'),
+    url('/assets/fonts/JetBrainsMono-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local('Playfair Display Bold'),
+    local('PlayfairDisplay-Bold'),
+    url('/assets/fonts/PlayfairDisplay-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local('Be Vietnam Pro'),
+    local('BeVietnamPro-Regular'),
+    url('/assets/fonts/BeVietnamPro-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src:
+    local('Be Vietnam Pro Medium'),
+    local('BeVietnamPro-Medium'),
+    url('/assets/fonts/BeVietnamPro-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Be Vietnam Pro';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src:
+    local('Be Vietnam Pro SemiBold'),
+    local('BeVietnamPro-SemiBold'),
+    url('/assets/fonts/BeVietnamPro-SemiBold.ttf') format('truetype');
+}
+
 /* Nền tối chung cho web shell (Phaser tự vẽ trong canvas) */
 :root {
   color-scheme: dark;

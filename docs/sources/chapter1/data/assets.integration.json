@@ -1,0 +1,168 @@
+{
+  "id": "CH1_ASSET_BINDING_TEMPLATE",
+  "policy": "Map to existing demo assets; these technical keys do not create facts or characters. Null means not provided in this workspace.",
+  "backgrounds": {
+    "room201": null,
+    "hallway": null,
+    "room204": null
+  },
+  "sprites": {
+    "DETECTIVE": null,
+    "HÒA": null,
+    "LINH": null,
+    "HÀO": null,
+    "NGƯỜI ĐÀN ÔNG": "same sprite as HÀO before name known",
+    "MINH": null,
+    "CẢNH SÁT": null
+  },
+  "expressions": {
+    "HÒA": [
+      "Anxious",
+      "Breathless",
+      "Cornered",
+      "Defensive",
+      "Flustered",
+      "Guarded",
+      "Hasty",
+      "Insistent",
+      "Irritated",
+      "Panicked",
+      "Puzzled",
+      "Reluctant",
+      "Stalled",
+      "Uneasy",
+      "Worried"
+    ],
+    "DETECTIVE": [
+      "Attentive",
+      "Calm",
+      "Gentle",
+      "Neutral",
+      "Quiet",
+      "Thoughtful"
+    ],
+    "NGƯỜI ĐÀN ÔNG": [
+      "Cool",
+      "Guarded"
+    ],
+    "MINH": [
+      "Breaking",
+      "Defensive",
+      "Exhausted",
+      "Failing",
+      "Guarded",
+      "Insistent",
+      "Quiet",
+      "Shaken",
+      "Stalled",
+      "Strained",
+      "Subdued",
+      "Tired",
+      "Wary"
+    ],
+    "LINH": [
+      "Ashamed",
+      "Breaking",
+      "Controlled",
+      "Defensive",
+      "Failing",
+      "Guarded",
+      "Hesitant",
+      "Insistent",
+      "Puzzled",
+      "Quiet",
+      "Shaken",
+      "Strained",
+      "Uneasy",
+      "Wary"
+    ],
+    "HÀO": [
+      "Cool",
+      "Dry",
+      "Flat",
+      "Guarded",
+      "Impatient",
+      "Low",
+      "Warning"
+    ],
+    "CẢNH SÁT": [
+      "Firm",
+      "Neutral"
+    ]
+  },
+  "hotspots": [
+    {
+      "id": "HP_LOCK",
+      "scene": "room204",
+      "name": "Ổ khóa cửa 204",
+      "geometry": null,
+      "targetNode": "P2_LOCK_DISPATCH"
+    },
+    {
+      "id": "HP_SINK",
+      "scene": "room204",
+      "name": "Bồn rửa và khăn mặt",
+      "geometry": null,
+      "targetNode": "P2_TOWEL_DISPATCH"
+    },
+    {
+      "id": "HP_NECK",
+      "scene": "room204",
+      "name": "Vùng cổ và ngực áo Tùng",
+      "geometry": null,
+      "targetNode": "P2_NECK_DISPATCH"
+    },
+    {
+      "id": "HP_INHALER",
+      "scene": "room204",
+      "name": "Ống hít hen suyễn",
+      "geometry": null,
+      "targetNode": "P2_INHALER_DISPATCH"
+    },
+    {
+      "id": "HP_TRASH",
+      "scene": "room204",
+      "name": "Thùng rác và hộp thuốc đã bóc",
+      "geometry": null,
+      "targetNode": "P2_BOX_DISPATCH"
+    },
+    {
+      "id": "HP_RECEIPT",
+      "scene": "room204",
+      "name": "Liên biên nhận thu tiền nhà",
+      "geometry": null,
+      "targetNode": "P2_RECEIPT_DISPATCH"
+    },
+    {
+      "id": "HP_DUST",
+      "scene": "room204",
+      "name": "Vòng trống trên lớp bụi mặt tủ",
+      "geometry": null,
+      "targetNode": "P2_WATCH_DISPATCH"
+    },
+    {
+      "id": "HP_BED",
+      "scene": "room204",
+      "name": "Giường, mép nệm; sau chi tiết mới gọi đồng xu lạ",
+      "geometry": null,
+      "targetNode": "P2_COIN_DISPATCH"
+    },
+    {
+      "id": "HP_BOARD",
+      "scene": "room204",
+      "name": "Bảng nỉ, tờ khảo sát cư dân",
+      "geometry": null,
+      "targetNode": "P2_SURVEY_DISPATCH"
+    }
+  ],
+  "bindingRequiredBeforePlayableUI": [
+    "room204 hotspot geometry",
+    "dialogue UI",
+    "Notebook UI",
+    "Press/Present event handlers",
+    "Deduction board",
+    "save/load checkpoint storage"
+  ],
+  "reuseExistingScenes": true,
+  "newBackgroundForRoom204": false
+}

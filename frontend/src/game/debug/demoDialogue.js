@@ -6,7 +6,7 @@
 export const PORTRAIT_DEMO_LINES = Object.freeze([
   {
     speaker: 'Ông chủ trọ',
-    text: '[DEMO] Đứng bên phải, kiểu nhép "smug". Gặp dấu phẩy, dấu chấm thì miệng dừng.',
+    text: 'Nhân vật xuất hiện ở phía bên phải màn hình, nhép miệng theo lời thoại.',
     character: 'landlord',
     expression: 'smirk',
     talk: 'smug',
@@ -14,11 +14,11 @@ export const PORTRAIT_DEMO_LINES = Object.freeze([
   },
   {
     speaker: 'Thám tử',
-    text: '[DEMO] Câu của người khác: chủ trọ vẫn đứng đó nhưng tối đi.',
+    text: 'sau đó duy cởi quần còn hoàng thì cởi áo, 2 đứa đỗi cho nhau nhau, tình anh em nghĩa hi',
   },
   {
     speaker: 'Ông chủ trọ',
-    text: '[DEMO] Chuyển sang bên trái, cau mày, kiểu nhép "normal". Bấm khi chữ đang chạy để hiện hết câu!',
+    text: 'Nhân vật chuyển sang phía bên trái màn hình, đứng yên, không nhép miệng.',
     character: 'landlord',
     expression: 'stern',
     talk: 'normal',
@@ -26,7 +26,7 @@ export const PORTRAIT_DEMO_LINES = Object.freeze([
   },
   {
     speaker: 'Ông chủ trọ',
-    text: '[DEMO] Câu không có "talk": đứng yên, không nhép miệng.',
+    text: 'Khi không dùng biến talk do phaser hỗ trợ nhân vật sẽ đứng yên, không nhép miệng. Khi dùng biến talk, nhân vật sẽ nhép miệng theo lời thoại.',
     character: 'landlord',
     expression: 'smirk',
     position: 'left',

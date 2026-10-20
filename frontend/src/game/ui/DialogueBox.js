@@ -19,17 +19,31 @@ const BOX_HEIGHT = 220
  *     màn hình (CharacterStage), nhép miệng khi chữ chạy. Không có ô chân dung.
  *   - line.portrait (texture key): ô chân dung nhỏ trong khung thoại (nhân vật chưa có ảnh nửa thân).
  * Câu thoại không có character -> nhân vật đang đứng trên sân khấu tối đi (đang nghe).
+ *
+ * Thiết lập người chơi (DEC-012) truyền qua options: charDelayMs (tốc độ chữ, 0 = hiện ngay),
+ * fontSize (cỡ chữ thân), onLineComplete (gọi khi câu đã hiện hết — dùng cho tự động chuyển thoại).
  */
 export class DialogueBox extends Phaser.GameObjects.Container {
   /**
    * @param {Phaser.Scene} scene
-   * @param {{ stage?: import('./CharacterStage').CharacterStage }} [options]
+   * @param {{ stage?: import('./CharacterStage').CharacterStage, charDelayMs?: number,
+   *           fontSize?: number, onLineComplete?: () => void }} [options]
    */
-  constructor(scene, { stage = null } = {}) {
+  constructor(
+    scene,
+    {
+      stage = null,
+      charDelayMs = TYPEWRITER.CHAR_DELAY_MS,
+      fontSize = null,
+      onLineComplete = null,
+    } = {},
+  ) {
     const { width, height } = scene.scale
     super(scene, 0, height - BOX_HEIGHT)
     this.setDepth(DEPTH.OVERLAY)
     this.stage = stage
+    this.charDelayMs = charDelayMs
+    this.onLineComplete = onLineComplete
 
     const panel = scene.add
       .rectangle(0, 0, width, BOX_HEIGHT, COLORS.panel, 0.92)
@@ -52,6 +66,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       color: COLORS.accentHex,
     })
     this.bodyText = scene.add.text(0, PADDING + 44, '', TEXT_STYLES.body)
+    if (fontSize) this.bodyText.setFontSize(fontSize)
 
     this.add([panel, this.portraitFrame, this.portrait, this.nameText, this.bodyText])
     scene.add.existing(this)
@@ -79,18 +94,26 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.fullText = text
     this.bodyText.setText('')
 
-    if (text.length === 0) return // repeat = -1 sẽ lặp vô hạn -> chặn chuỗi rỗng
+    // repeat = -1 sẽ lặp vô hạn -> chặn chuỗi rỗng; tốc độ "Hiện ngay" (0 ms) -> không chạy chữ
+    if (text.length === 0 || this.charDelayMs <= 0) {
+      this.bodyText.setText(text)
+      this.onLineComplete?.()
+      return
+    }
 
     if (onStage) this.stage.startTalking(onStage.talkAnim)
     let shown = 0
     this.typingEvent = this.scene.time.addEvent({
-      delay: TYPEWRITER.CHAR_DELAY_MS,
+      delay: this.charDelayMs,
       repeat: text.length - 1,
       callback: () => {
         shown += 1
         this.bodyText.setText(text.slice(0, shown))
         this.stage?.syncMouth(text[shown - 1])
-        if (shown >= text.length) this.stopTyping()
+        if (shown >= text.length) {
+          this.stopTyping()
+          this.onLineComplete?.()
+        }
       },
     })
   }
@@ -99,6 +122,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   completeTyping() {
     this.stopTyping()
     this.bodyText.setText(this.fullText)
+    this.onLineComplete?.()
   }
 
   stopTyping() {

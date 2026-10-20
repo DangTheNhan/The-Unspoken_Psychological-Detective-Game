@@ -9,14 +9,14 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 09/10/2026 — sau T-011 (Claude Code) |
-| Tác vụ đang làm | Không |
-| Đã xong gần nhất | **T-009**: áp dụng tái cấu trúc T-002 (B6). **T-010**: sửa `.gitattributes` (CRLF cho .ps1/.cmd/.bat), xóa `PROGRESS_LOG-1.md` + 3 PNG thừa, commit T-009+T-010 lên nhánh `Nhan` (chưa push). **T-011**: MySQL + `schema.sql` (4 bảng), backend chạy (validate OK), thử end-to-end đạt toàn bộ README Bước 7 |
-| Trạng thái dở dang | Không. Log T-011 chưa commit. Backend (8080) + Vite (5173) có thể còn chạy nền trong phiên Claude Code |
-| Việc tiếp theo | (1) Commit log T-011 + push nhánh `Nhan` + mở PR vào `master` khi người dùng yêu cầu; (2) WP-02/03 (API Contract + định dạng JSON hội thoại — chốt ISS-07); (3) ISS-29 (userId) để save/load lên server |
-| Đang bị chặn bởi | ISS-07 (định dạng JSON + lời thoại Ch1), ISS-29 (login chưa trả `userId` → save chỉ offline), ISS-05, ISS-06, ISS-10 — xem PROJECT_MEMORY mục E |
-| Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `cd backend; mvn clean test` |
-| Ghi chú cho phiên sau | Làm việc bằng Claude Code (có shell) → ghi Java trực tiếp vào package; ISS-26 đã đóng. Lỗi push nhầm `master`: người dùng xác nhận **đã sửa** (09/10). Máy: Java 21, Maven 3.10.0, MySQL Server 8.0.46 (service `MySQL80`, `mysql.exe` không có trong PATH → `C:\Program Files\MySQL\MySQL Server 8.0in\mysql.exe`); `DB_PASSWORD` đã đặt ở biến môi trường cấp User |
+| Cập nhật lần cuối | 20/10/2026 — T-020 xong phần code (Menu chính + Cài đặt, DEC-012); chờ người dùng chạy `npm run check` + xem thử |
+| Tác vụ đang làm | T-020 — chờ người dùng: (1) `cd frontend; npm run check`, (2) `npm run dev` xem menu, (3) thêm 2 font Playfair Display + Be Vietnam Pro (public/assets/fonts/README.md), (4) xác nhận Q-M1 = chỉ dịch giao diện. Còn chờ từ trước: T-017 `npm run check`; Q3–Q5 (CHAPTER1_PLAN mục 7) |
+| Đã xong gần nhất | T-012: gói Chương 1 đọc hết (SHA khớp, validator PASS); lưu `docs/sources/chapter1/` + `docs/chapter1/CHAPTER1_MEMORY.md` (tóm tắt) + `CHAPTER1_PLAN.md` (kế hoạch WP-C1…C10). Trước đó: T-009..T-011 (tái cấu trúc áp dụng, MySQL, end-to-end đạt) |
+| Trạng thái dở dang | Không có code dở. 43 file T-020 đã ghi lên máy (chưa git commit). AI chưa chạy được Vitest/ESLint/Vite thật (mạng chặn npm) — đã kiểm bằng bộ chạy thay thế + Phaser thật trong Chromium |
+| Việc tiếp theo | (1) Người dùng báo kết quả `npm run check` → sửa nếu lỗi; (2) Q3–Q5 → WP-C1…C10 (CHAPTER1_PLAN); (3) đề xuất chờ duyệt: menu tạm dừng (Esc) mở Cài đặt khi đang chơi, i18n cho trang React |
+| Đang bị chặn bởi | Q3–Q5 (T-012); ISS-29 (userId, cho phần lưu server ở WP-C8) |
+| Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `python docs/sources/chapter1/validation/validate_data.py` (chạy trên bản sao vì script ghi đè `validation.results.json`) |
+| Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
 
 ---
 
@@ -219,3 +219,70 @@
 - **Kết quả:** README Bước 5–7 đạt. T-002 hoàn tất toàn bộ phần kiểm thử.
 - **Điểm cần xác nhận:** commit/push/PR; tài khoản test `e2e_tester01` trong DB cục bộ có thể giữ để thử tiếp hoặc xóa.
 - **Self-Check:** không sửa code, API, schema; kết quả ghi đúng phạm vi đã chạy. Trạng thái: xong.
+
+### T-012 — Đọc gói `CHAPTER_1_COMPLETE`, lưu bộ nhớ, lập kế hoạch tích hợp Chương 1
+- Ngày giao: 13/10/2026 — người dùng: "đọc hết tất cả các file có trong zip hiện tại, lưu lại toàn bộ nội dung để không cần đọc lại ở lần làm việc sau, từ những nội dung hãy tìm một hướng đi tối ưu nhất sau đó hãy lên 1 plan chi tiết từng phần cần hoàn thành. những nội dung trùng lặp không cần ghi lại vào bộ nhớ, nếu có gì xảy ra nằm ngoài yêu cầu hiện tại của tôi hãy hỏi lại tôi…"
+- **Kế hoạch:** mục đích — nắm toàn bộ Chương 1, lưu để phiên sau không đọc lại, chọn hướng tích hợp; ảnh hưởng — chỉ thêm tài liệu (`docs/sources/chapter1/`, `docs/chapter1/CHAPTER1_MEMORY.md`, `CHAPTER1_PLAN.md`), cập nhật PROJECT_MEMORY (SRC-5, ISS-31, ghi chú ISS-02/06/07/15), CLAUDE.md (trỏ tới bộ nhớ Ch1), PROGRESS_LOG; **không sửa code**; rủi ro — tóm tắt sai so với gốc (giảm bằng cách giữ gói gốc trong repo, dẫn file/mục).
+- **Bước con & kiểm tra:** B1 giải nén vào thư mục riêng, kiểm SHA-256 theo MANIFEST: 28/28 khớp · B2 chạy `validate_data.py` trên bản sao: PASS (1257 node, 43 ST, 12 EV, 6255 assertion) · B3 đọc README_FIRST, MANIFEST, INTEGRATION_PROMPT, DATA_CONTRACT, validation/* · B4 đọc Bible 1.3 (602 dòng), Project.docx mới (so diff với bản cũ), Phase.docx, MASTER_PROMPT, 2 hồ sơ lịch sử · B5 đọc 5 kịch bản; xác nhận ALL_SCRIPTS = ghép nguyên văn 5 file · B6 phân tích `chapter1.json` (loại node, 19 predicate, 38 statementRules, deduction, runtimePolicy), danh mục, state v2, source-map (runtimeText trùng text node), assets · B7 kiểm hiện trạng repo trên máy (T-009..T-011 của Claude Code) · B8 viết bộ nhớ + kế hoạch · B9 ghi lên máy.
+- **Phát hiện chính:** (1) `reference/Project.docx` là **bản mới** của SRC-1 — Java (đóng ISS-02), thêm §3.1/§4.1 mâu thuẫn cấu trúc đã áp dụng, bỏ câu autosave → ISS-31; (2) gói cung cấp đủ định dạng + lời thoại → giải ISS-07/ISS-06; ΔP −15/−20 → giải ISS-15; (3) 5 route `blocked` ở NO_HANDLING/NORMAL_REPLACEMENT không bao giờ tới vì đứng sau route `wrong` cùng thẻ — validator dùng first-match theo mảng → engine phải theo đúng như vậy; (4) gói ghi Phaser 3, dự án Phaser 4.2.1 (DEC-005) — chỉ cần adapter; (5) repo mới có ảnh Hòa, thiếu toàn bộ background + 5 nhân vật + ảnh Evidence.
+- **Hướng đề xuất:** narrative engine JS thuần chạy `chapter1.json` + scene Phaser làm phần hiển thị (chi tiết `CHAPTER1_PLAN.md`).
+- **Cần xác nhận:** Q1–Q5 (mục 7 kế hoạch).
+- **Self-Check:** chỉ dùng nội dung gói + repo; không thêm đặc tả/lời thoại; các đề xuất ghi [ĐỀ XUẤT]. Trạng thái: xong phần đọc/lưu/kế hoạch; triển khai chờ duyệt.
+
+### T-013 — Ghi quyết định Q1: giữ nguyên cấu trúc dự án
+- Ngày giao: 13/10/2026 — người dùng: "ở Q1 giữ nguyên cấu trúc hiện tại của đồ án"
+- **Kế hoạch:** mục đích — ghi quyết định để mọi phiên sau theo đúng; ảnh hưởng — PROJECT_MEMORY (thêm DEC-009; ISS-01 đã xử lý, ISS-02 đóng, ISS-31 một phần), `docs/ARCHITECTURE.md` (thêm mục 3a bảng ánh xạ Project.docx bản mới §3.1/§4.1 → cấu trúc hiện tại), `docs/chapter1/CHAPTER1_PLAN.md` + `CHAPTER1_MEMORY.md` (đánh dấu Q1 đã trả lời), `CLAUDE.md` (dòng SRC-5 bỏ "chờ Q1", trỏ DEC-009); **không sửa code**; rủi ro — hiểu sai phạm vi câu trả lời (đã ghi rõ cách hiểu trong DEC-009 để người dùng sửa nếu cần).
+- **Cách hiểu đã ghi:** giữ cấu trúc hiện tại, không theo §3.1/§4.1, không thêm Redux; Project.docx bản mới được dùng làm bản tham chiếu kỹ thuật (ví dụ backend Java).
+- **Còn mở:** Q2 (autosave), Q3 (định dạng dữ liệu Chương 1), Q4 (văn bản P2–P4), Q5 (asset).
+- **Self-Check:** chỉ ghi quyết định người dùng vừa đưa và bảng ánh xạ thực tế; không đổi code/đặc tả khác. Trạng thái: xong.
+
+### T-014 — Ghi quyết định Q2: giữ tính năng autosave
+- Ngày giao: 13/10/2026 — người dùng: "Q2 vẫn giữ tính năng auto save"
+- **Kế hoạch:** mục đích — ghi quyết định để phiên sau và WP-C8 làm đúng; ảnh hưởng — PROJECT_MEMORY (thêm DEC-010; ISS-31 đóng; REQ-030 ghi căn cứ giữ theo DEC-010), `docs/chapter1/CHAPTER1_PLAN.md` (Q2 đã trả lời, WP-C8 bước 3 cụ thể hóa), `CHAPTER1_MEMORY.md` (Q2 đã trả lời); **không sửa code** — `game/systems/autosave.js` + test đã đúng REQ-030 nên giữ nguyên; rủi ro — hiểu sai phạm vi (đã ghi rõ cách hiểu trong DEC-010).
+- **Cách hiểu đã ghi:** giữ đúng REQ-030 (lưu thủ công bất kỳ lúc nào + tự động mỗi 5 phút + khi có sự kiện quan trọng); khi tích hợp Chương 1, sự kiện quan trọng = hiệu ứng `collect_evidence` và `save_checkpoint`.
+- **Còn mở:** Q3 (định dạng dữ liệu Chương 1), Q4 (văn bản P2–P4), Q5 (asset).
+- **Self-Check:** chỉ ghi quyết định người dùng vừa đưa; không đổi code/đặc tả khác. Trạng thái: xong.
+
+### T-015 — Flow tổng hợp và các flow chi tiết kèm code
+- Ngày giao: 16/10/2026 — người dùng: "với những gì đã chạy được trong project, làm ra cái flow tổng hợp và các flow chi tiết bao gồm code."
+- **Kế hoạch:** mục đích — tài liệu luồng hệ thống dựa trên code thật; ảnh hưởng — **không sửa file nào trong repo**, chỉ tạo trang Artifact riêng (riêng tư, của người dùng); rủi ro — mô tả sai trạng thái "đã chạy" (giảm bằng cách lấy trạng thái từ T-009..T-011 và đọc code thật), đoạn code lệch file (giảm bằng script cắt theo số dòng từ bản đã đối chiếu với máy).
+- **Bước con & kiểm tra:** B1 stage `frontend/src` (50 file) từ máy, `cmp` với bản sao: khớp; Java quá sâu để stage → dùng bản sao, 32/32 file trùng kích thước với máy · B2 đọc toàn bộ code + PROGRESS_LOG T-009..T-011 · B3 viết 14 flow (sơ đồ Mermaid, các bước, trạng thái, 70+ đoạn code trích nguyên văn có đường dẫn + số dòng) + bảng API, EventBus, test · B4 kiểm tra: ranh giới từng đoạn trích (in dòng đầu/cuối), bố cục desktop/điện thoại/sáng/tối bằng Playwright (không tràn ngang). **Chưa kiểm được:** Mermaid render thật (mạng chặn cdnjs/npm) — đã rà cú pháp bằng tay.
+- **Phát hiện ghi lại:** `DeductionScene`, `BadEndingScene` chưa có đường vào; `runtime.penalize` / `collectEvidence` chưa được gọi; `Hotspot` chưa đặt vào scene; sự kiện `ui:toast` và `notebook:entry-added` chưa có bên nghe; API save/load/bug report có code nhưng chưa có request thật (ISS-29, chưa có UI).
+- **Self-Check:** không đổi code/đặc tả/API; không chạy lại test (dùng kết quả T-009/T-010 và ghi rõ). Trạng thái: xong.
+
+### T-016 — Xác định vị trí lưu dữ liệu hội thoại
+- Ngày giao: 16/10/2026 — người dùng hỏi: "đoạn hội thoại của nhân vật hiện đang được lưu ở vị trí nào"
+- **Kế hoạch:** mục đích — đối chiếu vị trí dữ liệu hội thoại runtime với nguồn kịch bản Chương 1; ảnh hưởng — không sửa code, chỉ cập nhật nhật ký; rủi ro — nhầm file runtime rỗng với dữ liệu nguồn đầy đủ.
+- **Bước con & kiểm tra:** đọc `dialogueData.js`, `PreloadScene.js`, `DialogueScene.js`; kiểm tra `frontend/public/assets/dialogues/chapter-1.json`; đối chiếu `docs/sources/chapter1/data/chapter1.json` và các file `scripts/`.
+- **Kết quả:** runtime đang nạp `frontend/public/assets/dialogues/chapter-1.json`, nhưng `dialogues` hiện rỗng; dữ liệu Chương 1 đầy đủ đang ở `docs/sources/chapter1/data/chapter1.json` và nội dung kịch bản đọc được ở `docs/sources/chapter1/scripts/`.
+- **Self-Check:** không đổi code/đặc tả/API; chưa chạy test vì chỉ tra cứu vị trí dữ liệu. Trạng thái: xong.
+
+### T-017 — Đổi tên thư mục `features/game` → `features/play`
+- Ngày giao: 16/10/2026 — người dùng: "2 folder game nằm ở vị trí dể bị nhầm lẫn, hãy đỗi tên để dể phân biệt hơn"; chọn phương án "Chỉ đổi features/game → features/play".
+- **Kế hoạch:** mục đích — phân biệt trang React `/play` với thư mục Phaser `game/`; ảnh hưởng — `AppRouter.jsx` (1 import), `game/index.js` (1 chú thích), `docs/ARCHITECTURE.md`, `docs/chapter1/CHAPTER1_PLAN.md`, `CLAUDE.md` (thêm dòng phân biệt), PROJECT_MEMORY (DEC-011); rủi ro — sót import làm build lỗi (đã grep: không còn `features/game` trong code/tài liệu đang dùng), mất lịch sử git (dùng `git mv`).
+- **Bước con:** B1 sửa import + tài liệu, ghi lên máy (xong) · B2 **người dùng** chạy `git mv` (phiên này không di chuyển/xóa được thư mục trên máy) · B3 **người dùng** chạy `npm run check` · B4 xác nhận lại.
+- **Lưu ý:** giữa B1 và B2, `npm run dev` sẽ báo không tìm thấy `@/features/play/...` — bình thường, hết sau khi chạy `git mv`.
+- **Self-Check:** không đổi logic, API, CSDL, test; lịch sử T-xxx cũ giữ nguyên đường dẫn cũ. Trạng thái: chờ B2–B3.
+
+### T-018 — Đọc lại tài liệu và nguồn trước phần chính theo cốt truyện
+- Ngày giao: 20/10/2026 — người dùng: "phần demo vừa rồi được đánh giá khá tích cực bây giờ chúng tôi sẽ bắt tay vào làm phần chính đúng với tuyến cốt truyện của game, trước tiên hãy đọc lại cái file .md và các file source để nắm rõ hướng đi và chờ yêu cầu của tôi"
+- **Đã đọc (bản trên máy không đổi từ 16/10, bản sao khớp kích thước):** CLAUDE.md, PROJECT_MEMORY.md (toàn bộ A–H), PROGRESS_LOG.md, docs/ARCHITECTURE.md, docs/CONVENTIONS.md, docs/chapter1/CHAPTER1_MEMORY.md + CHAPTER1_PLAN.md; docs/sources: working-rules.md, Story.txt, Project.md; gói chapter1: README_FIRST, CLAUDE_INTEGRATION_PROMPT, DATA_CONTRACT, STORY_AND_GAMEPLAY_BIBLE (602 dòng), 5 kịch bản P1/P2/P3/FINAL/P4 (đủ), PLAYTEST_CHECKLIST.
+- **Phát hiện:** `docs/ARCHITECTURE.md` dòng 61 (cây thư mục) còn `features/game/` — sót ở T-017; `docs/CONVENTIONS.md` mục 7 ghi nhánh `main/feature/*` trong khi thực tế làm trên `Nhan` → PR vào `master` (CLAUDE.md).
+- **Self-Check:** chỉ đọc, không sửa code/tài liệu ngoài log. Trạng thái: xong, chờ yêu cầu.
+
+### T-019 — Kế hoạch dự án + thiết kế Menu chính & Cài đặt (ảnh xem trước)
+- Ngày giao: 20/10/2026 — người dùng: "hãy lên một bản kế hoạch chi tiết cho dự án hiện tại, bước tiếp theo tôi muốn là thiết kế một menu game trông có gu và hợp với game trinh thám … thêm vào phần lựa chọn setting … độ phân giải và cả ngôn ngữ gồm có tiếng việt và tiếng anh. sau đó hãy tạo ra một bức ảnh về phần menu để cho tôi xem trước. nếu tôi đồng ý thì mới bắt đầu lên kế hoạch code"
+- REQ / nguồn: Project.docx §3.2 (New Game / Load Game / điều khiển âm thanh); yêu cầu 20/10 (cài đặt đồ họa, âm thanh, độ phân giải, ngôn ngữ VI/EN); bảng màu `game/ui/theme.js`.
+- **Bước con 1 (xong):** tạo `docs/PROJECT_PLAN.md` [ĐỀ XUẤT — chờ duyệt]: hiện trạng, lộ trình A–F (A = Menu & Cài đặt, B = tích hợp Chương 1 WP-C1…C10, C = lưu server + Load Game, D = Admin, E = E2E + bảo vệ giai đoạn 1, F = Capstone 2/3), đặc tả Menu/Cài đặt, ảnh hưởng, rủi ro, đề xuất, câu hỏi Q-M1…Q-M5, các bước M1…M4.
+- **Bước con 2 (xong):** ảnh xem trước = artifact Design "Menu The Unspoken" (2 artboard 1280×720, bấm được): Menu chính (Ván mới / Tiếp tục điều tra / Cài đặt, nút tắt tiếng, cảnh hành lang mưa + cửa 204 — ảnh nền là hình minh họa tạm dựng bằng CSS) và Cài đặt (3 tab Hiển thị / Âm thanh / Trò chơi; chọn English đổi nhãn giao diện ngay). Nhãn tiếng Anh chỉ là giao diện; KHÔNG dịch lời thoại. Không có tiết lộ cốt truyện.
+- **File đã tạo/sửa:** `docs/PROJECT_PLAN.md` (mới), `PROGRESS_LOG.md` (mục này + ĐIỂM KHÔI PHỤC). Không sửa code, API, CSDL, cốt truyện.
+- **Self-Check:** đặc tả trong bản thiết kế khớp PROJECT_PLAN §3.3; phần [ĐỀ XUẤT] (bố cục, phông, mặc định) chờ duyệt; số phiên bản để `[phiên bản]` (chưa có nguồn). Trạng thái: chờ duyệt ảnh + Q-M1…Q-M5.
+
+### T-020 — Thực thi Menu chính & Cài đặt (DEC-012)
+- Ngày giao: 20/10/2026 14:00 — người dùng: "tôi chốt thiết kế hiện tại, về phần tùy chĩnh setting về display, vì là game trên web nên tôi nghĩ nó không cần thiết hãy bỏ phần đó đi và giữ nguyên các phần còn lại, chốt phướng án và thực thi"
+- **Bước con 1 (xong):** `docs/PROJECT_PLAN.md` — mục 3 đánh dấu ĐÃ CHỐT (DEC-012), bỏ tab Hiển thị, trạng thái Q-M1…Q-M5, kế hoạch code 3.9 (file mới/sửa, rủi ro, thứ tự). Bản thiết kế "Menu The Unspoken" cập nhật: màn Cài đặt còn 2 tab.
+- **Bước con 2 (xong):** logic thuần + test — `game/systems/settings.js`, `i18n.js`, `menuNavigation.js`, `game/core/settingsStore.js`, `game/data/uiText.js` (VI/EN) + 4 file test.
+- **Bước con 3 (xong):** giao diện — `MainMenuScene` làm lại, `SettingsScene` mới (2 tab), `ui/{MenuItem, IconButton, PanelButton, SegmentedControl, Slider, Toggle, ConfirmDialog, MenuBackdrop}.js`; áp dụng thiết lập vào `DialogueBox`/`DialogueScene` (tốc độ chữ, cỡ chữ, tự chuyển thoại) và âm thanh (`game/index.js`); i18n Preload/Room/Notebook/BadEnding/CredibilityBar; `useGameBridge` gửi `save:availability`; font JetBrains Mono (rút gọn 29 KB, OFL) + `@font-face` 3 font + README cách thêm 2 font còn thiếu.
+- **Bước con 4 (xong):** tài liệu — ARCHITECTURE (cây thư mục, sửa dòng `features/game` sót từ T-017, luồng thiết lập), CLAUDE.md, PROJECT_MEMORY (DEC-012, REQ-020).
+- **File đã tạo/sửa (đã ghi lên máy, 43 file):** xem `docs/PROJECT_PLAN.md` mục 3.9; thêm `game/ui/CredibilityBar.js` (nhãn uy tín theo ngôn ngữ).
+- **Self-Check (thật sự đã chạy):** 11 file test / 63 ca qua (bộ chạy thay thế giả lập describe/it/expect — KHÔNG phải Vitest); ESLint 10 với bộ luật tối thiểu: 0 lỗi; Prettier 3.8.1 `--check src`: đạt; chạy game thật (Phaser 4.2.1 lấy từ node_modules trên máy) trong Chromium không giao diện: menu, hộp xác nhận Ván mới, Cài đặt 2 tab, đổi English + Lưu + tải lại trang (giữ English), thanh trượt nghe thử 0.4 rồi Esc trả 0.8, nút loa (mute + lưu), ↑ ↓ bỏ qua mục khóa, hội thoại cỡ 26 px / hiện ngay / tự chuyển sang màn điều tra, HUD + Sổ tay tiếng Anh — đều đúng. **Chưa chạy:** `npm run check` (Vitest, ESLint đầy đủ, Vite build) và trang React `/play` thật (dev server trên máy không mở được từ trình duyệt của AI). Trạng thái: chờ người dùng kiểm tra.

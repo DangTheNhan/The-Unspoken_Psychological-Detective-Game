@@ -1,0 +1,121 @@
+/**
+ * Chuỗi GIAO DIỆN của game (menu, cài đặt, HUD, thông báo) — DEC-012: tiếng Việt + English.
+ * Chỉ giao diện: lời thoại / nội dung cốt truyện KHÔNG nằm ở đây và chưa có bản tiếng Anh.
+ * Thêm chuỗi: thêm CÙNG một khóa vào cả `vi` và `en` (test systems/i18n.test.js bắt lỗi thiếu khóa).
+ * Tham số dạng {ten} được thay khi gọi translate(lang, key, { ten }).
+ */
+export const UI_TEXT = Object.freeze({
+  vi: Object.freeze({
+    'menu.kicker': 'HỒ SƠ VỤ ÁN  ·  21:35  ·  ĐÊM MƯA',
+    'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
+    'menu.newGame': 'Ván mới',
+    'menu.continue': 'Tiếp tục điều tra',
+    'menu.settings': 'Cài đặt',
+    'menu.noSave': 'Chưa có bản lưu',
+    'menu.chapter': 'Chương 1 — Án mạng trong phòng trọ',
+    'menu.keys': '↑ ↓ chọn  ·  Enter xác nhận',
+    'menu.backdropNote': 'ẢNH NỀN MINH HỌA TẠM — CHỜ ART CHÍNH THỨC',
+
+    'confirm.newGame.title': 'Bắt đầu ván mới?',
+    'confirm.newGame.body':
+      'Trình duyệt đang giữ một bản lưu. Ván mới sẽ ghi đè bản lưu đó ở lần lưu kế tiếp.',
+    'confirm.newGame.ok': 'Bắt đầu',
+    'confirm.cancel': 'Hủy',
+
+    'settings.title': 'Cài đặt',
+    'settings.kicker': 'TÙY CHỈNH',
+    'settings.close': 'Đóng',
+    'settings.tab.audio': 'Âm thanh',
+    'settings.tab.game': 'Trò chơi',
+    'settings.reset': 'Khôi phục mặc định',
+    'settings.save': 'Lưu',
+    'settings.escHint': 'Esc — đóng không lưu',
+    'settings.on': 'Bật',
+    'settings.off': 'Tắt',
+    'settings.masterVolume': 'Âm lượng tổng',
+    'settings.musicVolume': 'Nhạc nền',
+    'settings.sfxVolume': 'Hiệu ứng',
+    'settings.muteAll': 'Tắt toàn bộ âm thanh',
+    'settings.language': 'Ngôn ngữ',
+    'settings.language.hint': 'Áp dụng cho menu và giao diện',
+    'settings.textSpeed': 'Tốc độ chữ',
+    'settings.textSpeed.slow': 'Chậm',
+    'settings.textSpeed.normal': 'Vừa',
+    'settings.textSpeed.fast': 'Nhanh',
+    'settings.textSpeed.instant': 'Hiện ngay',
+    'settings.autoAdvance': 'Tự động chuyển thoại',
+    'settings.autoAdvance.hint': 'Tự sang câu tiếp khi chữ đã hiện hết',
+    'settings.dialogueTextSize': 'Cỡ chữ hội thoại',
+    'settings.dialogueTextSize.medium': 'Vừa',
+    'settings.dialogueTextSize.large': 'Lớn',
+
+    'preload.loading': 'Đang tải… {percent}%',
+    'dialogue.systemSpeaker': 'Hệ thống',
+    'dialogue.missing':
+      'Chương {chapter}: chưa có lời thoại (chờ dữ liệu kịch bản). Bấm để tiếp tục.',
+    'room.placeholder': 'Chương {chapter} — chờ dữ liệu hiện trường',
+    'room.hint': 'N: Sổ tay   S: Lưu',
+    'hud.credibility': 'Uy tín: {value}',
+    'notebook.empty': '(Chưa có mục nào)',
+    'notebook.close': 'N / Esc: đóng',
+    'badEnding.reload': 'Tải lại checkpoint gần nhất',
+  }),
+  en: Object.freeze({
+    'menu.kicker': 'CASE FILE  ·  21:35  ·  RAINY NIGHT',
+    'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
+    'menu.newGame': 'New Game',
+    'menu.continue': 'Continue Investigation',
+    'menu.settings': 'Settings',
+    'menu.noSave': 'No save found',
+    'menu.chapter': 'Chapter 1 — Murder in the Boarding House',
+    'menu.keys': '↑ ↓ select  ·  Enter confirm',
+    'menu.backdropNote': 'PLACEHOLDER BACKGROUND — AWAITING FINAL ART',
+
+    'confirm.newGame.title': 'Start a new game?',
+    'confirm.newGame.body':
+      'This browser holds a saved game. A new game will overwrite it the next time it saves.',
+    'confirm.newGame.ok': 'Start',
+    'confirm.cancel': 'Cancel',
+
+    'settings.title': 'Settings',
+    'settings.kicker': 'OPTIONS',
+    'settings.close': 'Close',
+    'settings.tab.audio': 'Audio',
+    'settings.tab.game': 'Game',
+    'settings.reset': 'Restore defaults',
+    'settings.save': 'Save',
+    'settings.escHint': 'Esc — close without saving',
+    'settings.on': 'On',
+    'settings.off': 'Off',
+    'settings.masterVolume': 'Master volume',
+    'settings.musicVolume': 'Music',
+    'settings.sfxVolume': 'Sound effects',
+    'settings.muteAll': 'Mute all sound',
+    'settings.language': 'Language',
+    'settings.language.hint': 'Applies to menus and interface',
+    'settings.textSpeed': 'Text speed',
+    'settings.textSpeed.slow': 'Slow',
+    'settings.textSpeed.normal': 'Normal',
+    'settings.textSpeed.fast': 'Fast',
+    'settings.textSpeed.instant': 'Instant',
+    'settings.autoAdvance': 'Auto-advance dialogue',
+    'settings.autoAdvance.hint': 'Moves on once the line is fully shown',
+    'settings.dialogueTextSize': 'Dialogue text size',
+    'settings.dialogueTextSize.medium': 'Medium',
+    'settings.dialogueTextSize.large': 'Large',
+
+    'preload.loading': 'Loading… {percent}%',
+    'dialogue.systemSpeaker': 'System',
+    'dialogue.missing':
+      'Chapter {chapter}: no dialogue yet (awaiting script data). Click to continue.',
+    'room.placeholder': 'Chapter {chapter} — awaiting crime scene data',
+    'room.hint': 'N: Notebook   S: Save',
+    'hud.credibility': 'Credibility: {value}',
+    'notebook.empty': '(No entries yet)',
+    'notebook.close': 'N / Esc: close',
+    'badEnding.reload': 'Reload last checkpoint',
+  }),
+})
+
+/** Tên ngôn ngữ luôn viết bằng chính ngôn ngữ đó (không dịch) — dùng trong nút chọn ngôn ngữ. */
+export const LANGUAGE_NAMES = Object.freeze({ vi: 'Tiếng Việt', en: 'English' })

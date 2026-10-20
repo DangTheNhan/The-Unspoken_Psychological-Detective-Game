@@ -2,13 +2,15 @@ import Phaser from 'phaser'
 import { env } from '@/config/env'
 import { createLogger } from '@/shared/logger/logger'
 import { createGameConfig } from './config/gameConfig'
+import { GAME_EVENTS } from './constants/gameEvents'
 import { EventBus } from './core/EventBus'
 import { createRuntime, registerRuntime } from './core/runtime'
+import { toSoundManagerState } from './systems/settings'
 
 const log = createLogger('Game')
 
 /**
- * Điểm vào DUY NHẤT để tạo game — React gọi hàm này (features/game/components/PhaserGame.jsx).
+ * Điểm vào DUY NHẤT để tạo game — React gọi hàm này (features/play/components/PhaserGame.jsx).
  * @param {HTMLElement} parent phần tử DOM chứa canvas
  * @returns {Phaser.Game}
  */
@@ -17,7 +19,13 @@ export function createGame(parent) {
   const runtime = createRuntime()
   registerRuntime(game, runtime)
 
+  // Thiết lập âm lượng (DEC-012): áp dụng ngay khi tạo game và mỗi lần người chơi bấm Lưu
+  const applySound = (settings) => Object.assign(game.sound, toSoundManagerState(settings))
+  applySound(runtime.settings.get())
+  EventBus.on(GAME_EVENTS.SETTINGS_CHANGED, applySound)
+
   game.events.once(Phaser.Core.Events.DESTROY, () => {
+    EventBus.off(GAME_EVENTS.SETTINGS_CHANGED, applySound)
     runtime.destroy()
     if (globalThis.__THE_UNSPOKEN__?.game === game) delete globalThis.__THE_UNSPOKEN__
   })
