@@ -9,14 +9,14 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 09/10/2026 — sau T-010 (Claude Code) |
+| Cập nhật lần cuối | 09/10/2026 — sau T-011 (Claude Code) |
 | Tác vụ đang làm | Không |
-| Đã xong gần nhất | **T-009**: áp dụng tái cấu trúc T-002 (B6). **T-010**: sửa `.gitattributes` (CRLF cho .ps1/.cmd/.bat), xóa `PROGRESS_LOG-1.md` + 3 PNG thừa, commit T-009+T-010 lên nhánh `Nhan` (chưa push) |
-| Trạng thái dở dang | Chưa tạo CSDL MySQL (máy chưa có MySQL) → chưa chạy `spring-boot:run` / ddl-auto=validate / thử end-to-end (README Bước 5–7) |
-| Việc tiếp theo | (1) Người dùng cài MySQL Server (tự đặt mật khẩu root) → báo lại → AI chạy README Bước 5–7; (2) push nhánh `Nhan` + mở PR vào `master` khi người dùng yêu cầu; (3) WP-02/03 (API Contract + định dạng JSON hội thoại — chốt ISS-07) |
+| Đã xong gần nhất | **T-009**: áp dụng tái cấu trúc T-002 (B6). **T-010**: sửa `.gitattributes` (CRLF cho .ps1/.cmd/.bat), xóa `PROGRESS_LOG-1.md` + 3 PNG thừa, commit T-009+T-010 lên nhánh `Nhan` (chưa push). **T-011**: MySQL + `schema.sql` (4 bảng), backend chạy (validate OK), thử end-to-end đạt toàn bộ README Bước 7 |
+| Trạng thái dở dang | Không. Log T-011 chưa commit. Backend (8080) + Vite (5173) có thể còn chạy nền trong phiên Claude Code |
+| Việc tiếp theo | (1) Commit log T-011 + push nhánh `Nhan` + mở PR vào `master` khi người dùng yêu cầu; (2) WP-02/03 (API Contract + định dạng JSON hội thoại — chốt ISS-07); (3) ISS-29 (userId) để save/load lên server |
 | Đang bị chặn bởi | ISS-07 (định dạng JSON + lời thoại Ch1), ISS-29 (login chưa trả `userId` → save chỉ offline), ISS-05, ISS-06, ISS-10 — xem PROJECT_MEMORY mục E |
 | Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `cd backend; mvn clean test` |
-| Ghi chú cho phiên sau | Làm việc bằng Claude Code (có shell) → ghi Java trực tiếp vào package; ISS-26 đã đóng. Lỗi push nhầm `master`: người dùng xác nhận **đã sửa** (09/10). Máy: Java 21, Maven 3.10.0, chưa có MySQL |
+| Ghi chú cho phiên sau | Làm việc bằng Claude Code (có shell) → ghi Java trực tiếp vào package; ISS-26 đã đóng. Lỗi push nhầm `master`: người dùng xác nhận **đã sửa** (09/10). Máy: Java 21, Maven 3.10.0, MySQL Server 8.0.46 (service `MySQL80`, `mysql.exe` không có trong PATH → `C:\Program Files\MySQL\MySQL Server 8.0in\mysql.exe`); `DB_PASSWORD` đã đặt ở biến môi trường cấp User |
 
 ---
 
@@ -207,3 +207,15 @@
 - **Bước con:** B1 sửa `.gitattributes` → `git check-attr` cho `.ps1` = `eol: crlf` → B2 `git rm` 4 file → B3 `npm run check` lại: 30/30, build OK, exit 0 → B4 cập nhật log → B5 commit (chưa push).
 - **Chưa làm:** cài MySQL — cần người dùng tự cài và đặt mật khẩu root (AI không tự đặt/nhập mật khẩu cho tài khoản quản trị CSDL); push/PR — chưa được yêu cầu.
 - **Self-Check:** không đổi đặc tả, code, API, schema. Trạng thái: xong.
+
+### T-011 — Tạo CSDL MySQL, chạy backend, thử end-to-end (README Bước 5–7)
+- Ngày giao: 09/10/2026 — người dùng: "tôi đã cài đặt my sql rồi bây giờ bạn cần gì" → cung cấp mật khẩu root
+- **Kế hoạch:** mục đích — hoàn tất kiểm thử thật còn thiếu của T-002/T-009; ảnh hưởng — tạo database `detective_game` trên MySQL cục bộ, đặt biến môi trường `DB_PASSWORD` (User), không sửa file mã nguồn; rủi ro — README dùng `DROP DATABASE` (đã kiểm tra: DB chưa tồn tại → chỉ `CREATE`); mật khẩu root đã xuất hiện trong chat → khuyên người dùng không dùng lại cho dịch vụ khác, không ghi vào repo.
+- **Bước con & kiểm tra:**
+  - B1 kết nối MySQL 8.0.46: OK; `detective_game` chưa có → `CREATE DATABASE` + chạy `db/schema.sql` → 4 bảng `bug_reports, evidence_master, game_saves, users`.
+  - B2 `mvn spring-boot:run`: `Tomcat started on port 8080`, `ddl-auto=validate` qua (entity khớp schema), log không có WARN/ERROR.
+  - B3 `npm run dev` (Vite 8.3.3) + trình duyệt tích hợp: Đăng ký (tài khoản test `e2e_tester01`, mật khẩu lưu ở scratchpad phiên, không ghi vào repo) → tự sang Đăng nhập → Đăng nhập → `/play` menu Phaser → New Game → hội thoại (câu hệ thống "chưa có lời thoại", đúng ISS-07) → InvestigationScene, Uy tín 100 → N: Sổ tay 4 tab (Evidence/People/Timeline/Statements) → Esc → S: "Đã lưu tạm trên trình duyệt (offline)" (đúng ISS-29) → F9: chủ trọ nửa thân bên phải nhép miệng, câu người khác → tối đi. Console: 0 lỗi suốt quá trình.
+  - B4 DB: `users` có 1 dòng (`ROLE_PLAYER`, mật khẩu `{bcrypt}`); `game_saves` = 0 (đúng, save đang offline).
+- **Kết quả:** README Bước 5–7 đạt. T-002 hoàn tất toàn bộ phần kiểm thử.
+- **Điểm cần xác nhận:** commit/push/PR; tài khoản test `e2e_tester01` trong DB cục bộ có thể giữ để thử tiếp hoặc xóa.
+- **Self-Check:** không sửa code, API, schema; kết quả ghi đúng phạm vi đã chạy. Trạng thái: xong.
