@@ -36,3 +36,21 @@ export const DIALOGUE_FONT_SIZES = Object.freeze({ medium: 22, large: 26 })
 
 /** Chương mở đầu khi New Game (Capstone 1 = Chương 1, §6.1). */
 export const FIRST_CHAPTER = 1
+
+/**
+ * TẠM — di chuyển trong phòng 2.5D (DEC-013). Tài liệu chưa quy định; chỉnh khi chơi thử.
+ * WALK_SPEED: px/giây ở mốc gần camera; ở xa nhân dần theo phối cảnh (systems/depthScale.js).
+ */
+export const ROOM_MOVEMENT = Object.freeze({
+  WALK_SPEED: 300,
+  WALK_ANIM_FPS: 10,
+  /** Biên độ nhún (px, ở mốc gần) khi đi dọc — tạm thay chu kỳ đi lên/xuống còn thiếu (Q-R5). */
+  BOB_HEIGHT: 6,
+  BOB_PERIOD_MS: 320,
+  /** Khoảng cách (px) từ chân tới điểm đứng của đồ vật để hiện nút E. */
+  INTERACT_RADIUS: 70,
+  /** Tới gần điểm đích của đường đi bao nhiêu thì coi là đã tới. */
+  ARRIVE_EPSILON: 3,
+  /** Bước 1 tutorial: chạm vòng sáng trong bán kính này. */
+  MARKER_RADIUS: 40,
+})

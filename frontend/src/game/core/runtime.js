@@ -26,9 +26,11 @@ export function createRuntime() {
   }
   EventBus.on(GAME_EVENTS.SAVE_AVAILABILITY, onSaveAvailability)
 
+  /** @returns {boolean} true nếu đã gửi yêu cầu lưu (false khi chưa vào ván chơi). */
   const requestSave = (reason) => {
-    if (!started) return // chưa vào ván chơi (đang ở MainMenu) -> không lưu
+    if (!started) return false // chưa vào ván chơi (đang ở MainMenu) -> không lưu
     EventBus.emit(GAME_EVENTS.SAVE_REQUESTED, { reason, snapshot: session.toSaveSnapshot() })
+    return true
   }
 
   const autosave = createAutosaveScheduler({ onSave: requestSave })
@@ -52,9 +54,9 @@ export function createRuntime() {
       started = true
       autosave.start()
     },
-    /** §5.2: lưu thủ công bất kỳ lúc nào. */
+    /** §5.2: lưu thủ công bất kỳ lúc nào — nút "Lưu tiến trình" trong Sổ tay (DEC-013 Q-R6). */
     saveNow() {
-      requestSave(AUTOSAVE.REASONS.MANUAL)
+      return requestSave(AUTOSAVE.REASONS.MANUAL)
     },
     /** §5.2: sự kiện quan trọng (tìm được bằng chứng) -> lưu ngay. */
     collectEvidence(entry) {

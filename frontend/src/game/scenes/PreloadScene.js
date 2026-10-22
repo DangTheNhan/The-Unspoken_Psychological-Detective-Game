@@ -4,6 +4,8 @@ import { FIRST_CHAPTER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { loadUiFonts } from '../core/fonts'
 import { getRuntime } from '../core/runtime'
+import { ROOMS } from '../data/rooms'
+import { DETECTIVE_ATLAS } from '../entities/Player'
 import { loadCharacterAssets, registerCharacterAnimations } from '../data/characters'
 import { dialogueCacheKey, dialogueUrl } from '../data/dialogueData'
 import { TEXT_STYLES } from '../ui/theme'
@@ -35,6 +37,13 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.json(dialogueCacheKey(FIRST_CHAPTER), dialogueUrl(FIRST_CHAPTER))
     loadCharacterAssets(this.load)
+
+    // Phòng 2.5D + nhân vật thám tử đi lại (DEC-013)
+    for (const room of Object.values(ROOMS)) {
+      this.load.image(room.background.key, room.background.url)
+      for (const occluder of room.occluders) this.load.image(occluder.key, occluder.url)
+    }
+    this.load.atlas(DETECTIVE_ATLAS.key, DETECTIVE_ATLAS.textureUrl, DETECTIVE_ATLAS.atlasUrl)
   }
 
   create() {

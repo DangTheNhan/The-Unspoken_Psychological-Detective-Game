@@ -1,13 +1,18 @@
 import Phaser from 'phaser'
+import { GAME_EVENTS } from '../constants/gameEvents'
 import { SCENE_KEYS } from '../constants/sceneKeys'
+import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
 import { NOTEBOOK_TABS } from '../systems/notebook'
+import { PanelButton } from '../ui/PanelButton'
 import { TextButton } from '../ui/TextButton'
-import { COLORS, DEPTH, TEXT_STYLES } from '../ui/theme'
+import { COLORS, DEPTH, TEXT_STYLES, menuTextStyle } from '../ui/theme'
 
 /**
  * Sổ tay điều tra 4 tab — Project.docx §3.2 (Evidence, People, Timeline, Statements).
  * Chạy chồng lên scene điều tra (launch + pause). N hoặc Esc để đóng.
+ * Lưu tiến trình nằm ở đây (DEC-013 Q-R6: lưu game thiết kế trong Sổ tay, bỏ phím tắt S):
+ * bấm "Lưu tiến trình" -> runtime.saveNow() -> React lưu -> báo lại qua SAVE_RESULT.
  * data: { returnTo: string } — key scene cần resume khi đóng.
  */
 export class NotebookScene extends Phaser.Scene {
@@ -41,9 +46,44 @@ export class NotebookScene extends Phaser.Scene {
       .setOrigin(1, 0)
       .setDepth(DEPTH.OVERLAY)
 
+    this.createSaveControls()
     this.input.keyboard?.on('keydown-N', () => this.close())
     this.input.keyboard?.on('keydown-ESC', () => this.close())
     this.selectTab(this.activeTab)
+  }
+
+  createSaveControls() {
+    const { height } = this.scale
+    const runtime = getRuntime(this)
+    const saveButton = new PanelButton(this, {
+      x: 80,
+      y: height - 112,
+      label: runtime.t('notebook.save'),
+      variant: 'primary',
+      onClick: () => {
+        const sent = runtime.saveNow()
+        this.saveStatus.setText(
+          sent ? runtime.t('notebook.saving') : runtime.t('notebook.saveFailed', { message: '—' }),
+        )
+      },
+    }).setDepth(DEPTH.OVERLAY)
+    this.saveStatus = this.add
+      .text(saveButton.x + saveButton.width + 16, height - 90, '', menuTextStyle({ size: 14 }))
+      .setColor(COLORS.mutedHex)
+      .setOrigin(0, 0.5)
+      .setDepth(DEPTH.OVERLAY)
+
+    const onResult = ({ ok, remote, message } = {}) => {
+      if (!this.saveStatus?.active) return
+      const text = !ok
+        ? runtime.t('notebook.saveFailed', { message: message ?? '' })
+        : runtime.t(remote ? 'notebook.savedRemote' : 'notebook.savedLocal')
+      this.saveStatus.setText(text)
+    }
+    EventBus.on(GAME_EVENTS.SAVE_RESULT, onResult)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
+      EventBus.off(GAME_EVENTS.SAVE_RESULT, onResult),
+    )
   }
 
   selectTab(tabId) {

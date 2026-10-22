@@ -4,6 +4,7 @@ import { FIRST_CHAPTER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
+import { FIRST_ROOM_ID } from '../data/rooms'
 import { ensureValidSelection, stepSelection } from '../systems/menuNavigation'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
 import { IconButton } from '../ui/IconButton'
@@ -207,8 +208,15 @@ export class MainMenuScene extends Phaser.Scene {
     this.muteButton.setIcon(this.runtime.settings.get().muteAll ? 'speakerMuted' : 'speaker')
   }
 
+  /**
+   * Ván mới -> [Intro: người dùng bổ sung sau] -> phòng 201 có tutorial (DEC-013).
+   * PENDING: chèn cảnh intro trước phòng 201 khi có nội dung.
+   */
   startNewGame() {
     this.runtime.startNewGame()
-    this.scene.start(SCENE_KEYS.DIALOGUE, { chapter: FIRST_CHAPTER })
+    this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
+      chapter: FIRST_CHAPTER,
+      roomId: FIRST_ROOM_ID,
+    })
   }
 }

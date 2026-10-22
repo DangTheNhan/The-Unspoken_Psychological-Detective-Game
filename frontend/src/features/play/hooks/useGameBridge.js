@@ -26,6 +26,8 @@ export function useGameBridge({ userId = null } = {}) {
       try {
         const result = await persistProgress(snapshot, { userId, reason })
         announceSaveAvailability()
+        // Báo kết quả cho Sổ tay trong game (DEC-013: nút Lưu nằm trong Sổ tay)
+        EventBus.emit(GAME_EVENTS.SAVE_RESULT, { ok: true, remote: result.remote })
         setStatusMessage(
           result.remote
             ? 'Đã lưu tiến trình lên máy chủ.'
@@ -33,6 +35,7 @@ export function useGameBridge({ userId = null } = {}) {
         )
       } catch (error) {
         log.error('Lưu thất bại', error)
+        EventBus.emit(GAME_EVENTS.SAVE_RESULT, { ok: false, remote: false, message: error.message })
         setStatusMessage(`Lưu thất bại: ${error.message}`)
       }
     }

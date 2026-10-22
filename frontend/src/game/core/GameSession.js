@@ -1,6 +1,7 @@
 import { CREDIBILITY, FIRST_CHAPTER } from '../constants/gameplay'
 import { applyPenalty, isDepleted } from '../systems/credibility'
 import { addEntry, createEmptyNotebook } from '../systems/notebook'
+import { normalizeTutorialState } from '../systems/tutorial'
 
 /**
  * Trạng thái một lượt chơi — nguồn sự thật duy nhất cho chapter / uy tín / sổ tay.
@@ -12,10 +13,13 @@ export class GameSession {
     chapter = FIRST_CHAPTER,
     credibility = CREDIBILITY.START,
     notebook = createEmptyNotebook(),
+    tutorial = undefined,
   } = {}) {
     this.chapter = chapter
     this.credibility = credibility
     this.notebook = notebook
+    // Tutorial phòng 201 (DEC-013): một phần file lưu bình thường (Q-R9)
+    this.tutorial = normalizeTutorialState(tutorial)
   }
 
   /** §3.3: trừ uy tín; trả về { value, depleted } để scene quyết định chuyển Bad Ending. */
@@ -41,7 +45,7 @@ export class GameSession {
     return {
       currentChapter: this.chapter,
       credibilityScore: this.credibility,
-      saveDataJson: JSON.stringify({ notebook: this.notebook }),
+      saveDataJson: JSON.stringify({ notebook: this.notebook, tutorial: this.tutorial }),
     }
   }
 
@@ -51,6 +55,7 @@ export class GameSession {
       chapter: currentChapter,
       credibility: credibilityScore,
       notebook: data.notebook ?? createEmptyNotebook(),
+      tutorial: data.tutorial,
     })
   }
 }

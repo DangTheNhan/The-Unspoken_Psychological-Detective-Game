@@ -26,4 +26,12 @@ describe('GameSession', () => {
     const restored = GameSession.fromSaveSnapshot(original.toSaveSnapshot())
     expect(restored.toSaveSnapshot()).toEqual(original.toSaveSnapshot())
   })
+
+  it('trạng thái tutorial nằm trong file lưu và đọc lại được (DEC-013)', () => {
+    const session = new GameSession()
+    expect(session.tutorial.step).toBe('move')
+    session.tutorial = { step: 'notebook', status: 'active' }
+    const restored = GameSession.fromSaveSnapshot(session.toSaveSnapshot())
+    expect(restored.tutorial).toEqual({ step: 'notebook', status: 'active' })
+  })
 })

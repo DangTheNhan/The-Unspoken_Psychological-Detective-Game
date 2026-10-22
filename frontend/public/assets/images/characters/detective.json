@@ -1,0 +1,214 @@
+{
+ "frames": {
+  "walk-side-0": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "walk-side-1": {
+   "frame": {
+    "x": 264,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "walk-side-2": {
+   "frame": {
+    "x": 528,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "walk-side-3": {
+   "frame": {
+    "x": 792,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "walk-side-4": {
+   "frame": {
+    "x": 1056,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "walk-side-5": {
+   "frame": {
+    "x": 0,
+    "y": 604,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "idle-front": {
+   "frame": {
+    "x": 264,
+    "y": 604,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "idle-left": {
+   "frame": {
+    "x": 528,
+    "y": 604,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "idle-right": {
+   "frame": {
+    "x": 792,
+    "y": 604,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  },
+  "idle-back": {
+   "frame": {
+    "x": 1056,
+    "y": 604,
+    "w": 264,
+    "h": 604
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 264,
+    "h": 604
+   },
+   "sourceSize": {
+    "w": 264,
+    "h": 604
+   }
+  }
+ },
+ "meta": {
+  "app": "The Unspoken — scripts/art/build_room201_assets.py",
+  "image": "detective.webp",
+  "size": {
+   "w": 1320,
+   "h": 1208
+  },
+  "scale": "1",
+  "note": "Gốc ở giữa-đáy ô (setOrigin(0.5,1)). walk-side-* nhìn sang TRÁI; đi sang phải = flipX (tấm đi phải gửi kèm là ảnh lật gương của tấm đi trái)."
+ }
+}
