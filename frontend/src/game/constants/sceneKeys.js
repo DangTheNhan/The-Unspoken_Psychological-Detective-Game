@@ -6,6 +6,7 @@ export const SCENE_KEYS = Object.freeze({
   BOOT: 'BootScene',
   PRELOAD: 'PreloadScene',
   MAIN_MENU: 'MainMenuScene', // §3.2
+  SETTINGS: 'SettingsScene', // DEC-012: lớp phủ Cài đặt mở từ MainMenu (chứa phần âm thanh của §3.2)
   DIALOGUE: 'DialogueScene', // §3.2
   ROOM_INVESTIGATION: 'RoomInvestigationScene', // §3.2
   NOTEBOOK: 'NotebookScene', // §3.2

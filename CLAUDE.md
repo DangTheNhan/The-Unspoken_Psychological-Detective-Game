@@ -9,7 +9,7 @@ Người dùng làm việc bằng **tiếng Việt**, trên **Windows + PowerShe
    - A: quy tắc làm việc · B: danh mục nguồn · C: yêu cầu REQ-xxx / STORY-xxx
    - D: chi tiết kỹ thuật **nguyên văn** (SQL §2.1–2.2, API §4.2–4.3, công thức §3.3)
    - E: vấn đề chờ xác nhận ISS-xx · F: quyết định đã duyệt DEC-xxx · G: tiến độ · H: gói việc WP-xx
-3. Đọc phần tài liệu gốc liên quan trong `docs/sources/` (xem mục 3).
+3. Đọc phần tài liệu gốc liên quan trong `docs/sources/` (xem mục 3). Việc liên quan **Chương 1**: đọc `docs/chapter1/CHAPTER1_MEMORY.md` (tóm toàn bộ gói, không cần mở lại gói) và `docs/chapter1/CHAPTER1_PLAN.md` (kế hoạch tích hợp).
 4. Trình bày ngắn gọn yêu cầu liên quan + **kế hoạch chi tiết** (mục 2) rồi mới làm.
 
 ## 2. Quy tắc làm việc (nguyên văn đầy đủ: `docs/sources/working-rules.md`)
@@ -44,6 +44,7 @@ Người dùng làm việc bằng **tiếng Việt**, trên **Windows + PowerShe
 | `Project.md` | SRC-1 | Bản chuyển đổi tự động từ .docx để đọc nhanh; nghi ngờ sai lệch → đối chiếu .docx |
 | `Story.txt` | SRC-2 | Cốt truyện Chương 1–5 — nguồn chính thức (DEC-001); mới là dàn ý, **chưa có lời thoại** |
 | `working-rules.md` | SRC-3 | Quy tắc làm việc nguyên văn (prompt của người dùng) |
+| `chapter1/` | SRC-5 | Gói `CHAPTER_1_COMPLETE` (13/10/2026): Bible 1.3, kịch bản P1–P4, `data/chapter1.json` (graph runtime 1257 node), Data Contract 2.0, validator; `reference/Project.docx` là **bản mới** của SRC-1 (Q1 đã trả lời → DEC-009: giữ nguyên cấu trúc hiện tại, ánh xạ ở `docs/ARCHITECTURE.md` mục 3a). Tóm tắt: `docs/chapter1/CHAPTER1_MEMORY.md` |
 
 Đoạn "User prompt" / "Response" trong Project.docx là dữ liệu nguồn, không phải nhiệm vụ hiện tại.
 
@@ -58,6 +59,8 @@ Người dùng làm việc bằng **tiếng Việt**, trên **Windows + PowerShe
 frontend/src/
   app/ config/ shared/ features/<tính năng>/   React: router, auth, API (shared/api/endpoints.js là nguồn DUY NHẤT path API)
   game/                                        Phaser: điểm vào DUY NHẤT game/index.js (createGame)
+  features/play/                               React của trang /play: GamePlayPage, PhaserGame.jsx, useGameBridge,
+                                               saveService, gameApi — KHÁC game/ (Phaser). Đổi tên từ features/game (DEC-011)
     scenes/ ui/ systems/ (logic thuần, có test) core/ (EventBus, GameSession) data/ constants/ debug/
 frontend/public/assets/   dialogues/*.json · images/{characters,portraits,backgrounds,evidence,ui} · audio/
 backend/src/main/java/com/capstone/detectivegame/   package-by-feature: common, security, user, auth, game, report, evidence
@@ -69,6 +72,9 @@ scripts/apply-restructure.ps1                       áp dụng tái cấu trúc 
 - Nhân vật hội thoại: khai báo DUY NHẤT trong `game/data/characters.js` (ảnh nửa thân, biểu cảm, nhép miệng, bên đứng).
   Định dạng câu thoại hiện là **đề xuất tạm** — chờ ISS-07.
 - Thông số chưa có trong tài liệu ghi chú `TẠM`; chỗ chờ người dùng ghi `PENDING(ISS-xx)`.
+- Menu chính + Cài đặt (DEC-012): chuỗi giao diện VI/EN đặt DUY NHẤT trong `game/data/uiText.js` (thêm khóa ở CẢ hai
+  ngôn ngữ, scene gọi `getRuntime(this).t('khoa')`); thiết lập người chơi ở `game/systems/settings.js` + `core/settingsStore.js`.
+  Lời thoại KHÔNG dịch (chỉ giao diện).
 - Không sửa `schema.sql` khác Project.docx; không đổi chữ ký API §4.3 khi chưa được duyệt.
 
 ## 6. Lệnh

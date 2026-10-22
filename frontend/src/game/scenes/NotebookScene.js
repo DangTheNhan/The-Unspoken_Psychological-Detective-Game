@@ -37,7 +37,7 @@ export class NotebookScene extends Phaser.Scene {
       .text(80, 150, '', { ...TEXT_STYLES.body, wordWrap: { width: width - 160 } })
       .setDepth(DEPTH.OVERLAY)
     this.add
-      .text(width - 80, height - 70, 'N / Esc: đóng', TEXT_STYLES.small)
+      .text(width - 80, height - 70, getRuntime(this).t('notebook.close'), TEXT_STYLES.small)
       .setOrigin(1, 0)
       .setDepth(DEPTH.OVERLAY)
 
@@ -51,11 +51,12 @@ export class NotebookScene extends Phaser.Scene {
     NOTEBOOK_TABS.forEach((tab, index) =>
       this.tabButtons[index].setAlpha(tab.id === tabId ? 1 : 0.5),
     )
-    const entries = getRuntime(this).session.notebook[tabId]
+    const runtime = getRuntime(this)
+    const entries = runtime.session.notebook[tabId]
     // PENDING(ISS-06): cách hiển thị chi tiết từng loại entry
     this.content.setText(
       entries.length === 0
-        ? '(Chưa có mục nào)'
+        ? runtime.t('notebook.empty')
         : entries.map((entry) => `• ${entry.title ?? entry.id}`).join('\n'),
     )
   }

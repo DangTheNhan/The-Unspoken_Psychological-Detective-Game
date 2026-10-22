@@ -15,4 +15,12 @@ export const GAME_EVENTS = Object.freeze({
   NOTEBOOK_ENTRY_ADDED: 'notebook:entry-added',
   /** React -> Phaser. payload: { message: string } — hiện thông báo ngắn trong game */
   TOAST: 'ui:toast',
+  /**
+   * React -> Phaser. payload: { hasSave: boolean } — trình duyệt đang có bản lưu hay không
+   * (useGameBridge gửi khi mở trang và sau mỗi lần lưu). MainMenu dùng để mờ "Tiếp tục điều tra"
+   * và hỏi xác nhận trước khi bắt đầu ván mới (DEC-012).
+   */
+  SAVE_AVAILABILITY: 'save:availability',
+  /** Phaser nội bộ. payload: settings (systems/settings.js) — sau khi người chơi bấm Lưu ở Cài đặt */
+  SETTINGS_CHANGED: 'settings:changed',
 })

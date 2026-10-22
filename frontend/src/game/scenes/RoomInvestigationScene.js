@@ -32,16 +32,18 @@ export class RoomInvestigationScene extends Phaser.Scene {
       .text(
         width / 2,
         height / 2,
-        `Chương ${this.chapter} — chờ dữ liệu hiện trường`,
+        runtime.t('room.placeholder', { chapter: this.chapter }),
         TEXT_STYLES.heading,
       )
       .setOrigin(0.5)
       .setDepth(DEPTH.BACKGROUND)
 
     // HUD
-    const credibilityBar = new CredibilityBar(this, 24, 20, runtime.session.credibility)
+    const credibilityBar = new CredibilityBar(this, 24, 20, runtime.session.credibility, (value) =>
+      runtime.t('hud.credibility', { value }),
+    )
     this.add
-      .text(width - 24, 20, 'N: Sổ tay   S: Lưu', TEXT_STYLES.small)
+      .text(width - 24, 20, runtime.t('room.hint'), TEXT_STYLES.small)
       .setOrigin(1, 0)
       .setDepth(DEPTH.HUD)
 

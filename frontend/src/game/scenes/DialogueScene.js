@@ -1,7 +1,10 @@
 import Phaser from 'phaser'
 import { createLogger } from '@/shared/logger/logger'
+import { TYPEWRITER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
+import { getRuntime } from '../core/runtime'
 import { dialogueCacheKey, parseDialogueFile } from '../data/dialogueData'
+import { dialogueFontSizePx, textCharDelayMs } from '../systems/settings'
 import { CharacterStage } from '../ui/CharacterStage'
 import { DialogueBox } from '../ui/DialogueBox'
 
@@ -10,6 +13,8 @@ const log = createLogger('DialogueScene')
 /**
  * Visual Novel Engine — Project.docx §3.2.
  * Luồng: bấm chuột / Space / Enter -> (đang chạy chữ ? hiện hết : câu tiếp) -> hết thoại -> điều tra.
+ * Thiết lập (DEC-012, đọc 1 lần khi vào scene): tốc độ chữ, cỡ chữ, tự động chuyển thoại
+ * (câu hiện hết -> chờ TYPEWRITER.AUTO_ADVANCE_DELAY_MS -> câu tiếp; bấm tay thì hủy hẹn giờ).
  * data: { chapter: number, lines?: object[], nextScene?: string }
  *   lines     — (debug) dùng lời thoại truyền vào thay cho file JSON của chương
  *   nextScene — scene chạy khi hết thoại, mặc định RoomInvestigationScene
@@ -34,19 +39,29 @@ export class DialogueScene extends Phaser.Scene {
       this.lines = raw ? parseDialogueFile(raw).lines : []
     }
 
+    const runtime = getRuntime(this)
     if (this.lines.length === 0) {
       log.warn(`Chương ${this.chapter} chưa có lời thoại — PENDING(ISS-07)`)
       this.lines = [
         {
-          speaker: 'Hệ thống',
-          text: `Chương ${this.chapter}: chưa có lời thoại (chờ dữ liệu kịch bản). Bấm để tiếp tục.`,
+          speaker: runtime.t('dialogue.systemSpeaker'),
+          text: runtime.t('dialogue.missing', { chapter: this.chapter }),
         },
       ]
     }
 
+    const settings = runtime.settings.get()
+    this.autoAdvance = settings.autoAdvance
+    this.autoTimer = null
+
     // Thứ tự lớp: nhân vật nửa thân (CharacterStage) nằm sau khung thoại (DialogueBox)
     this.characterStage = new CharacterStage(this)
-    this.box = new DialogueBox(this, { stage: this.characterStage })
+    this.box = new DialogueBox(this, {
+      stage: this.characterStage,
+      charDelayMs: textCharDelayMs(settings),
+      fontSize: dialogueFontSizePx(settings),
+      onLineComplete: () => this.scheduleAutoAdvance(),
+    })
     this.box.showLine(this.lines[0])
 
     this.input.on('pointerup', () => this.advance())
@@ -54,7 +69,18 @@ export class DialogueScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ENTER', () => this.advance())
   }
 
+  scheduleAutoAdvance() {
+    if (!this.autoAdvance) return
+    this.autoTimer?.remove(false)
+    this.autoTimer = this.time.delayedCall(TYPEWRITER.AUTO_ADVANCE_DELAY_MS, () => {
+      this.autoTimer = null
+      this.advance()
+    })
+  }
+
   advance() {
+    this.autoTimer?.remove(false)
+    this.autoTimer = null
     if (this.box.isTyping) {
       this.box.completeTyping()
       return

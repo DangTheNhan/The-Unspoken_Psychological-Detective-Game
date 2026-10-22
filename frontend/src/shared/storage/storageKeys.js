@@ -7,3 +7,6 @@ export const STORAGE_KEYS = Object.freeze({
   // Hybrid Storage (Project.docx §6.3): bản sao lưu trạng thái mới nhất
   LOCAL_SAVE_BACKUP: 'theUnspoken.save.backup.v1',
 })
+
+// Khóa của phần game (Phaser) — khai báo tại game/core/settingsStore.js vì game/ không import shared/storage:
+//   'theUnspoken.settings.v1' — thiết lập người chơi (DEC-012). Không dùng lại tên này ở đây.
