@@ -21,6 +21,11 @@ export const GAME_EVENTS = Object.freeze({
    * và hỏi xác nhận trước khi bắt đầu ván mới (DEC-012).
    */
   SAVE_AVAILABILITY: 'save:availability',
+  /**
+   * React -> Phaser. payload: { ok: boolean, remote: boolean, message?: string } — kết quả một lần lưu
+   * (useGameBridge gửi sau persistProgress). Sổ tay hiện kết quả cho người chơi (DEC-013 Q-R6).
+   */
+  SAVE_RESULT: 'save:result',
   /** Phaser nội bộ. payload: settings (systems/settings.js) — sau khi người chơi bấm Lưu ở Cài đặt */
   SETTINGS_CHANGED: 'settings:changed',
 })

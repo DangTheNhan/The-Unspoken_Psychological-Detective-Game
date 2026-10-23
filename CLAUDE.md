@@ -75,6 +75,10 @@ scripts/apply-restructure.ps1                       áp dụng tái cấu trúc 
 - Menu chính + Cài đặt (DEC-012): chuỗi giao diện VI/EN đặt DUY NHẤT trong `game/data/uiText.js` (thêm khóa ở CẢ hai
   ngôn ngữ, scene gọi `getRuntime(this).t('khoa')`); thiết lập người chơi ở `game/systems/settings.js` + `core/settingsStore.js`.
   Lời thoại KHÔNG dịch (chỉ giao diện).
+- Phòng 2.5D + di chuyển (DEC-013): dữ liệu phòng ở `game/data/rooms/` (đa giác sàn, vật cản, hotspot), nhân vật ở
+  `game/entities/Player.js`, va chạm/tìm đường/tutorial là logic thuần trong `game/systems/`. Nội dung khi xem đồ vật để
+  TRỐNG (`textKey: null`) tới khi người dùng cung cấp. Lưu game nằm trong Sổ tay (không có phím tắt lưu).
+  Asset phòng/nhân vật dựng bằng `scripts/art/build_room201_assets.py` (xóa dấu ✦, tách nền, atlas).
 - Không sửa `schema.sql` khác Project.docx; không đổi chữ ký API §4.3 khi chưa được duyệt.
 
 ## 6. Lệnh

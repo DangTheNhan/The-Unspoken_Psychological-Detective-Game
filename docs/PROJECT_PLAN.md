@@ -22,6 +22,7 @@
 | Giai đoạn | Nội dung | Phụ thuộc / bị chặn bởi | Mốc §6.1 |
 |---|---|---|---|
 | **A — Menu chính & Cài đặt** (đang làm, mục 3) | Menu có phong cách trinh thám, màn Cài đặt (âm thanh, trò chơi, ngôn ngữ VI/EN) — bỏ tab Hiển thị (DEC-012) | Không bị chặn | Hoàn thiện REQ-020 (MainMenuScene) |
+| **A2 — Phòng 201: di chuyển + tutorial** (T-021, đề xuất) | Nhân vật đi trong phòng không xuyên tường/đồ, tương tác vật, tutorial; kế hoạch 10 phase ở `docs/ROOM201_TUTORIAL_PLAN.md` | Q-R1…Q-R9 | Bước đầu của Chương 1 (mở ở 201) |
 | **B — Tích hợp Chương 1** | WP-C1..C10 trong `docs/chapter1/CHAPTER1_PLAN.md`: bộ chạy kịch bản, hội thoại, khám 204, Press/Present, Notebook, Final, P4 | Q3, Q4, Q5 | Notebook & Deduction (Tuần 6) → Ch1 thông suốt |
 | **C — Lưu/tải server + Load Game** | Save = state v2, Load Game ở menu, checkpoint, đồng bộ offline | ISS-29, ISS-05, ISS-18 | REQ-030, REQ-064 |
 | **D — Admin Dashboard** | Số tài khoản hoạt động, % hoàn thành chương, bảng bug PENDING→RESOLVED | ISS-10, ISS-11, ISS-12 | Tuần 8 |

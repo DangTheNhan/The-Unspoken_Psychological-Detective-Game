@@ -74,6 +74,9 @@ frontend/
       ├─ data/dialogueData.js            nơi DUY NHẤT biết cấu trúc file JSON hội thoại
       ├─ data/characters.js              nơi DUY NHẤT khai báo nhân vật: ảnh nửa thân, biểu cảm, nhép miệng, bên đứng
       ├─ data/uiText.js                  chuỗi GIAO DIỆN tiếng Việt / English (không chứa lời thoại) — DEC-012
+      ├─ data/rooms/{index,room201}.js   dữ liệu phòng 2.5D: ảnh nền, đa giác sàn đi được, vật cản, lớp che,
+      │                                  điểm tương tác (hotspot + điểm đứng), phối cảnh — DEC-013
+      ├─ entities/Player.js              thám tử đi trong phòng: phím/chuột, hoạt ảnh, co giãn theo độ sâu — DEC-013
       ├─ systems/credibility.js          max(0, c − ΔP) (§3.3)
       ├─ systems/notebook.js             4 tab Evidence/People/Timeline/Statements (§3.2)
       ├─ systems/autosave.js             5 phút + sự kiện quan trọng (§5.2)
@@ -81,9 +84,15 @@ frontend/
       ├─ systems/settings.js             thiết lập người chơi: mặc định, chuẩn hóa, quy đổi (âm lượng, tốc độ chữ, cỡ chữ)
       ├─ systems/i18n.js                 translate(lang, key, params) — thiếu khóa rơi về tiếng Việt
       ├─ systems/menuNavigation.js       ↑ ↓ trong menu, bỏ qua mục bị khóa
+      ├─ systems/walkArea.js             va chạm đa giác (không xuyên tường/đồ), trượt dọc tường, chia bước nhỏ
+      ├─ systems/pathfinding.js          A* trên lưới 16 px cho bấm-chuột-để-đi + làm mượt đường
+      ├─ systems/depthScale.js           phối cảnh: chiều cao/tốc độ/bàn chân theo y chân
+      ├─ systems/facing.js               hướng nhìn -> hoạt ảnh (đi ngang 6 hình, đứng 4 hướng)
+      ├─ systems/tutorial.js             máy trạng thái tutorial phòng 201 (lưu trong GameSession)
       ├─ ui/{DialogueBox, CharacterStage, CredibilityBar, Hotspot, TextButton, theme}.js   CharacterStage = nhân vật nửa thân trái/phải
       ├─ ui/{MenuItem, IconButton, PanelButton, SegmentedControl, Slider, Toggle, ConfirmDialog}.js   thành phần menu/cài đặt (DEC-012)
       ├─ ui/MenuBackdrop.js              cảnh nền menu vẽ bằng code — TẠM tới khi có ảnh nền (ISS-27)
+      ├─ ui/RoomWidgets.js               nhãn "E", bảng hướng dẫn, vòng sáng, viền đồ vật, thông báo ngắn
       ├─ scenes/                          Boot → Preload → MainMenu → Dialogue → RoomInvestigation
       │                                   (+ Settings overlay từ MainMenu, Notebook overlay, Deduction, BadEnding)
       └─ debug/DebugScene.js             overlay FPS/scene/uy tín — chỉ khi env.debug
@@ -91,10 +100,11 @@ frontend/
 
 ### Luồng scene
 ```
-Boot ─► Preload (nạp JSON, chờ font) ─► MainMenu ─Ván mới─► Dialogue ─hết thoại─► RoomInvestigation
-                                  │ ▲                                           │ N ⇄ Notebook (launch + pause)
-                       Cài đặt ⇄ Settings (launch + pause)                      │ S = lưu thủ công
-                                    └──── BadEnding ◄── uy tín = 0 ─────────────┘
+Boot ─► Preload (JSON, font, nền phòng, atlas) ─► MainMenu ─Ván mới─► [Intro: bổ sung sau]
+                                  │ ▲                                   ─► RoomInvestigation(room201 + tutorial)
+                       Cài đặt ⇄ Settings (launch + pause)                   │ N ⇄ Notebook (launch + pause; nút Lưu)
+                                                                             │ ra cửa ─► Dialogue ─► RoomInvestigation
+                                    └──── BadEnding ◄── uy tín = 0 ──────────┘   (PENDING Q3–Q5: nối P1_001)
 ```
 
 ### Thiết lập & ngôn ngữ (DEC-012)
