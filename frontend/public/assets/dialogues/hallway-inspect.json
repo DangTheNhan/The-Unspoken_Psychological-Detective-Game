@@ -1,0 +1,8 @@
+{
+  "_huong_dan": "Lời hiện ra khi thám tử XEM đồ vật ở hành lang tầng 2. Mỗi đồ vật là một danh sách câu; mỗi câu là một khung thoại, người chơi nhấn E để sang câu sau. Để trống [] = game hiện '[Chờ nội dung]'. Chỉ viết tiếng Việt, giữ nguyên các mã HALL_..., nhớ dấu phẩy giữa các câu và đặt mỗi câu trong ngoặc kép. Cửa A201 là lối về phòng 201 nên không có ở đây. Lưu file rồi tải lại trang (Ctrl+F5) là thấy.",
+  "HALL_A202": [],
+  "HALL_A203": [],
+  "HALL_A204": [],
+  "HALL_A205": [],
+  "HALL_STAIRS": []
+}

@@ -41,6 +41,7 @@ export class PreloadScene extends Phaser.Scene {
     // Phòng 2.5D + nhân vật thám tử đi lại (DEC-013)
     for (const room of Object.values(ROOMS)) {
       this.load.image(room.background.key, room.background.url)
+      if (room.inspectContent) this.load.json(room.inspectContent.key, room.inspectContent.url)
       for (const occluder of room.occluders) this.load.image(occluder.key, occluder.url)
     }
     this.load.atlas(DETECTIVE_ATLAS.key, DETECTIVE_ATLAS.textureUrl, DETECTIVE_ATLAS.atlasUrl)

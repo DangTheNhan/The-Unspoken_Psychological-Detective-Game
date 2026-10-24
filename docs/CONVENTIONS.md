@@ -41,8 +41,9 @@ Mục tiêu: ai mở file nào cũng đoán được nó làm gì, lỗi xảy r
 **Phòng 2.5D mới** (DEC-013, mẫu: `game/data/rooms/room201.js`)
 1. Ảnh nền 16:9 → `public/assets/images/backgrounds/<id>.webp` (1920×1080); ảnh gốc vào `art-source/`.
 2. Tạo `game/data/rooms/<id>.js`: `walkArea` (đa giác sàn, mép trên đặt ở mép trước đồ đạc), `obstacles`, `occluders`
-   (ảnh cắt đồ vật đứng trước nhân vật), `hotspots` (`rect` vùng bấm + `stand` điểm đứng + `face` + `textKey` — `null` = chờ nội dung,
-   KHÔNG tự viết), `spawn`, `depth` (2 mốc chiều cao người theo y chân). Mọi tọa độ theo khung 1280×720.
+   (ảnh cắt đồ vật đứng trước nhân vật), `hotspots` (`rect` vùng bấm + `stand` điểm đứng + `face`), `inspectContent` (file lời khi xem đồ vật
+   `public/assets/dialogues/<id>-inspect.json`, khóa = id hotspot, mảng rỗng = chờ nội dung — KHÔNG tự viết), `spawn`,
+   `depth` (2 mốc chiều cao người theo y chân; nên giữ người ≤ ~45% chiều cao màn hình — DEC-014). Mọi tọa độ theo khung 1280×720.
 3. Khai báo trong `game/data/rooms/index.js`; tên đồ vật (chuỗi giao diện) thêm vào `data/uiText.js` cả VI/EN.
 4. Chạy dev với debug, phím **F8** xem vùng đi được/ô lưới, bấm chuột để in tọa độ → chỉnh số; thêm test như `room201.test.js`
    (điểm xuất hiện + mọi điểm đứng phải đứng được và đi tới được).

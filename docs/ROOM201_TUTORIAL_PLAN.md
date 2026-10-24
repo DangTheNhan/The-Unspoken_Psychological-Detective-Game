@@ -193,7 +193,7 @@ Tốc độ đi cũng nhân theo tỉ lệ này (ở xa đi chậm hơn trên m�
 | # | Trả lời | Áp dụng |
 |---|---|---|
 | Q-R1, Q-R2 | Nhân vật là **thám tử**, ảnh nền là **phòng 201** | Asset `detective-*`, `room201` |
-| Q-R3 | **Để trống** chữ khi xem đồ vật, bổ sung khi được yêu cầu | Hotspot có `textKey: null` → hiện khung trống có nhãn `[Chờ nội dung]`; không lấy câu P1_001 |
+| Q-R3 | **Để trống** chữ khi xem đồ vật, bổ sung khi được yêu cầu | (24/10) Lời đặt ở file riêng `frontend/public/assets/dialogues/room201-inspect.json`, mảng rỗng → hiện khung trống có nhãn `[Chờ nội dung]`; không lấy câu P1_001 |
 | Q-R4 | **Chốt theo ảnh** vừa gửi (không sửa ảnh theo P1_001) | Ghi nhận lệch ảnh ↔ P1_001 là chấp nhận |
 | Q-R5 | Ảnh đi lên/xuống **bổ sung sau** | Tạm: tư thế trước/sau + nhún nhẹ khi đi dọc |
 | Q-R6 | **Lưu game đặt trong Sổ tay** của thám tử; **bỏ phím tắt** lưu | Nút "Lưu" trong NotebookScene; bỏ phím S; WASD dùng cho di chuyển |
@@ -206,3 +206,28 @@ Tốc độ đi cũng nhân theo tỉ lệ này (ở xa đi chậm hơn trên m�
 - Công cụ đo đa giác trong chế độ debug → nhóm tự chỉnh vùng đi/hotspot khi đổi ảnh nền.
 - Tiếng bước chân + mưa ngoài cửa sổ khi có âm thanh được duyệt (nối sẵn với âm lượng trong Cài đặt).
 - Hiệu ứng ánh đèn bàn/đèn tuýp nhẹ bằng lớp phủ (tắt khi hệ điều hành bật giảm chuyển động).
+
+## 7b. Điều chỉnh sau chơi thử — DEC-014 (24/10/2026)
+Người dùng: nhân vật quá to dù hợp với map → so sánh 3 phương án (A hiện tại, B lùi sân khấu, C thu nhỏ đều 70%),
+người dùng **chốt B** (24/10 13:34).
+- Vùng đi được chỉ tới y ≤ 615 (dải sàn sát camera chỉ để nhìn).
+- Chiều cao nhân vật 215 px (y 474) → 330 px (y 615) — dịu hơn tỉ lệ thật ~25%.
+- Tốc độ đi giảm 300 → 220 px/giây (TẠM) cho khớp cỡ người mới.
+- Lời khi xem đồ vật chuyển ra file riêng `frontend/public/assets/dialogues/room201-inspect.json`, nhiều câu/đồ vật, E để sang câu.
+
+## 9. Hành lang tầng 2 — T-024 / DEC-015 (24/10/2026)
+Người dùng gửi ảnh hành lang (A201–A205, lan can, giếng cầu thang, cầu thang phải): "khi nhân vật chính mở cửa phòng
+201 ra sẽ đến hành lang, hãy làm nhân vật đi lại thích hợp trên map này".
+- **Nền:** `hallway.webp` giữ độ phân giải gốc 1672×940 (ảnh không có dấu ✦); ảnh gốc ở `art-source/hallway/`.
+- **Vùng đi hình chữ U** (`data/rooms/hallway.js`): dải hành lang trái (cửa A201 → A203) + dải chiếu nghỉ sau lan can
+  (trước A204/A205 → đầu cầu thang phải). Giếng cầu thang, chân tường, các chậu cây sát tường trái ngoài vùng đi.
+  Mép dưới y 624 (kiểu DEC-014). Cao 222 px ở chân tường sau (y 446) → 330 px ở mép dưới (TẠM).
+- **Lớp che:** lan can (sau + đoạn lan can trái gần góc) luôn đè nhân vật; 2 chậu cây cạnh lan can xếp theo đáy chậu
+  (`baseY`) → đứng sau chậu thì bị lá che, đứng trước thì không. Mặt nạ: `scripts/art/build_hallway_assets.py`.
+- **Cửa nối:** cửa phòng 201 (`R201_DOOR`) → hành lang, xuất hiện trước A201 quay sang phải; cửa A201 (`HALL_A201`,
+  nhãn "Vào phòng") → phòng 201, xuất hiện ở cửa quay vào phòng. Màn hình tối/sáng 250 ms (TẠM). Thay chỗ tạm
+  "ra cửa → DialogueScene" của T-022.
+- **Điểm xem (khung, lời để trống):** A202, A203, A204, A205, cầu thang → `public/assets/dialogues/hallway-inspect.json`.
+- **Chưa làm / chờ xác nhận:** A204 dẫn vào phòng 204 (P2 Chương 1) và cầu thang đi đâu; ảnh này chưa thấy "giấy khen"
+  trên tường hành lang mà gói Chương 1 cần (EV_KhangCertificate); vị trí phòng chưa nằm trong file lưu (tải game luôn
+  về phòng 201) — thay đổi dữ liệu lưu cần duyệt; bảng "Nội quy", "Thông báo", biển "Nước ngập" chưa làm điểm xem.

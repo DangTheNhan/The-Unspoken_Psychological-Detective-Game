@@ -6,7 +6,8 @@ import { ROOM_MOVEMENT } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
-import { FIRST_ROOM_ID, ROOMS } from '../data/rooms'
+import { FIRST_ROOM_ID, ROOMS, entrancePoint } from '../data/rooms'
+import { getInspectLines } from '../data/rooms/inspectContent'
 import { Player } from '../entities/Player'
 import { footAt } from '../systems/depthScale'
 import { buildGrid, findPath, smoothPath } from '../systems/pathfinding'
@@ -21,8 +22,14 @@ import { COLORS, DEPTH, TEXT_STYLES } from '../ui/theme'
 
 const log = createLogger('RoomInvestigationScene')
 
-/** Lớp vẽ: nền 0 · đồ vật/viền 10 · nhân vật 20..21 (theo y chân) · lớp che 30 · HUD 100 · hộp thoại 200. */
+/**
+ * Lớp vẽ: nền 0 · đồ vật/viền 10 · nhân vật 20 + y/1000 (theo y chân) · lớp che 30 · HUD 100 · hộp thoại 200.
+ * Lớp che có baseY xếp cùng thang với nhân vật (20 + baseY/1000): nhân vật đứng sau đáy vật thì bị che.
+ */
 const OCCLUDER_DEPTH = 30
+const CHARACTER_DEPTH_BASE = 20
+/** TẠM — thời gian tối/sáng màn hình khi chuyển phòng (ms). */
+const ROOM_FADE_MS = 250
 
 /**
  * Màn điều tra 2.5D Point-and-Click — Project.docx §3.2: "Người chơi điều khiển nhân vật hoặc trỏ chuột
@@ -32,8 +39,9 @@ const OCCLUDER_DEPTH = 30
  * để tương tác · N mở Sổ tay (lưu tiến trình nằm trong Sổ tay — DEC-013 Q-R6) · Esc bỏ qua hướng dẫn.
  * Debug (env.debug): F8 hiện vùng đi được + bấm chuột in tọa độ ra console để chỉnh dữ liệu phòng.
  *
- * data: { chapter: number, roomId?: string }
- * PENDING(Q3–Q5, CHAPTER1_PLAN): ra cửa phòng 201 hiện chuyển sang DialogueScene tạm (chưa nối P1_001).
+ * data: { chapter: number, roomId?: string, entrance?: string (id phòng vừa rời — chọn chỗ xuất hiện) }
+ * Cửa có `target` chuyển sang phòng khác (T-024: phòng 201 <-> hành lang).
+ * PENDING(Q3–Q5, CHAPTER1_PLAN): chưa nối P1_001 (Hòa gõ cửa) — vị trí phòng chưa nằm trong file lưu.
  * PENDING (Capstone 3): Flashback Hiện tại/Quá khứ tại Chương 5 sẽ gắn vào scene này.
  */
 export class RoomInvestigationScene extends Phaser.Scene {
@@ -44,6 +52,12 @@ export class RoomInvestigationScene extends Phaser.Scene {
   init(data) {
     this.chapter = data?.chapter
     this.roomId = data?.roomId ?? FIRST_ROOM_ID
+    this.entrance = data?.entrance ?? null
+    // Scene được dựng lại (restart) khi đổi phòng -> xóa tham chiếu tới object của lần trước
+    this.leaving = false
+    this.player = null
+    this.marker = null
+    this.debugOverlay = null
   }
 
   create() {
@@ -62,22 +76,26 @@ export class RoomInvestigationScene extends Phaser.Scene {
       .setDisplaySize(width, height)
       .setDepth(DEPTH.BACKGROUND)
     for (const occluder of this.room.occluders) {
+      const depth =
+        occluder.baseY === undefined ? OCCLUDER_DEPTH : CHARACTER_DEPTH_BASE + occluder.baseY / 1000
       this.add
         .image(occluder.x, occluder.y, occluder.key)
         .setOrigin(0)
         .setDisplaySize(occluder.width, occluder.height)
-        .setDepth(OCCLUDER_DEPTH)
+        .setDepth(depth)
     }
 
     this.footAt = ([, y]) => footAt(this.room.depth, y)
     this.grid = buildGrid(this.room, this.footAt, undefined, width, height)
 
-    const spawn = nearestClearPoint(this.room, [this.room.spawn.x, this.room.spawn.y], this.footAt)
+    const start = entrancePoint(this.room, this.entrance)
+    const spawn = nearestClearPoint(this.room, [start.x, start.y], this.footAt)
     this.player = new Player(this, {
       room: this.room,
       x: spawn.x,
       y: spawn.y,
-      face: this.room.spawn.face,
+      face: start.face,
+      depthBase: CHARACTER_DEPTH_BASE,
     })
 
     this.outline = new HotspotOutline(this)
@@ -94,8 +112,14 @@ export class RoomInvestigationScene extends Phaser.Scene {
     this.refreshTutorial()
 
     // Quay lại từ Sổ tay: xóa phím đang "dính" và ghi nhận bước tutorial
-    this.events.on(Phaser.Scenes.Events.RESUME, () => this.onResume())
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.player?.destroy())
+    // this.events tồn tại qua các lần restart -> gỡ listener khi tắt scene để không bị gọi lặp
+    const onResume = () => this.onResume()
+    this.events.on(Phaser.Scenes.Events.RESUME, onResume)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.RESUME, onResume)
+      this.player?.destroy()
+    })
+    this.cameras.main.fadeIn(ROOM_FADE_MS, 0, 0, 0)
   }
 
   // ---------- HUD & dự phòng ----------
@@ -190,7 +214,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
   }
 
   isBusy() {
-    return Boolean(this.inspectBox || this.dialog)
+    return Boolean(this.inspectBox || this.dialog || this.leaving)
   }
 
   // ---------- Vòng lặp ----------
@@ -224,7 +248,9 @@ export class RoomInvestigationScene extends Phaser.Scene {
     this.outline.draw(rects, this.nearHotspot?.rect ?? null, time)
 
     if (this.nearHotspot) {
-      const label = this.nearHotspot.action === 'exit' ? 'interact.exit' : 'interact.inspect'
+      const label =
+        this.nearHotspot.promptKey ??
+        (this.nearHotspot.action === 'exit' ? 'interact.exit' : 'interact.inspect')
       this.prompt.showAt(this.player.x, this.player.headY - 30, this.runtime.t(label))
     } else {
       this.prompt.hide()
@@ -262,7 +288,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     if (this.dialog) return // hộp xác nhận tự xử lý phím
     if (this.inspectBox) {
       if (this.inspectBox.isTyping) this.inspectBox.completeTyping()
-      else this.closeInspect()
+      else this.nextInspectLine()
       return
     }
     if (this.nearHotspot) {
@@ -274,15 +300,16 @@ export class RoomInvestigationScene extends Phaser.Scene {
 
   activateHotspot(hotspot) {
     if (hotspot.action === 'exit') {
-      this.tryExit()
+      this.tryExit(hotspot)
       return
     }
     this.openInspect(hotspot)
   }
 
   /**
-   * Xem đồ vật. Nội dung: DEC-013 Q-R3 — ĐỂ TRỐNG (textKey = null) tới khi người dùng cung cấp;
-   * hiển thị nhãn "[Chờ nội dung]" thay vì tự viết.
+   * Xem đồ vật. Lời lấy từ file nội dung của phòng (vd public/assets/dialogues/room201-inspect.json,
+   * khóa = id hotspot) — nhóm tự điền (DEC-013 Q-R3). Chưa có -> hiện "[Chờ nội dung]", không tự viết.
+   * Nhiều câu: E / Space / Enter / bấm chuột để sang câu sau; hết câu thì đóng.
    */
   openInspect(hotspot) {
     const settings = this.runtime.settings.get()
@@ -290,28 +317,61 @@ export class RoomInvestigationScene extends Phaser.Scene {
       charDelayMs: textCharDelayMs(settings),
       fontSize: dialogueFontSizePx(settings),
     })
-    const text = hotspot.textKey
-      ? this.runtime.t(hotspot.textKey)
-      : this.runtime.t('interact.pending')
-    this.inspectBox.showLine({ speaker: this.runtime.t(hotspot.nameKey), text })
+    const content = this.room.inspectContent
+      ? this.cache.json.get(this.room.inspectContent.key)
+      : null
+    const lines = getInspectLines(content, hotspot.id)
+    this.inspectSpeaker = this.runtime.t(hotspot.nameKey)
+    this.inspectLines = lines.length > 0 ? lines : [this.runtime.t('interact.pending')]
+    this.inspectIndex = 0
+    this.inspectBox.showLine({ speaker: this.inspectSpeaker, text: this.inspectLines[0] })
     this.prompt.hide()
     this.advanceTutorial(TUTORIAL_EVENTS.INSPECTED)
+  }
+
+  nextInspectLine() {
+    this.inspectIndex += 1
+    if (this.inspectIndex >= this.inspectLines.length) {
+      this.closeInspect()
+      return
+    }
+    this.inspectBox.showLine({
+      speaker: this.inspectSpeaker,
+      text: this.inspectLines[this.inspectIndex],
+    })
   }
 
   closeInspect() {
     this.inspectBox?.destroy()
     this.inspectBox = null
+    this.inspectLines = null
   }
 
-  tryExit() {
+  /** Ra cửa: sang phòng `hotspot.target.roomId` (tối màn hình rồi dựng lại scene với phòng mới). */
+  tryExit(hotspot) {
     const session = this.runtime.session
     if (!canExit(session.tutorial)) {
       this.toast.show(this.runtime.t('room201.exitLocked'))
       return
     }
+    const targetId = hotspot.target?.roomId
+    if (!targetId || !ROOMS[targetId]) {
+      log.warn(`Cửa ${hotspot.id} chưa có phòng đích hợp lệ: ${targetId}`)
+      this.toast.show(this.runtime.t('interact.pending'))
+      return
+    }
     this.advanceTutorial(TUTORIAL_EVENTS.EXITED)
-    // PENDING(Q3–Q5): nối P1_001 (Hòa gõ cửa) khi tích hợp Chương 1 — tạm dùng DialogueScene hiện có
-    this.scene.start(SCENE_KEYS.DIALOGUE, { chapter: this.chapter ?? session.chapter })
+    this.leaving = true
+    this.player.stop()
+    this.prompt.hide()
+    this.cameras.main.fadeOut(ROOM_FADE_MS, 0, 0, 0)
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      this.scene.restart({
+        chapter: this.chapter ?? session.chapter,
+        roomId: targetId,
+        entrance: this.room.id,
+      })
+    })
   }
 
   // ---------- Sổ tay ----------
@@ -355,7 +415,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
       body: t(`tutorial.${tutorial.step}`),
       footer: t('tutorial.skipHint'),
     })
-    if (tutorial.step === 'move' && !this.marker) {
+    if (tutorial.step === 'move' && !this.marker && this.room.tutorialMarker) {
       const { x, y } = this.room.tutorialMarker
       this.marker = new FloorMarker(this, x, y, ROOM_MOVEMENT.MARKER_RADIUS)
     } else if (tutorial.step !== 'move' && this.marker) {

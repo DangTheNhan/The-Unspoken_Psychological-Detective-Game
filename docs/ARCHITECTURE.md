@@ -74,8 +74,10 @@ frontend/
       ├─ data/dialogueData.js            nơi DUY NHẤT biết cấu trúc file JSON hội thoại
       ├─ data/characters.js              nơi DUY NHẤT khai báo nhân vật: ảnh nửa thân, biểu cảm, nhép miệng, bên đứng
       ├─ data/uiText.js                  chuỗi GIAO DIỆN tiếng Việt / English (không chứa lời thoại) — DEC-012
-      ├─ data/rooms/{index,room201}.js   dữ liệu phòng 2.5D: ảnh nền, đa giác sàn đi được, vật cản, lớp che,
-      │                                  điểm tương tác (hotspot + điểm đứng), phối cảnh — DEC-013
+      ├─ data/rooms/{index,room201,hallway}.js   dữ liệu phòng 2.5D: ảnh nền, đa giác sàn đi được, vật cản,
+      │                                  lớp che (baseY = xếp theo chiều sâu), điểm tương tác (hotspot + điểm đứng),
+      │                                  cửa nối phòng (target/entrances), phối cảnh — DEC-013/014/015
+      ├─ data/rooms/inspectContent.js    đọc lời khi xem đồ vật từ public/assets/dialogues/<phòng>-inspect.json
       ├─ entities/Player.js              thám tử đi trong phòng: phím/chuột, hoạt ảnh, co giãn theo độ sâu — DEC-013
       ├─ systems/credibility.js          max(0, c − ΔP) (§3.3)
       ├─ systems/notebook.js             4 tab Evidence/People/Timeline/Statements (§3.2)
@@ -103,8 +105,9 @@ frontend/
 Boot ─► Preload (JSON, font, nền phòng, atlas) ─► MainMenu ─Ván mới─► [Intro: bổ sung sau]
                                   │ ▲                                   ─► RoomInvestigation(room201 + tutorial)
                        Cài đặt ⇄ Settings (launch + pause)                   │ N ⇄ Notebook (launch + pause; nút Lưu)
-                                                                             │ ra cửa ─► Dialogue ─► RoomInvestigation
-                                    └──── BadEnding ◄── uy tín = 0 ──────────┘   (PENDING Q3–Q5: nối P1_001)
+                                                                             │ cửa 201 ⇄ cửa A201: RoomInvestigation(hallway)
+                                    └──── BadEnding ◄── uy tín = 0 ──────────┘   (restart scene + tối/sáng màn hình — DEC-015)
+                                                                                 (PENDING Q3–Q5: nối P1_001)
 ```
 
 ### Thiết lập & ngôn ngữ (DEC-012)

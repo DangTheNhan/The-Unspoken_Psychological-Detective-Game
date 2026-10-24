@@ -42,7 +42,7 @@ export const FIRST_CHAPTER = 1
  * WALK_SPEED: px/giây ở mốc gần camera; ở xa nhân dần theo phối cảnh (systems/depthScale.js).
  */
 export const ROOM_MOVEMENT = Object.freeze({
-  WALK_SPEED: 300,
+  WALK_SPEED: 220, // DEC-014: nhân vật nhỏ hơn -> giảm theo để bước chân không "trượt"
   WALK_ANIM_FPS: 10,
   /** Biên độ nhún (px, ở mốc gần) khi đi dọc — tạm thay chu kỳ đi lên/xuống còn thiếu (Q-R5). */
   BOB_HEIGHT: 6,

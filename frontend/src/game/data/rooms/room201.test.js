@@ -13,7 +13,7 @@ describe('dữ liệu phòng 201 — không kẹt nhân vật', () => {
     expect(clear(ROOM_201.tutorialMarker.x, ROOM_201.tutorialMarker.y)).toBe(true)
   })
 
-  it('mọi điểm đứng của hotspot đứng được và đi tới được từ điểm xuất hiện', () => {
+  it('mọi điểm đứng của hotspot đứng được và đi tới được từ điểm xuất hiện (xem thêm rooms.test.js)', () => {
     const grid = buildGrid(ROOM_201, foot)
     for (const hotspot of ROOM_201.hotspots) {
       const [x, y] = hotspot.stand
@@ -23,9 +23,15 @@ describe('dữ liệu phòng 201 — không kẹt nhân vật', () => {
     }
   })
 
-  it('mã hotspot không trùng; nội dung xem đồ vật đang để trống (DEC-013 Q-R3)', () => {
+  it('mã hotspot không trùng; lời xem đồ vật nằm ở file nội dung riêng (DEC-013 Q-R3)', () => {
     const ids = ROOM_201.hotspots.map((h) => h.id)
     expect(new Set(ids).size).toBe(ids.length)
-    expect(ROOM_201.hotspots.every((h) => h.textKey === null)).toBe(true)
+    expect(ROOM_201.inspectContent.url).toBe('assets/dialogues/room201-inspect.json')
+  })
+
+  it('DEC-014: nhân vật không xuống dải sàn sát camera (y > 615) và không cao quá 330 px', () => {
+    expect(ROOM_201.walkArea.every(([, y]) => y <= 615)).toBe(true)
+    expect(clear(640, 640)).toBe(false)
+    expect(Math.round((footAt(ROOM_201.depth, 615).rx * 2) / 0.18)).toBe(330)
   })
 })

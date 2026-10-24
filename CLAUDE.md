@@ -76,9 +76,13 @@ scripts/apply-restructure.ps1                       áp dụng tái cấu trúc 
   ngôn ngữ, scene gọi `getRuntime(this).t('khoa')`); thiết lập người chơi ở `game/systems/settings.js` + `core/settingsStore.js`.
   Lời thoại KHÔNG dịch (chỉ giao diện).
 - Phòng 2.5D + di chuyển (DEC-013): dữ liệu phòng ở `game/data/rooms/` (đa giác sàn, vật cản, hotspot), nhân vật ở
-  `game/entities/Player.js`, va chạm/tìm đường/tutorial là logic thuần trong `game/systems/`. Nội dung khi xem đồ vật để
-  TRỐNG (`textKey: null`) tới khi người dùng cung cấp. Lưu game nằm trong Sổ tay (không có phím tắt lưu).
+  `game/entities/Player.js`, va chạm/tìm đường/tutorial là logic thuần trong `game/systems/`. Lời khi xem đồ vật nằm
+  ở file riêng `frontend/public/assets/dialogues/<phòng>-inspect.json` (nhóm tự điền, AI không viết). Lưu game nằm trong
+  Sổ tay (không có phím tắt lưu). Cỡ nhân vật/vùng đi phòng 201 theo DEC-014 (lùi sân khấu, y ≤ 615, cao 215→330 px).
   Asset phòng/nhân vật dựng bằng `scripts/art/build_room201_assets.py` (xóa dấu ✦, tách nền, atlas).
+- Hành lang tầng 2 (DEC-015, `game/data/rooms/hallway.js`): cửa phòng 201 ⇄ cửa A201 (hotspot `action: 'exit'` +
+  `target.roomId`, phòng đích khai báo `entrances[id phòng vừa rời]`). Lớp che có `baseY` xếp chiều sâu với nhân vật,
+  không có `baseY` = luôn đè (lan can). Lời xem đồ ở `hallway-inspect.json`. Asset: `scripts/art/build_hallway_assets.py`.
 - Không sửa `schema.sql` khác Project.docx; không đổi chữ ký API §4.3 khi chưa được duyệt.
 
 ## 6. Lệnh
