@@ -470,6 +470,8 @@ Script `scripts/apply-restructure.ps1` **đã được chạy** ngày 09/10/2026
 
 ### G4. Bước tiếp theo
 Xem PROGRESS_LOG.md → "ĐIỂM KHÔI PHỤC" và mục H.
+Bảng việc cần làm cập nhật (27/10/2026, T-025): `docs/PROJECT_PLAN.md` mục 2a (TD-01..TD-45, theo giai đoạn 0–7). Mục H giữ làm danh sách gói việc gốc.
+Từ 03/11/2026 (T-027): bảng việc sống là `docs/TODO.md` (TD-01..TD-63, nhóm A–I, cột "Thứ tự (chốt)" để nhóm thống nhất).
 
 ---
 
