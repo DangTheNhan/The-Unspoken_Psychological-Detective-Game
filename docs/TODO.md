@@ -19,8 +19,8 @@
 | TD-01 | Đổi mật khẩu MySQL `root` (đã lộ trong commit `b744ce7` trên `master`), cập nhật biến môi trường `DB_PASSWORD` | Bạn | **P0** | S | — | ❓ | 1 | 1 |
 | TD-02 | Trả `backend/src/main/resources/application.yml` về `${DB_PASSWORD:}` (không giá trị mặc định); commit qua nhánh + PR | AI soạn / Bạn đẩy | **P0** | S | — | 🔄 03/11: AI đã sửa file trên máy `C:\The-Unspoken…`, chờ commit + PR | 1 | 2 |
 | TD-46 | **Đồng bộ hai máy**: máy Desktop có T-025 (PROJECT_PLAN/PROGRESS_LOG/PROJECT_MEMORY) chưa commit; máy `C:\The-Unspoken…` có commit phòng 204 + hoạt ảnh 6 khung (chưa chắc đã commit). Chọn 1 máy làm chính, commit/push, máy kia pull | Bạn | **P0** | S | — | ⬜ | 1 | 3 |
-| TD-03 | Chạy `cd frontend; npm run check` và `cd backend; mvn clean test`, gửi log lỗi (nếu có) — code T-020 → T-026 chưa qua kiểm tra thật | Bạn → AI sửa | **P0** | S | TD-46 | ❓ | 2 | 4 |
-| TD-04 | Sửa xuống dòng CRLF của `frontend/index.html` (Prettier báo lỗi) | AI / Bạn | P1 | S | — | ⬜ | 2 | |
+| TD-03 | Chạy `cd frontend; npm run check` và `cd backend; mvn clean test`, gửi log lỗi (nếu có) — code T-020 → T-026 chưa qua kiểm tra thật | Bạn → AI sửa | **P0** | S | TD-46 | ✅ 03/11 (T-029) | 2 | 4 |
+| TD-04 | Sửa xuống dòng CRLF của `frontend/index.html` (Prettier báo lỗi) | AI / Bạn | P1 | S | — | ✅ 03/11 (T-029: file đã LF, `format:check` qua) | 2 | |
 | TD-05 | Xóa `package-lock.json` rỗng ở gốc (+ `node_modules/` gốc nếu còn), `git rm package-lock.json` | Bạn đồng ý → AI | P2 | S | Bạn đồng ý | ⬜ | | |
 | TD-06 | Thống nhất phiên bản Node/npm cả nhóm để `frontend/package-lock.json` không đổi qua lại | Bạn | P2 | S | — | ⬜ | | |
 | TD-07 | Quy trình git: mỗi việc 1 nhánh, PR vào `master`, không đẩy thẳng `master` | Nhóm | P1 | — | — | 🔄 | | |

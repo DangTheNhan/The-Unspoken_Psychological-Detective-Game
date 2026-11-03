@@ -9,11 +9,11 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 03/11/2026 — T-028 (dọn nền: TD-02 đã sửa `application.yml`; hướng dẫn TD-01, TD-46, TD-03) |
-| Tác vụ đang làm | T-028 — dọn nền theo thứ tự nhóm chốt: TD-01 (Bạn đổi mật khẩu MySQL) → TD-02 (AI đã sửa file, chờ commit/PR) → TD-46 (đồng bộ 2 máy) → TD-03 (Bạn chạy `npm run check` + `mvn clean test`, gửi log) |
+| Cập nhật lần cuối | 03/11/2026 — T-029 (TD-03: chạy kiểm tra thật, sửa định dạng `room201-inspect.json`; `npm run check` + `mvn clean test` đều qua) |
+| Tác vụ đang làm | Không có. T-029 xong (TD-03, TD-04 ✅). Thay đổi T-029 chưa commit |
 | Đã xong gần nhất | T-026: ảnh nền phòng 204 + hoạt ảnh đi ngang 6 khung (31/10); T-027: `docs/TODO.md` (03/11). Trước đó: T-024 hành lang (DEC-015), T-025 kế hoạch 27/10 |
 | Trạng thái dở dang | Không có code dở. AI chưa chạy được Vitest/Vite thật trên máy (node_modules bản Windows thiếu binding Linux, npm bị chặn 403) — đã kiểm bằng bộ chạy thay thế + ESLint thật của dự án trên máy + Phaser thật trong Chromium |
-| Việc tiếp theo | Nhận log TD-03 → AI sửa lỗi nếu có → TD-04 (CRLF index.html). Sau dọn nền: Q3/Q4 (TD-08/09), rồi TD-52 + TD-16..18 theo `docs/TODO.md` |
+| Việc tiếp theo | Commit T-029 (khi người dùng yêu cầu). Sau dọn nền: Q3/Q4 (TD-08/09), rồi TD-52 + TD-16..18 theo `docs/TODO.md` |
 | Đang bị chặn bởi | Q3–Q5 (T-012); ISS-29 (userId, cho phần lưu server ở WP-C8) |
 | Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `python docs/sources/chapter1/validation/validate_data.py` (chạy trên bản sao vì script ghi đè `validation.results.json`) |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
@@ -341,3 +341,12 @@
 - **TD-01, TD-46, TD-03:** việc trên máy người dùng (đổi mật khẩu, git, chạy kiểm tra) — AI gửi hướng dẫn từng bước; AI không tự nhập/đổi mật khẩu (quy tắc an toàn), không chạy git trong thư mục máy.
 - `docs/TODO.md`: cột "Thứ tự (chốt)" TD-01=1, TD-02=2, TD-46=3, TD-03=4; TD-02 → 🔄.
 - **Self-Check:** đọc lại file sau sửa (LF, 1 dòng thay). Chưa chạy backend với cấu hình mới — nếu máy chưa đặt biến `DB_PASSWORD` thì backend báo `Access denied` (README bước 6 đã hướng dẫn đặt biến).
+
+### T-029 — TD-03: chạy kiểm tra thật trên máy + sửa lỗi test
+- Ngày giao: 03/11/2026 — "chạy kiểm tra" (`npm install`, `npm run check`, `mvn clean test`), sau đó "Có, sửa đi".
+- Máy: Node v24.18.0, npm 11.16.0, Maven 3.10.0, JDK 21.0.12. `_migration/` không còn.
+- **Lần chạy 1:** `npm install` xong (npm audit: 10 lỗ hổng — 8 moderate, 2 high, chưa xử lý). Lint ✅, Prettier ✅, Vitest ❌ 109/110 — `inspectContent.test.js`: `R201_COATS` và `R201_WINDOW` trong `frontend/public/assets/dialogues/room201-inspect.json` là chuỗi, không phải danh sách. Build ✅ (cảnh báo font BeVietnamPro resolve lúc chạy — không phải lỗi). `mvn clean test` ✅ (mã thoát 0).
+- **Sửa (người dùng đồng ý):** bọc 2 giá trị thành `["..."]`, GIỮ NGUYÊN chữ do nhóm viết (chữ hiện là nội dung thử, nhóm cần thay bằng lời thật).
+- **Lần chạy 2:** `npm run check` ✅ — 20 file test, 110/110 test qua, build qua.
+- TD-04 (CRLF `index.html`): kiểm `git ls-files --eol` → `i/lf w/lf`, Prettier qua → đánh dấu ✅.
+- `docs/TODO.md`: TD-03, TD-04 → ✅. Chưa commit.
