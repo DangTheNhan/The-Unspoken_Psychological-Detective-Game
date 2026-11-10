@@ -15,20 +15,16 @@ const log = createLogger('SaveService')
  * PENDING(ISS-29): login không trả userId -> chưa gọi được API save.
  *
  * @param {{ currentChapter: number, credibilityScore: number, saveDataJson: string }} snapshot
- * @param {{ userId?: number|null, username?: string, reason?: string }} context
+ * @param {{ userId?: number|null, reason?: string }} context
  */
-export async function persistProgress(
-  snapshot,
-  { userId = null, username, reason = 'unknown' } = {},
-) {
-  const local = storage.set(backupKey(username), {
+export async function persistProgress(snapshot, { userId = null, reason = 'unknown' } = {}) {
+  storage.set(STORAGE_KEYS.LOCAL_SAVE_BACKUP, {
     ...snapshot,
     reason,
     savedAt: new Date().toISOString(),
   })
 
   if (userId === null || userId === undefined) {
-    if (!local) throw new Error('Không ghi được bản lưu trên trình duyệt.')
     log.warn('Chưa có userId (ISS-29) -> chỉ lưu localStorage')
     return { remote: false, reason: 'missing-user-id' }
   }
@@ -38,7 +34,7 @@ export async function persistProgress(
     log.debug('Đã lưu lên server', reason, data)
     return { remote: true, data }
   } catch (error) {
-    if (error.isNetworkError && local) {
+    if (error.isNetworkError) {
       log.warn('Mất kết nối -> chế độ offline, giữ bản localStorage')
       return { remote: false, reason: 'offline' }
     }
@@ -46,11 +42,6 @@ export async function persistProgress(
   }
 }
 
-function backupKey(username) {
-  const key = STORAGE_KEYS.LOCAL_SAVE_BACKUP
-  return username ? `${key}.${encodeURIComponent(username)}` : key
-}
-
-export function readLocalBackup(username) {
-  return storage.get(backupKey(username)) ?? storage.get(STORAGE_KEYS.LOCAL_SAVE_BACKUP)
+export function readLocalBackup() {
+  return storage.get(STORAGE_KEYS.LOCAL_SAVE_BACKUP)
 }

@@ -8,7 +8,6 @@ import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
 import { FIRST_ROOM_ID, ROOMS, entrancePoint } from '../data/rooms'
 import { getInspectLines } from '../data/rooms/inspectContent'
-import { isStoryMapNode, storyMapHotspots } from '../data/storyMap'
 import { Player } from '../entities/Player'
 import { footAt } from '../systems/depthScale'
 import { buildGrid, findPath, smoothPath } from '../systems/pathfinding'
@@ -18,7 +17,6 @@ import { nearestClearPoint } from '../systems/walkArea'
 import { ConfirmDialog } from '../ui/ConfirmDialog'
 import { CredibilityBar } from '../ui/CredibilityBar'
 import { DialogueBox } from '../ui/DialogueBox'
-import { PanelButton } from '../ui/PanelButton'
 import { FloorMarker, HotspotOutline, InteractPrompt, Toast, TutorialHint } from '../ui/RoomWidgets'
 import { COLORS, DEPTH, TEXT_STYLES } from '../ui/theme'
 
@@ -90,11 +88,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     this.footAt = ([, y]) => footAt(this.room.depth, y)
     this.grid = buildGrid(this.room, this.footAt, undefined, width, height)
 
-    const saved = this.runtime.session.player
-    const start =
-      saved?.roomId === this.roomId && Number.isFinite(saved.x) && Number.isFinite(saved.y)
-        ? saved
-        : entrancePoint(this.room, this.entrance)
+    const start = entrancePoint(this.room, this.entrance)
     const spawn = nearestClearPoint(this.room, [start.x, start.y], this.footAt)
     this.player = new Player(this, {
       room: this.room,
@@ -112,10 +106,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
     this.dialog = null
     this.nearHotspot = null
     this.notebookOpen = false
-    this.storyMap = isStoryMapNode(this.runtime.story?.node)
-    const storySpots = storyMapHotspots(this.runtime.story ?? {})
-    this.hotspots = this.storyMap ? storySpots : this.room.hotspots
-    if (this.storyMap) this.createStoryMapControls(storySpots)
 
     this.createHotspotZones()
     this.bindInput()
@@ -130,29 +120,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
       this.player?.destroy()
     })
     this.cameras.main.fadeIn(ROOM_FADE_MS, 0, 0, 0)
-  }
-
-  createStoryMapControls(spots) {
-    for (const spot of spots) {
-      if (!spot.name) continue
-      this.add
-        .text(spot.stand[0], spot.stand[1] - 55, spot.name, {
-          ...TEXT_STYLES.body,
-          color: COLORS.textHex,
-          backgroundColor: '#241f2b',
-          padding: { x: 6, y: 2 },
-        })
-        .setOrigin(0.5)
-        .setDepth(DEPTH.HUD)
-    }
-    const button = new PanelButton(this, {
-      y: 62,
-      label: this.runtime.t('story.investigate'),
-      onClick: () => {
-        if (!this.isBusy()) this.openStory({ mapMenu: true })
-      },
-    })
-    button.setX(this.scale.width - button.width - 24).setDepth(DEPTH.HUD)
   }
 
   // ---------- HUD & dự phòng ----------
@@ -219,9 +186,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
       keyboard.on('keydown-N', () => {
         if (!this.isBusy()) this.openNotebook()
       })
-      keyboard.on('keydown-M', () => {
-        if (this.storyMap && !this.isBusy()) this.openStory({ mapMenu: true })
-      })
       keyboard.on('keydown-ESC', () => this.onEscape())
       if (env.debug) keyboard.on('keydown-F8', () => this.toggleDebugOverlay())
     }
@@ -259,7 +223,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
     if (!this.player) return
     // Giới hạn delta khi tab bị treo lâu -> không "nhảy cóc" (walkArea vẫn chia bước nhỏ)
     this.player.update(Math.min(delta, 50), this.readKeyVector())
-    if (this.runtime.session.story && !this.leaving) this.rememberPosition()
     this.updateNearbyHotspot(time)
     this.checkMarker()
   }
@@ -267,7 +230,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
   updateNearbyHotspot(time) {
     let nearest = null
     let nearestDistance = ROOM_MOVEMENT.INTERACT_RADIUS
-    for (const hotspot of this.hotspots) {
+    for (const hotspot of this.room.hotspots) {
       const [sx, sy] = hotspot.stand
       const distance = Math.hypot(this.player.x - sx, this.player.y - sy)
       if (distance <= nearestDistance) {
@@ -288,11 +251,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
       const label =
         this.nearHotspot.promptKey ??
         (this.nearHotspot.action === 'exit' ? 'interact.exit' : 'interact.inspect')
-      this.prompt.showAt(
-        this.player.x,
-        this.player.headY - 30,
-        this.nearHotspot.label ?? this.runtime.t(label),
-      )
+      this.prompt.showAt(this.player.x, this.player.headY - 30, this.runtime.t(label))
     } else {
       this.prompt.hide()
     }
@@ -308,7 +267,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
   }
 
   createHotspotZones() {
-    for (const hotspot of this.hotspots) {
+    for (const hotspot of this.room.hotspots) {
       const [x, y, w, h] = hotspot.rect
       const zone = this.add.zone(x, y, w, h).setOrigin(0).setDepth(DEPTH.HOTSPOT)
       zone.setInteractive({ useHandCursor: true })
@@ -340,11 +299,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
   }
 
   activateHotspot(hotspot) {
-    if (hotspot.choiceIndex !== undefined) {
-      this.rememberPosition()
-      if (this.runtime.story.choose(hotspot.choiceIndex)) this.openStory()
-      return
-    }
     if (hotspot.action === 'exit') {
       this.tryExit(hotspot)
       return
@@ -407,10 +361,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
       return
     }
     this.advanceTutorial(TUTORIAL_EVENTS.EXITED)
-    if (session.story && !this.runtime.story) {
-      this.openStory()
-      return
-    }
     this.leaving = true
     this.player.stop()
     this.prompt.hide()
@@ -427,33 +377,10 @@ export class RoomInvestigationScene extends Phaser.Scene {
   // ---------- Sổ tay ----------
 
   openNotebook() {
-    this.rememberPosition()
-    const runner = this.runtime.story
-    const notebook = runner?.choices().find(({ targetNode }) => targetNode === 'P3_NOTEBOOK')
-    if (notebook && runner.choose(notebook.index)) {
-      this.openStory()
-      return
-    }
     this.player?.stop()
     this.notebookOpen = true
     this.scene.launch(SCENE_KEYS.NOTEBOOK, { returnTo: this.scene.key })
     this.scene.pause()
-  }
-
-  rememberPosition() {
-    if (!this.player) return
-    const session = this.runtime.session
-    if (session.player?.roomId !== this.roomId) session.player = { roomId: this.roomId }
-    session.player.x = this.player.x
-    session.player.y = this.player.y
-    session.player.face = this.player.facing
-  }
-
-  openStory(data = {}) {
-    if (data.mapMenu) this.rememberPosition()
-    this.leaving = true
-    this.player.stop()
-    this.scene.start(SCENE_KEYS.STORY, data)
   }
 
   onResume() {
@@ -521,7 +448,6 @@ export class RoomInvestigationScene extends Phaser.Scene {
       onConfirm: () => {
         this.dialog = null
         this.advanceTutorial(TUTORIAL_EVENTS.SKIPPED)
-        if (this.runtime.session.story && !this.runtime.story) this.openStory()
       },
       onCancel: () => {
         this.dialog = null

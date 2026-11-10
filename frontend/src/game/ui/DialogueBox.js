@@ -36,7 +36,6 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       charDelayMs = TYPEWRITER.CHAR_DELAY_MS,
       fontSize = null,
       onLineComplete = null,
-      fitText = false,
     } = {},
   ) {
     const { width, height } = scene.scale
@@ -45,13 +44,11 @@ export class DialogueBox extends Phaser.GameObjects.Container {
     this.stage = stage
     this.charDelayMs = charDelayMs
     this.onLineComplete = onLineComplete
-    this.fitText = fitText
 
     const panel = scene.add
       .rectangle(0, 0, width, BOX_HEIGHT, COLORS.panel, 0.92)
       .setOrigin(0)
       .setStrokeStyle(2, COLORS.panelBorder)
-    this.panel = panel
 
     // Ô chân dung — chỉ hiện khi câu thoại dùng line.portrait. Ảnh nguồn phải VUÔNG.
     this.portraitFrame = scene.add
@@ -84,27 +81,17 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   }
 
   /**
-   * @param {{ speaker?: string, text: string, kind?: string, portrait?: string|null, character?: string|null,
+   * @param {{ speaker?: string, text: string, portrait?: string|null, character?: string|null,
    *           expression?: string|null, talk?: string|null, position?: string|null }} line
    */
   showLine(line) {
-    const { text = '', portrait = null, kind } = line
+    const { text = '', portrait = null } = line
     this.stopTyping()
 
     const onStage = this.placeCharacter(line)
     this.nameText.setText(line.speaker || onStage?.name || '')
     this.setPortrait(onStage ? null : portrait)
-    this.bodyText.setFontStyle(kind === 'narration' ? 'italic' : 'normal')
-    this.bodyText.setColor(
-      kind === 'ui' ? COLORS.accentHex : kind === 'action' ? COLORS.mutedHex : COLORS.textHex,
-    )
     this.fullText = text
-    if (this.fitText) {
-      this.bodyText.setText(text)
-      const height = Math.max(BOX_HEIGHT, this.bodyText.y + this.bodyText.height + PADDING)
-      this.panel.setSize(this.scene.scale.width, height)
-      this.setY(this.scene.scale.height - height)
-    }
     this.bodyText.setText('')
 
     // repeat = -1 sẽ lặp vô hạn -> chặn chuỗi rỗng; tốc độ "Hiện ngay" (0 ms) -> không chạy chữ
