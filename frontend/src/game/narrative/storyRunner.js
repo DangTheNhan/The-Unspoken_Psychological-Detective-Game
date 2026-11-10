@@ -6,7 +6,14 @@ import { commitEvent } from './effects'
 import { createContext, testCondition } from './expr'
 import { cloneJson } from './statePath'
 
-const AUTOMATIC_TYPES = new Set(['router', 'transition', 'notebook_update', 'checkpoint_restore'])
+const AUTOMATIC_TYPES = new Set([
+  'router',
+  'transition',
+  'notebook_update',
+  'checkpoint_restore',
+  'narration',
+  'action',
+])
 const FINAL_NOTEBOOK_HANDLER = 'commit_ch1_final_notebook'
 
 /**

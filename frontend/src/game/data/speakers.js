@@ -1,3 +1,7 @@
+import { suspectPortrait } from './suspectPortraits'
+
+const SUSPECT_IDS = { LINH: 'linh', MINH: 'minh', HÀO: 'hao', 'NGƯỜI ĐÀN ÔNG': 'hao' }
+
 const HOA_EXPRESSIONS = {
   Anxious: 'stern',
   Breathless: 'stern',
@@ -18,12 +22,16 @@ const HOA_EXPRESSIONS = {
 
 export function storyLine(node) {
   const text = node.text?.replaceAll('**', '') ?? ''
+  const suspect = SUSPECT_IDS[node.speaker]
+  if (suspect) {
+    return { speaker: node.speaker, text, ...suspectPortrait(suspect, node.expression) }
+  }
   if (node.speaker !== 'HÒA') return { speaker: node.speaker, text }
   return {
     speaker: node.speaker,
     text,
     character: 'landlord',
     expression: HOA_EXPRESSIONS[node.expression] ?? 'stern',
-    talk: HOA_EXPRESSIONS[node.expression] === 'smirk' ? 'smug' : 'normal',
+    talk: HOA_EXPRESSIONS[node.expression] === 'smirk' ? 'story-smug' : 'story-normal',
   }
 }

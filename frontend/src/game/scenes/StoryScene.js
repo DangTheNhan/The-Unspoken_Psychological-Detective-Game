@@ -3,7 +3,8 @@ import { TYPEWRITER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { getRuntime } from '../core/runtime'
 import { CHAPTER_DATA } from '../data/chapters'
-import { ROOMS } from '../data/rooms'
+import { ROOMS, roomBackground } from '../data/rooms'
+import { ROOM_204_NECK_PHOTO } from '../data/rooms/room204'
 import { storyLine } from '../data/speakers'
 import { isStoryMapNode, storyMapHotspots } from '../data/storyMap'
 import { dialogueFontSizePx, textCharDelayMs } from '../systems/settings'
@@ -44,8 +45,9 @@ export class StoryScene extends Phaser.Scene {
     super(SCENE_KEYS.STORY)
   }
 
-  init({ mapMenu = false } = {}) {
+  init({ mapMenu = false, entrance = null } = {}) {
     this.mapMenu = mapMenu
+    this.entrance = entrance
     this.statement = null
     this.pickingEvidence = false
     this.activeSlot = null
@@ -59,7 +61,7 @@ export class StoryScene extends Phaser.Scene {
     this.runtime = getRuntime(this)
     const { files } = CHAPTER_DATA[1]
     this.runner = this.runtime.startStory(this.cache.json.get(files.graph.key))
-    this.characterStage = new CharacterStage(this)
+    this.characterStage = new CharacterStage(this, { closeMouthAtPunctuation: true })
     this.evidenceNames = new Map(
       this.cache.json
         .get(files.evidence.key)
@@ -107,11 +109,12 @@ export class StoryScene extends Phaser.Scene {
   render() {
     this.clearView()
     const { node, state, version } = this.runner
-    if (!node?.next || node.type === 'notebook_view') this.characterStage.hide()
+    if (node?.type !== 'dialogue') this.characterStage.hide()
     if (isStoryMapNode(node) && !this.mapMenu) {
       this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
         chapter: state.chapter,
         roomId: state.scene_location,
+        entrance: this.entrance,
       })
       return
     }
@@ -133,7 +136,8 @@ export class StoryScene extends Phaser.Scene {
       return
     }
     if (node.next) {
-      this.showLine(node, version)
+      if (node.type === 'dialogue') this.showLine(node, version)
+      else this.showNotice(node, version)
       return
     }
     const mapIndices = this.mapMenu
@@ -146,8 +150,11 @@ export class StoryScene extends Phaser.Scene {
 
   drawBackdrop(roomId) {
     const { width, height } = this.scale
-    const key = ROOMS[roomId]?.background.key
-    if (key) this.view.push(this.add.image(0, 0, key).setOrigin(0).setDisplaySize(width, height))
+    const room = ROOMS[roomId]
+    if (room) {
+      const { key } = roomBackground(room, this.runner.state)
+      this.view.push(this.add.image(0, 0, key).setOrigin(0).setDisplaySize(width, height))
+    }
     this.view.push(this.add.rectangle(0, 0, width, height, COLORS.background, 0.36).setOrigin(0))
     this.view.push(
       new CredibilityBar(this, 24, 16, this.runner.state.credibility, (value) =>
@@ -174,7 +181,7 @@ export class StoryScene extends Phaser.Scene {
       fontSize: dialogueFontSizePx(settings),
       fitText: true,
       onLineComplete: () => {
-        if (settings.autoAdvance && ['dialogue', 'narration', 'action'].includes(node.type)) {
+        if (settings.autoAdvance) {
           this.autoTimer = this.time.delayedCall(TYPEWRITER.AUTO_ADVANCE_DELAY_MS, () =>
             this.advanceLine?.(),
           )
@@ -189,18 +196,82 @@ export class StoryScene extends Phaser.Scene {
       }
       if (this.runner.advance(version)) this.render()
     }
+    box.showLine(storyLine(node))
+    this.showNeckPhoto(node, box.y)
+  }
+
+  showNotice(node, version) {
     const record = this.runner.record
     let line = record
       ? {
           speaker: record.name ?? record.title ?? record.speaker,
           text: record.text ?? record.description,
         }
-      : storyLine(node)
+      : { text: node.text }
     if (node.predicateId === 'P4_CLOSE_READY' && node.showMissingSourcesOnly) {
       line = closingChecklist(this.runner.state, (key) => this.runtime.t(key))
     }
-    if (!line.text) line.text = this.runtime.t('story.continue')
-    box.showLine({ ...line, kind: node.type })
+    const { width, height } = this.scale
+    const x = 80
+    const text = line.text ?? ''
+    const body = this.add
+      .text(
+        x + 22,
+        0,
+        text.replaceAll('**', ''),
+        menuTextStyle({
+          size: 21,
+          wrapWidth: width - 2 * x - 44,
+        }),
+      )
+      .setDepth(DEPTH.OVERLAY + 1)
+    const header = line.speaker
+      ? this.add
+          .text(x + 22, 0, line.speaker, menuTextStyle({ size: 17, color: COLORS.accentHex }))
+          .setDepth(DEPTH.OVERLAY + 1)
+      : null
+    const headingHeight = header ? header.height + 8 : 0
+    const panelHeight = headingHeight + body.height + 62
+    const panelY = height - panelHeight - 32
+    const panel = this.add
+      .rectangle(x, panelY, width - 2 * x, panelHeight, COLORS.panel, 0.95)
+      .setOrigin(0)
+      .setStrokeStyle(1, COLORS.panelBorder)
+      .setDepth(DEPTH.OVERLAY)
+    const prompt = this.add
+      .text(
+        x + 22,
+        panelY + panelHeight - 32,
+        `${this.runtime.t('story.continue')} [Enter]`,
+        menuTextStyle({ size: 14, color: COLORS.mutedHex }),
+      )
+      .setDepth(DEPTH.OVERLAY + 1)
+    body.setY(panelY + 16 + headingHeight)
+    if (header) {
+      header.setY(panelY + 13)
+      this.view.push(header)
+    }
+    this.view.push(panel, body, prompt)
+    this.advanceLine = () => {
+      if (this.runner.advance(version)) this.render()
+    }
+    this.showNeckPhoto(node, panelY)
+  }
+
+  showNeckPhoto(node, panelY) {
+    if (node.id.startsWith('P2_NECK') || node.evidenceId === 'EV_NeckScratches') {
+      const { key, frame, crop } = ROOM_204_NECK_PHOTO
+      if (!this.textures.exists(key)) return
+      const top = 66
+      const height = Math.min(400, panelY - top - 16)
+      this.view.push(
+        this.add
+          .image(this.scale.width / 2, top, key, frame)
+          .setOrigin(0.5, 0)
+          .setDisplaySize(height * (crop[2] / crop[3]), height)
+          .setDepth(DEPTH.OVERLAY - 1),
+      )
+    }
   }
 
   showCrossExam(node, version) {

@@ -38,20 +38,43 @@ class ChapterPlaytest {
     return this.page.evaluate(() => window.__THE_UNSPOKEN__.runtime.story.state)
   }
 
+  dialoguePortrait() {
+    return this.page.evaluate(() => {
+      const { game, runtime } = window.__THE_UNSPOKEN__
+      const box = game.scene.getScene('StoryScene').view.find((object) => object.portrait)
+      return [runtime.story.node.speaker, box?.portrait.texture.key]
+    })
+  }
+
+  hasTexture(sceneKey, textureKey, frame) {
+    return this.page.evaluate(
+      ({ sceneKey, textureKey, frame }) =>
+        window.__THE_UNSPOKEN__.game.scene
+          .getScene(sceneKey)
+          .children.list.some(
+            (object) =>
+              object.visible &&
+              object.texture?.key === textureKey &&
+              (!frame || object.frame?.name === frame),
+          ),
+      { sceneKey, textureKey, frame },
+    )
+  }
+
   async click(x, y) {
     const box = await this.page.locator('canvas').boundingBox()
     await this.page.mouse.click(box.x + (x * box.width) / 1280, box.y + (y * box.height) / 720)
   }
 
-  async start(withTutorial) {
+  async start(withTutorial, { textSpeed = 'instant', stopAtOpening = false } = {}) {
     // Phiên giả chỉ ở trình duyệt test. Luồng lưu cục bộ chạy qua React và Phaser thật.
-    await this.page.addInitScript(() => {
+    await this.page.addInitScript((speed) => {
       localStorage.setItem(
         'theUnspoken.auth.v1',
         JSON.stringify({ token: 'playtest', username: 'playtest' }),
       )
-      localStorage.setItem('theUnspoken.settings.v1', JSON.stringify({ textSpeed: 'instant' }))
-    })
+      localStorage.setItem('theUnspoken.settings.v1', JSON.stringify({ textSpeed: speed }))
+    }, textSpeed)
     await this.page.goto('/play')
     await this.waitForScene('MainMenuScene')
     await this.key('Enter')
@@ -78,8 +101,10 @@ class ChapterPlaytest {
       await this.key('Enter')
     }
     await this.waitForScene('StoryScene')
-    expect(await this.node()).toBe('P1_001__001')
+    expect(await this.node()).toBe('P1_001__002')
+    if (stopAtOpening) return
     await this.readLines()
+    await this.waitForScene('RoomInvestigationScene')
   }
 
   async readLines(stopAt) {
@@ -88,12 +113,14 @@ class ChapterPlaytest {
         const { game, runtime } = window.__THE_UNSPOKEN__
         return {
           node: runtime.story.state.current_node,
+          type: runtime.story.node?.type,
           line:
             game.scene.isActive('StoryScene') &&
             Boolean(game.scene.getScene('StoryScene').advanceLine),
         }
       })
       if (!view.line || view.node === stopAt) return
+      expect(['narration', 'action']).not.toContain(view.type)
       await this.key('Enter')
     }
     throw new Error(`Không dừng được đoạn thoại tại ${await this.node()}`)
@@ -143,7 +170,11 @@ class ChapterPlaytest {
   }
 
   async clickSpot(id) {
-    await this.waitForScene('RoomInvestigationScene')
+    await this.page.waitForFunction(() => {
+      const game = window.__THE_UNSPOKEN__?.game
+      const room = game?.scene.getScene('RoomInvestigationScene')
+      return room?.sys.isActive() && !room.leaving && !room.cameras.main.fadeEffect.isRunning
+    })
     const rect = await this.page.evaluate(
       (spotId) =>
         window.__THE_UNSPOKEN__.game.scene
@@ -184,7 +215,16 @@ class ChapterPlaytest {
     }
     await this.readLines(stopAt)
     const node = await this.node()
-    if (['P1_HUB_MENU', 'P2_ROOM_UI', 'P3_HUB'].includes(node)) {
+    if (
+      [
+        'P1_HALL_204',
+        'P1_ROOM_204_VIEW',
+        'P1_ROOM_204_EXIT',
+        'P1_HUB_MENU',
+        'P2_ROOM_UI',
+        'P3_HUB',
+      ].includes(node)
+    ) {
       await this.page.waitForFunction(() => {
         const { game, runtime } = window.__THE_UNSPOKEN__
         const scene = game.scene.getScene('RoomInvestigationScene')
@@ -254,6 +294,79 @@ class ChapterPlaytest {
   }
 }
 
+test('Chủ trọ nhép miệng theo lượt nói ở đầu Chương 1', async ({ page }) => {
+  const game = new ChapterPlaytest(page)
+  const renderedMouthColors = (sceneKey, poseCount) =>
+    page.evaluate(
+      async ({ key, count }) => {
+        const { game } = window.__THE_UNSPOKEN__
+        const { sprite } = game.scene.getScene(key).characterStage
+        const colors = new Map()
+        const deadline = performance.now() + 1500
+        while (colors.size < count && performance.now() < deadline) {
+          const texture = sprite.texture.key
+          if (sprite.alpha === 1 && sprite.anims.isPlaying && !colors.has(texture)) {
+            const { x, y } = sprite.getTopLeft()
+            // Điểm nằm giữa miệng trên ảnh gốc 783 × 990.
+            const sample = await new Promise((resolve) => {
+              game.renderer.snapshotPixel(
+                Math.round(x + 414 * sprite.scaleX),
+                Math.round(y + 306 * sprite.scaleY),
+                ({ color }) => resolve({ texture: sprite.texture.key, color }),
+              )
+            })
+            colors.set(sample.texture, sample.color)
+          }
+          await new Promise(requestAnimationFrame)
+        }
+        return [...colors.values()]
+      },
+      { key: sceneKey, count: poseCount },
+    )
+  const stageState = () =>
+    page.evaluate(() => {
+      const scene = window.__THE_UNSPOKEN__.game.scene.getScene('StoryScene')
+      const { sprite } = scene.characterStage
+      const box = scene.view.find((object) => object.bodyText)
+      return {
+        visible: sprite.visible,
+        dimmed: sprite.isTinted,
+        playing: sprite.anims.isPlaying,
+        texture: sprite.texture.key,
+        typing: box.isTyping,
+        textLength: box.bodyText.text.length,
+      }
+    })
+
+  await game.start(false, { textSpeed: 'normal', stopAtOpening: true })
+  expect(await stageState()).toMatchObject({ visible: true, dimmed: false })
+  expect(new Set(await renderedMouthColors('StoryScene', 3)).size).toBe(3)
+  await expect.poll(stageState).toMatchObject({
+    playing: false,
+    texture: 'char-landlord-stern',
+    typing: false,
+  })
+
+  await game.key('Enter')
+  expect(await game.node()).toBe('P1_002__002')
+  await expect.poll(async () => (await stageState()).textLength).toBeGreaterThan(2)
+  expect(await stageState()).toMatchObject({
+    visible: true,
+    dimmed: true,
+    playing: false,
+    texture: 'char-landlord-stern',
+  })
+
+  await game.readLines('P1_002__003')
+  expect(await stageState()).toMatchObject({ dimmed: false, playing: true, typing: true })
+  await game.key('Enter')
+  expect(await stageState()).toMatchObject({ playing: false, texture: 'char-landlord-stern' })
+
+  await game.key('F9')
+  await game.waitForScene('DialogueScene')
+  expect(new Set(await renderedMouthColors('DialogueScene', 2)).size).toBe(2)
+})
+
 for (const early of [true, false]) {
   test(`Chương 1 qua giao diện · nguồn tùy chọn ${early ? 'thu sớm' : 'qua hồ sơ Phase 4'}`, async ({
     page,
@@ -261,9 +374,31 @@ for (const early of [true, false]) {
     const game = new ChapterPlaytest(page)
     await test.step('Phòng 201, hỏi đủ bốn người', async () => {
       await game.start(early)
+      expect(await game.node()).toBe('P1_HALL_204')
+      expect(await game.hasTexture('RoomInvestigationScene', 'chapter1-portrait-linh')).toBe(false)
+      await game.choose('P1_ENTER_204')
+      expect(await game.node()).toBe('P1_ROOM_204_VIEW')
+      expect(await game.hasTexture('RoomInvestigationScene', 'bg-room204-tung')).toBe(true)
+      expect(await game.hasTexture('RoomInvestigationScene', 'room204-neck-photo')).toBe(false)
+      await game.choose('P1_SEE_TUNG')
+      expect((await game.state()).flags.victim_seen_from_door).toBe(true)
+      expect((await game.state()).statements).toEqual({})
+      expect((await game.state()).evidence_collected).toEqual([])
+      await game.choose('P1_LEAVE_204', 'P1_003__002')
+      expect(await game.dialoguePortrait()).toEqual(['NGƯỜI ĐÀN ÔNG', 'chapter1-portrait-hao'])
+      await game.readLines('P1_003__004')
+      expect(await game.dialoguePortrait()).toEqual(['MINH', 'chapter1-portrait-minh'])
+      await game.readLines()
+      await game.choose('P1_HOA_04')
+      for (const id of ['linh', 'minh', 'hao']) {
+        expect(await game.hasTexture('RoomInvestigationScene', `chapter1-portrait-${id}`)).toBe(
+          true,
+        )
+      }
+      await game.choose('P1_LINH_DISPATCH', 'P1_LINH_01__002')
+      expect(await game.dialoguePortrait()).toEqual(['LINH', 'chapter1-portrait-linh'])
+      await game.readLines()
       await game.choices(
-        'P1_HOA_04',
-        'P1_LINH_DISPATCH',
         'P1_LINH_04',
         'P1_HAO_DISPATCH',
         'P1_HAO_04',
@@ -276,6 +411,8 @@ for (const early of [true, false]) {
 
     await test.step('Phòng 204, lối ra và nguồn thu thập', async () => {
       expect(await game.node()).toBe('P2_ROOM_UI')
+      expect(await game.hasTexture('RoomInvestigationScene', 'bg-room204-tung')).toBe(true)
+      expect(await game.hasTexture('RoomInvestigationScene', 'room204-neck-photo')).toBe(false)
       await game.choose('P2_EXIT_CHECK')
       expect(await game.node()).toBe('P2_ROOM_UI')
       const core = [
@@ -285,7 +422,19 @@ for (const early of [true, false]) {
         'P2_RECEIPT_DISPATCH',
         'P2_WATCH_DISPATCH',
       ]
-      await game.choices(...(early ? core : core.reverse()))
+      for (const target of early ? core : core.reverse()) {
+        if (target === 'P2_NECK_DISPATCH') {
+          await game.choose(target, 'P2_NECK__002')
+          expect(await game.hasTexture('StoryScene', 'room204-neck-photo', 'neck-and-collar')).toBe(
+            true,
+          )
+          expect((await game.state()).evidence_collected).not.toContain('EV_NeckScratches')
+          await game.readLines()
+          await game.waitForScene('RoomInvestigationScene')
+        } else {
+          await game.choose(target)
+        }
+      }
       expect((await game.state()).evidence_collected).toHaveLength(5)
       if (early) {
         await game.choices(
@@ -301,12 +450,9 @@ for (const early of [true, false]) {
       expect(await game.node()).toBe('P3_HUB')
       if (!early) {
         expect((await game.state()).evidence_records.EV_WetTowel).toBeUndefined()
-        await game.choices(
-          'P3_ROOM_RETURN',
-          'P2_TOWEL_DISPATCH',
-          'P2_BOX_DISPATCH',
-          'P2_EXIT_CHECK',
-        )
+        await game.choose('P3_ROOM_RETURN')
+        expect(await game.hasTexture('RoomInvestigationScene', 'bg-room204-tung')).toBe(true)
+        await game.choices('P2_TOWEL_DISPATCH', 'P2_BOX_DISPATCH', 'P2_EXIT_CHECK')
         expect((await game.state()).evidence_records.EV_WetTowel.collected_phase).toBe(3)
       }
     })
@@ -391,11 +537,12 @@ for (const early of [true, false]) {
       if (!early) {
         await game.choose('P4_CLOSE_GATE', 'P4_INCOMPLETE')
         expect(await game.node()).toBe('P4_INCOMPLETE')
-        const checklist = await page.evaluate(
-          () =>
-            window.__THE_UNSPOKEN__.game.scene
-              .getScene('StoryScene')
-              .view.find((object) => object.bodyText)?.bodyText.text,
+        const checklist = await page.evaluate(() =>
+          window.__THE_UNSPOKEN__.game.scene
+            .getScene('StoryScene')
+            .view.filter((object) => object.type === 'Text')
+            .map(({ text }) => text)
+            .join('\n'),
         )
         expect(checklist).toContain('tờ khảo sát')
         expect(checklist).toContain('giấy khen')
@@ -406,13 +553,14 @@ for (const early of [true, false]) {
       if (!early) await game.choose('P4_SURVEY_RECORD')
       await game.choices('P4_LINH_SURVEY', 'P4_CERTIFICATE')
       await game.choose('P4_CLOSE_GATE', 'P4_CHAPTER_TRANSITION__002')
-      const title = await page.evaluate(
-        () =>
-          window.__THE_UNSPOKEN__.game.scene
-            .getScene('StoryScene')
-            .view.find((object) => object.bodyText)?.bodyText.text,
+      const title = await page.evaluate(() =>
+        window.__THE_UNSPOKEN__.game.scene
+          .getScene('StoryScene')
+          .view.filter((object) => object.type === 'Text')
+          .map(({ text }) => text)
+          .join('\n'),
       )
-      expect(title).toBe('CHAPTER 2 — CON HẺM NƠI QUÁN BAR')
+      expect(title).toContain('CHAPTER 2 — CON HẺM NƠI QUÁN BAR')
       await game.readLines()
       const state = await game.state()
       expect(state.current_node).toBe('CH2_ENTRY')

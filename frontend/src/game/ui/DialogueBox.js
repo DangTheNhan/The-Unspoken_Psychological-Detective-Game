@@ -84,16 +84,16 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   }
 
   /**
-   * @param {{ speaker?: string, text: string, kind?: string, portrait?: string|null, character?: string|null,
+   * @param {{ speaker?: string, text: string, kind?: string, portrait?: string|null, portraitFrame?: string, character?: string|null,
    *           expression?: string|null, talk?: string|null, position?: string|null }} line
    */
   showLine(line) {
-    const { text = '', portrait = null, kind } = line
+    const { text = '', portrait = null, portraitFrame, kind } = line
     this.stopTyping()
 
     const onStage = this.placeCharacter(line)
     this.nameText.setText(line.speaker || onStage?.name || '')
-    this.setPortrait(onStage ? null : portrait)
+    this.setPortrait(onStage ? null : portrait, portraitFrame)
     this.bodyText.setFontStyle(kind === 'narration' ? 'italic' : 'normal')
     this.bodyText.setColor(
       kind === 'ui' ? COLORS.accentHex : kind === 'action' ? COLORS.mutedHex : COLORS.textHex,
@@ -114,7 +114,8 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       return
     }
 
-    if (onStage) this.stage.startTalking(onStage.talkAnim)
+    const talkAnim = onStage?.talkAnim
+    if (talkAnim) this.stage.startTalking(talkAnim)
     let shown = 0
     this.typingEvent = this.scene.time.addEvent({
       delay: this.charDelayMs,
@@ -122,7 +123,7 @@ export class DialogueBox extends Phaser.GameObjects.Container {
       callback: () => {
         shown += 1
         this.bodyText.setText(text.slice(0, shown))
-        this.stage?.syncMouth(text[shown - 1])
+        if (talkAnim) this.stage.syncMouth(text[shown - 1])
         if (shown >= text.length) {
           this.stopTyping()
           this.onLineComplete?.()
@@ -156,11 +157,12 @@ export class DialogueBox extends Phaser.GameObjects.Container {
   }
 
   /** Có ô chân dung -> chữ lùi sang phải; không có -> chữ dùng hết bề ngang khung. */
-  setPortrait(textureKey) {
+  setPortrait(textureKey, frame) {
     const exists = Boolean(textureKey) && this.scene.textures.exists(textureKey)
     this.portraitFrame.setVisible(exists)
     this.portrait.setVisible(exists)
-    if (exists) this.portrait.setTexture(textureKey).setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)
+    if (exists)
+      this.portrait.setTexture(textureKey, frame).setDisplaySize(PORTRAIT_SIZE, PORTRAIT_SIZE)
 
     const textX = exists ? PADDING * 2 + PORTRAIT_SIZE : PADDING * 2
     this.nameText.setX(textX)

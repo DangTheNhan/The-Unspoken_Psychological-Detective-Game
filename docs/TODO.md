@@ -1,6 +1,6 @@
 # TODO — The Unspoken (bảng việc sống)
 
-> Cập nhật **10/11/2026 (T-046)** — đã rà hotspot phòng 204 và qua hai lượt Playwright tới cuối Chương 1. Còn ảnh thi thể TD-49, lưu server và playtest tay TD-38.
+> Cập nhật **10/11/2026 (T-050)** — Phase 1 hướng dẫn vào phòng 204 quan sát Tùng trước khi lấy lời khai. Hộp thoại hiện lời nói, chân dung Linh, Minh và Hào dùng bảng thiết kế nhóm gửi.
 
 > Cập nhật: **03/11/2026 (T-042)** — DEC-021: quay về nhân vật thám tử cũ, thiết kế mới V6c cất lại (TD-47/48/59/61). Trước đó (T-034) — Q3 (DEC-016), Q4/Q5/N-Q1 (DEC-017), N-Q2 (DEC-018: NPC trên map, tới gần nhấn E), N-Q3 (DEC-019: lưu vị trí nhân vật — cách B) đã chốt; TD-16 (N0) ✅; TD-17: N1 ✅ (T-035); N2 xong phần AI (T-036), chờ `npm run check` + trả lời N2-Q1/Q2. Trước đó (T-028) — nhóm chốt thứ tự đầu tiên: TD-01 → TD-02 → TD-46 → TD-03. Đây là danh sách việc DUY NHẤT cần theo dõi; `docs/PROJECT_PLAN.md` mục 2a là bản chụp ngày 27/10.
 > Mã `TD-xx` giữ nguyên số của PROJECT_PLAN 2a; việc mới từ TD-46 trở đi.
@@ -38,7 +38,7 @@
 | TD-47 | **Tốc độ đi lên/xuống** 88 px/giây (= 0,4 × đi ngang) — hoạt ảnh 4 hướng mới tính theo số này | F | P1 | ⏸ gác (DEC-021: dùng lại nhân vật cũ — 220 px/giây mọi hướng) | 2 | |
 | TD-48 | **Thiết kế thám tử**: đổi hẳn sang bản mới (tóc rối, sổ tay, túi ô liu) cho hoạt ảnh, tư thế đứng và chân dung hội thoại? | F, G | P1 | ✅ DEC-021: GIỮ THIẾT KẾ CŨ (DEC-020 gác; thiết kế mới cất trong art-source) | 2 | |
 | TD-14 | **Hành lang / phòng 204**: cửa A204 dẫn vào phòng 204 (đi tự do hay chỉ theo kịch bản P2)? cầu thang đi đâu? giấy khen đặt ở đâu? có lưu vị trí phòng vào file lưu? điểm xem bảng Nội quy/Thông báo? | C, E | P1 | ⏸ chờ Bạn | 3 | |
-| TD-49 | **Thi thể Tùng** ở phòng 204: lớp ảnh riêng (ẩn được khi cảnh sát xử lý / khi tái dựng) hay vẽ dính vào nền? | C | P2 | ⏸ chờ Bạn | 3 | |
+| TD-49 | **Thi thể Tùng** ở phòng 204 | C | P2 | ✅ T-048 dùng nền đã ghép của PR #8 làm biến thể cho cảnh khám hiện trường | 3 | |
 | TD-11 | **ISS-29** — Cách lấy `userId` khi login chỉ trả `{token,type,username,role}` (đụng API §4.3) | E | P1 | ⏸ | 4 | |
 | TD-12 | **ISS-05** — Mỗi user 1 bản lưu (ghi đè) hay nhiều bản (lịch sử/checkpoint)? | E | P1 | ⏸ | 4 | |
 | TD-13 | **ISS-10/11/12** — API admin, ROLE_ADMIN, định nghĩa "tài khoản hoạt động" & "% hoàn thành chương", công nghệ "thời gian thực" | H | P1 (trước Tuần 8) | ⏸ | 5 | |
@@ -50,9 +50,9 @@
 |---|---|---|---|---|---|---|---|---|
 | TD-50 | Ảnh nền phòng 204 (`art-source/room204/room204.png`, `backgrounds/room204.webp`) | Bạn + AI | P1 | — | — | ✅ 31/10 | | |
 | TD-51 | Sửa chi tiết ảnh 204 cho khớp gói Chương 1: tờ khảo sát (bỏ chữ + dấu X to → vài dòng gạch đỏ), gạt tàn bỏ khói, 1 tờ biên nhận dưới mép gạt tàn, hộp thuốc nhỏ NẰM TRONG thùng rác, vòng sạch trên bụi mặt tủ | AI (sửa ảnh) hoặc Bạn (vẽ lại) | P2 | S | — | ⬜ | | |
-| TD-52 | **Map phòng 204**: vùng đi, vật cản, lớp che và 9 hotspot (HP_LOCK, SINK, NECK, INHALER, TRASH, RECEIPT, DUST, BED, BOARD). Nội dung xem đồ lấy từ graph | AI | P1 | M | TD-49 cho lớp ảnh thi thể | 🔄 Đã rà vùng bấm và đường đi (T-046). Chờ ảnh để chốt vùng cổ | 3 | |
+| TD-52 | **Map phòng 204** gồm vùng đi, vật cản và 9 hotspot. Nội dung xem đồ lấy từ graph | AI | P1 | M | — | ✅ T-046 rà vùng bấm. T-048 căn lại vùng cổ và vùng đi quanh thi thể | 3 | |
 | TD-53 | Cửa A204 ⇄ phòng 204 (theo TD-14) | AI | P1 | S | TD-14 | ⏸ | | |
-| TD-54 | Lớp thi thể Tùng (ảnh + vị trí) | Bạn (ảnh) → AI | P2 | S | TD-49 | ⏸ | | |
+| TD-54 | Ảnh Tùng trong phòng 204 và ảnh cận vùng cổ | Bạn (ảnh) → AI | P2 | S | — | ✅ T-048 | | |
 | TD-55 | Giấy khen chữ ký Khang trên tường hành lang (hotspot phụ cho `EV_KhangCertificate`) | Bạn (ảnh) → AI | P2 | S | TD-14 | ⏸ | | |
 | TD-27 | Điền lời xem đồ vật: `room201-inspect.json`, `hallway-inspect.json` | Bạn | P2 | S | — | ⬜ | | |
 
@@ -93,7 +93,7 @@
 | TD-59 | Tích hợp 4 hướng: ô 448×720, 4 ảnh riêng (bỏ lật gương), tư thế đứng mới, tốc độ lật hình theo hướng, tốc độ dọc; chạy thử 201 + hành lang | AI | P1 | M | TD-48 (DEC-021 chọn thiết kế cũ) · lịch sử: T-039 tích hợp, T-040 sửa giật, T-041 AI sửa hình | ⏸ gác (DEC-021) — code + atlas cất ở `art-source/characters/detective/walk-4dir-v6c-t041/integration/` | |
 | TD-60 | Phương án dự phòng: nếu V6b không đạt → đưa V5 vào game tạm, sửa hoạt ảnh sau | Bạn quyết | P2 | S | TD-58 | ⏸ | |
 | TD-61 | Chân dung hội thoại thám tử theo thiết kế mới (6 biểu cảm dùng trong Chương 1: Attentive, Calm, Gentle, Neutral, Quiet, Thoughtful) | Bạn (ảnh) → AI | P1 | M | TD-48 | ⏸ gác (DEC-021) | |
-| TD-62 | Chân dung hội thoại NPC: Linh (14 biểu cảm), Hào (7), Minh (13), Cảnh sát (2); Hòa đã có 3 ảnh → cần bảng ánh xạ 15 biểu cảm | Bạn (ảnh) → AI | P1 | L | TD-10 | ⏸ | |
+| TD-62 | Chân dung hội thoại NPC | Bạn (ảnh) → AI | P1 | L | TD-10 | 🔄 T-050 đã nối Linh, Minh và Hào từ bảng thiết kế. Còn ảnh Cảnh sát | |
 | TD-45 | Quyết định dùng/bỏ `characters/main1–3.png` (5,2 MB, không code nào dùng) | Bạn | P3 | S | — | ⬜ | |
 
 ## G. Asset khác & âm thanh

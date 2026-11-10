@@ -125,6 +125,7 @@ Cỡ: S ≈ 1 phiên · M ≈ 2–3 phiên · L ≥ 4 phiên. Mỗi phase kết 
 - **Xong khi:** New Game tạo state v2 ban đầu; lưu/đọc lại localStorage không mất gì; save cũ không làm hỏng game.
 
 **N7 — Hiển thị hội thoại & lựa chọn** · M · TD-19
+- **T-050** hiển thị lời nhân vật trong hộp thoại. Lời dẫn và chỉ dẫn sân khấu tự chạy qua. Thông báo và bản ghi có bảng riêng.
 - `data/speakers.js`: ánh xạ `speaker`/`expression` → ảnh (HÒA → 3 ảnh landlord theo bảng ánh xạ 15 biểu cảm; nhân vật chưa có
   ảnh → chỉ hiện NHÃN TÊN, không ảnh tạm (DEC-017)); thám tử: ẩn hoặc chân dung nhỏ [ĐỀ XUẤT].
 - `DialogueBox` 4 kiểu: `dialogue` (có tên), `narration` (chữ nghiêng, không tên), `action` (chỉ dẫn), `ui` (thông báo hệ thống).
@@ -132,6 +133,7 @@ Cỡ: S ≈ 1 phiên · M ≈ 2–3 phiên · L ≥ 4 phiên. Mỗi phase kết 
 - **Xong khi:** đọc hết thoại Phase 1 trong trình duyệt, chọn được câu hỏi, câu đã hỏi tự ẩn.
 
 **N8 — Nối map với kịch bản** · M · TD-20
+- **T-050** nối lời báo của Hòa với ba bước trên bản đồ. Người chơi vào A204, quan sát Tùng rồi trở ra trước khi gặp người để lấy lời khai.
 - `RoomInvestigationScene` nghe đổi `scene_location`: `room201` → `hallway` (P1_002) → … ; cửa ra/vào theo kịch bản.
 - Nơi tập trung (HUB) theo DEC-018: NPC đứng trên map (Linh ở cửa 205, Hào bên lan can, Minh gần đầu cầu thang — theo chữ
   trong dữ liệu; Hòa, cảnh sát đặt TẠM), tới gần → [E] → chạy lựa chọn tương ứng của nút `choice` HUB; lựa chọn đang ẩn theo
@@ -150,7 +152,7 @@ Cỡ: S ≈ 1 phiên · M ≈ 2–3 phiên · L ≥ 4 phiên. Mỗi phase kết 
 - `data/rooms/room204.js`: vùng đi, vật cản (giường, bàn, tủ, cửa WC), lớp che; 9 hotspot đo theo ảnh thật, gắn với nút
   `investigation` (HP_LOCK, SINK, NECK, INHALER, TRASH, RECEIPT, DUST, BED, BOARD); `ui/InspectModal.js` (ảnh + chữ từ nút;
   đóng giữa chừng không commit); nút "Trở ra hỏi chuyện" sáng khi đủ 5 vật chứng chính (`P2_CORE`), không tự chuyển.
-- Lớp thi thể Tùng **[CHỜ TD-49]**; ảnh xem cận vật chứng chưa có → chỉ hiện nhãn tên vật chứng (DEC-017), thay ảnh khi nhóm gửi (TD-63).
+- **T-048** dùng `Tunginroom.png` làm nền khám phòng 204. Khi chọn vùng cổ, game hiển thị khung cắt từ `Tung.png`. Ảnh xem cận các vật chứng còn lại theo TD-63.
 - **Xong khi:** thu 5 vật chứng chính theo nhiều thứ tự → sang Phase 3; bỏ khăn/hộp vẫn thoát được.
 
 **N11 — Sổ tay 4 tab đọc state v2** · M · TD-24
@@ -221,7 +223,7 @@ Không đổi: `schema.sql`, chữ ký API §4.3, cốt truyện, lời thoại,
 | ~~N-Q3~~ | **ĐÃ TRẢ LỜI (DEC-019): phương án B** — state v2 + khối vị trí nhân vật cạnh state; chi tiết ở N6 | — | — |
 | ~~N2-Q1~~ | **Đã chốt cách hiển thị (T-044):** Lịch sử trò chuyện đọc lại hội thoại đã hoàn tất; tab Lời khai dùng bản ghi quan trọng từ graph và liên kết bản thay thế. Runtime giữ phiên bản cũ và nguồn cập nhật cho mỗi lần sửa lời khai. | N2, N11, N5 | — |
 | ~~N2-Q2~~ | **Đã chốt (T-045):** giữ `source_kind` theo validator. Sổ tay hiện nhãn theo nguồn đã ghi, gồm ảnh hiện trường, ảnh trong hồ sơ cảnh sát và giấy khen hành lang. | N11 | — |
-| TD-49 | Thi thể Tùng: lớp ảnh riêng hay vẽ dính nền? | N10 | Trước N10 |
+| ~~TD-49~~ | T-048 dùng nền ghép sẵn của PR #8 trong thời gian được phép khám phòng 204. | N10 | — |
 | ISS-29 (TD-11) | Lấy `userId` khi login | N15 (lưu server) | Trước N15 |
 
 ## 7. Rủi ro bug / lỗi phần mềm

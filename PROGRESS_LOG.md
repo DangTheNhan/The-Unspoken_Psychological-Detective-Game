@@ -9,12 +9,12 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 10/11/2026 — T-046. Đã rà vùng bấm phòng 204 và chạy qua hai lượt Chương 1 trên Chrome |
+| Cập nhật lần cuối | 10/11/2026 — T-050. Đã đổi mở đầu và nối chân dung Linh, Minh, Hào |
 | Tác vụ đang làm | T-043 chờ ảnh 24 khung. Chương 1 còn playtest tay TD-38 |
-| Đã xong gần nhất | T-046 hoàn thành phần Playwright N16 (TD-36). T-045 đóng N2-Q2 |
-| Trạng thái dở dang | Mã và dữ liệu Chương 1 đã đẩy lên `origin/Nhan` tại `fff5ed8`. Hotspot vùng cổ và lớp ảnh thi thể chờ TD-49 |
-| Việc tiếp theo | Playtest tay theo TD-38, chốt TD-49 và ISS-29 |
-| Đang bị chặn bởi | TD-49 (ảnh thi thể), ISS-29 (lưu server) |
+| Đã xong gần nhất | T-050 nối hướng dẫn đến A204 trước khi lấy lời khai. T-048 hoàn thành ảnh Tùng và vùng cổ |
+| Trạng thái dở dang | Mã Chương 1 bản trước đã đẩy lên `origin/Nhan` tại `fff5ed8`. T-048 và T-050 đang ở máy |
+| Việc tiếp theo | Playtest tay theo TD-38 và chốt ISS-29 |
+| Đang bị chặn bởi | ISS-29 (lưu server) |
 | Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `npm run test:e2e` · `python scripts/chapter1/validate.py` (tự chạy validator của gói trên bản sao tạm — KHÔNG chạy thẳng `docs/sources/.../validate_data.py` vì nó ghi đè `validation.results.json`) |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
 
@@ -504,3 +504,23 @@
 - Commit cục bộ `fff5ed8` trên nhánh `Nhan` gồm frontend, dữ liệu runtime, bộ kiểm thử và tài liệu kỹ thuật Chương 1.
 - Kiểm tra trước commit qua 182 test frontend, 4 test backend bằng Maven offline và 6.255 assertion của validator Chương 1.
 - Đã đẩy `fff5ed8` lên `origin/Nhan` theo yêu cầu của người dùng và xác nhận hai đầu nhánh trùng nhau.
+
+### T-048 — Tích hợp ảnh Tùng vào phòng 204
+- Người dùng yêu cầu đưa bộ ảnh Tùng đã có vào game. Dùng `Tunginroom.png` làm nền riêng trong lúc được phép khám phòng 204 và giữ nền trống cho các ngữ cảnh khác. Dùng khung cắt cổ áo từ `Tung.png` khi người chơi chọn vùng cổ hoặc xem lại vật chứng này trong luồng kịch bản.
+- Đã căn `HP_NECK` vào vùng đầu/cổ, thêm vùng cản chân quanh thân Tùng và dời điểm đứng gần giường, mặt tủ và bảng. `npm run check` qua 183 test và build, gồm kiểm đường đi giữa các hotspot.
+- Hai lượt Playwright đã qua. Kiểm tra nền có Tùng ở Phase 2 và khi trở lại phòng ở Phase 3, ảnh cận mở đúng lúc chọn vùng cổ và vật chứng chỉ được ghi sau khi xem xong. Validator qua 6.255 assertion, dữ liệu runtime khớp nguồn.
+
+### T-049 — Kiểm tra lỗi khởi động backend
+- `mvn spring-boot:run` biên dịch qua và kết nối MySQL 8.0.46. Tomcat báo cổng 8080 đang được `steamwebhelper.exe` (PID 21560 tại lúc kiểm tra) sử dụng.
+- Đã xác nhận Spring Boot chạy thành công khi đặt `SERVER_PORT=8081` trong PowerShell. Phiên kiểm thử đã kết thúc. Khi chạy frontend cùng backend cổng 8081, dùng `VITE_API_URL=http://localhost:8081/api`.
+
+### T-050 — Mở đầu phòng 204 và chân dung nhân vật
+- Theo yêu cầu người dùng, hộp thoại chỉ hiện lời nói. Runner tự đi qua lời dẫn và chỉ dẫn sân khấu. Thông báo và nội dung hồ sơ dùng bảng riêng.
+- Sau khi Hòa báo việc, game đánh dấu cửa A204. Người chơi vào phòng, quan sát Tùng, rồi ra hành lang. Linh, Minh và Hào mới xuất hiện ở lượt lấy lời khai. Phần nhìn hiện trường ban đầu không ghi vật chứng. Rút hai câu xưng chưa vào phòng để khớp với diễn biến mới.
+- Dùng ba bảng thiết kế người dùng cung cấp. Phaser lấy các ô chân dung từ ảnh gốc cho hội thoại và điểm tương tác trên bản đồ.
+- Hotspot kịch bản mở ngay khi người chơi bấm trong tầm tương tác. Đã kiểm tra việc nói tiếp với Minh sau khi lưu và tải lại ở đoạn báo cáo.
+- `npm run check` qua 183 test và build. Hai lượt Playwright qua trên Chrome, xác nhận quan sát Tùng trước khi lấy lời khai và đúng chân dung người nói. Validator qua 6.290 assertion cho bản game và 6.255 assertion cho gói nguồn.
+
+### T-051 — Khôi phục luồng đăng nhập và đăng ký cục bộ
+- Cổng 8080 trả 404 từ Steam WebHelper, backend game chưa nghe ở 8081. Đã khởi động backend 8081 và Vite 5173. `frontend/.env.local` đặt API thành `http://localhost:8081/api` cho máy này.
+- Chrome kiểm tra qua form thật. Đăng ký trả HTTP 201, đăng nhập trả HTTP 200 và chuyển đến `/play`. Đã dọn đúng tài khoản thử trong MySQL cục bộ. Hai dịch vụ vẫn chạy để người dùng tiếp tục thử.

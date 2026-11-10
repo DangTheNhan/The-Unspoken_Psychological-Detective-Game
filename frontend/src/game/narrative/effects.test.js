@@ -249,7 +249,7 @@ describe('effects — chạy trên dữ liệu thật chapter1.json', () => {
         failures.push(error.message)
       }
     }
-    expect(withEffects.length).toBe(100)
+    expect(withEffects.length).toBe(104)
     expect(failures).toEqual([])
     expect(JSON.stringify(initialState)).toBe(before)
   })
