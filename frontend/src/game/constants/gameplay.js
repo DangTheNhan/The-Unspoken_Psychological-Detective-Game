@@ -19,6 +19,7 @@ export const AUTOSAVE = Object.freeze({
     INTERVAL: 'interval',
     MANUAL: 'manual',
     EVIDENCE_COLLECTED: 'evidence-collected',
+    STORY_PROGRESS: 'story-progress',
   }),
 })
 
