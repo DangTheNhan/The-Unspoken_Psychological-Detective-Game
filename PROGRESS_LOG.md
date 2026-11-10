@@ -9,11 +9,11 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 24/10/2026 — T-024 (DEC-015: hành lang tầng 2 sau cửa phòng 201) |
-| Tác vụ đang làm | T-024 xong phần code, đã ghi lên máy (Desktop). Chờ người dùng: (1) `cd frontend; npm run check` + `npm run dev` cho T-023 + T-024; (2) xác nhận A204 → phòng 204, cầu thang đi đâu, giấy khen ở hành lang, có lưu vị trí phòng vào file lưu không; (3) điền `room201-inspect.json`, `hallway-inspect.json`; (4) xóa `package-lock.json` + `node_modules` thừa ở gốc; (5) commit/push |
-| Đã xong gần nhất | T-012: gói Chương 1 đọc hết (SHA khớp, validator PASS); lưu `docs/sources/chapter1/` + `docs/chapter1/CHAPTER1_MEMORY.md` (tóm tắt) + `CHAPTER1_PLAN.md` (kế hoạch WP-C1…C10). Trước đó: T-009..T-011 (tái cấu trúc áp dụng, MySQL, end-to-end đạt) |
+| Cập nhật lần cuối | 03/11/2026 — T-029 (TD-03: chạy kiểm tra thật, sửa định dạng `room201-inspect.json`; `npm run check` + `mvn clean test` đều qua) |
+| Tác vụ đang làm | Không có. T-029 xong (TD-03, TD-04 ✅). Thay đổi T-029 chưa commit |
+| Đã xong gần nhất | T-026: ảnh nền phòng 204 + hoạt ảnh đi ngang 6 khung (31/10); T-027: `docs/TODO.md` (03/11). Trước đó: T-024 hành lang (DEC-015), T-025 kế hoạch 27/10 |
 | Trạng thái dở dang | Không có code dở. AI chưa chạy được Vitest/Vite thật trên máy (node_modules bản Windows thiếu binding Linux, npm bị chặn 403) — đã kiểm bằng bộ chạy thay thế + ESLint thật của dự án trên máy + Phaser thật trong Chromium |
-| Việc tiếp theo | (1) Người dùng báo kết quả `npm run check` → sửa nếu lỗi; (2) trả lời câu hỏi T-024 (phòng 204, cầu thang, giấy khen, lưu vị trí); (3) nhận nội dung đồ vật/ảnh đi lên-xuống/intro → điền; (4) Q3–Q5 → WP-C1…C10 (nối P1_001) |
+| Việc tiếp theo | Commit T-029 (khi người dùng yêu cầu). Sau dọn nền: Q3/Q4 (TD-08/09), rồi TD-52 + TD-16..18 theo `docs/TODO.md` |
 | Đang bị chặn bởi | Q3–Q5 (T-012); ISS-29 (userId, cho phần lưu server ở WP-C8) |
 | Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `python docs/sources/chapter1/validation/validate_data.py` (chạy trên bản sao vì script ghi đè `validation.results.json`) |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
@@ -315,3 +315,38 @@
 - **Bước con 2 — dữ liệu + code:** `data/rooms/hallway.js` (vùng đi chữ U, mép dưới y 624, cao 222→330 px TẠM, 6 hotspot, `entrances`); `room201.js` (cửa có `target: hallway`, `entrances.hallway`); `rooms/index.js` (+`entrancePoint`); `RoomInvestigationScene` (cửa sang phòng khác bằng restart + tối/sáng 250 ms, lớp che `baseY` xếp cùng thang với nhân vật 20 + y/1000, nhãn `promptKey`, dọn tham chiếu + gỡ listener RESUME khi restart); `uiText` (`interact.enter`, `hallway.*` VI/EN); `public/assets/dialogues/hallway-inspect.json` (5 khóa rỗng); test `hallway.test.js`, `rooms.test.js` (kiểm chung MỌI phòng: lối vào/điểm đứng đi tới được, cửa nối hai chiều), `inspectContent.test.js` đổi sang kiểm mọi phòng.
 - **Self-Check:** 20 file test / 110 ca qua (bộ chạy thay thế, KHÔNG phải Vitest); ESLint bộ luật tối thiểu 0 lỗi; Prettier đạt; Phaser thật trong Chromium: phòng 201 → bấm cửa → hành lang, đứng (200, 605) trước A201; giữ → dừng ở x 388 (chậu cây), ↑ dừng ở chân tường y 463, → đi ra sau lan can, ↓ bị lan can chặn; bấm A204 → đi tới (629, 460), lan can che chân đúng, hiện "[Chờ nội dung]"; bấm cầu thang → (938, 460); bấm cửa A201 → về phòng 201 ở cửa (190, 585). Ảnh gửi người dùng: `hanh-lang-chay-that.jpg`. **Chưa chạy:** `npm run check` thật.
 - **Chờ xác nhận:** A204 → phòng 204 (P2); cầu thang; "giấy khen" (gói Chương 1 đặt trên tường hành lang, ảnh này chưa thấy); lưu vị trí phòng trong file lưu (đổi dữ liệu lưu → cần duyệt); điểm xem cho bảng Nội quy/Thông báo.
+
+### T-025 — Kiểm tra hiện trạng + lộ trình & bảng việc cần làm
+- Ngày giao: 27/10/2026 16:04 — "kiểm tra project hiện tại và lên các implement và table of todo tasks".
+- **Đã kiểm tra (chỉ đọc, trên máy):** `master` = `origin/master` = `b744ce7` (duy-nkd, 24/10 14:56, "Add hallway exploration and room inspection content") — đã gồm T-023 + T-024; không còn thay đổi chưa commit; không còn `_migration/`. Cây `frontend/src` (scene, systems, rooms), backend 32 lớp Java + 1 test, asset có trong `public/assets`, PROJECT_MEMORY C/E/H, CHAPTER1_PLAN.
+- **Phát hiện:** (1) `b744ce7` đưa `backend/src/main/resources/application.yml` có mật khẩu MySQL ghi cứng (giá trị mặc định 6 ký tự của `DB_PASSWORD`) lên `master`; (2) commit đẩy thẳng `master`; (3) `frontend/package-lock.json` bị bỏ các trường `libc` (khác phiên bản npm); (4) `characters/main1–3.png` (937×1678, 5,2 MB, từ 2879879 ngày 09/10) không được code nào dùng; (5) nhiều trạng thái REQ ở PROJECT_MEMORY mục C còn từ 08/10.
+- **Đã làm:** viết lại `docs/PROJECT_PLAN.md` mục 1 (hiện trạng 27/10), mục 2 (lộ trình GĐ 0–8), mục 2a (bảng TODO TD-01..TD-45: Ai/Ưu tiên/Cỡ/Chặn bởi/Xong khi), mục 2b (rủi ro); mục 3 cũ (Menu & Cài đặt) giữ làm lịch sử. PROJECT_MEMORY G4 trỏ tới bảng mới. Không sửa code, không chạy git ghi.
+- **Self-Check:** số liệu trong bảng lấy từ file thật trên máy (git log/show chỉ đọc, `GIT_OPTIONAL_LOCKS=0`, không để lại `.lock`); không đưa giá trị mật khẩu vào tài liệu. Lịch tuần là ước tính (Tuần 1 = 07/10) — cần nhóm xác nhận.
+
+### T-026 — Ảnh phòng 204 + hoạt ảnh đi của thám tử (31/10 → 02/11/2026)
+- 31/10: hướng dẫn prompt vẽ phòng 204 theo gói Chương 1 (9 vị trí vật chứng, bồn rửa sau vách/WC khuất khu bàn); người dùng chốt bản có WC góc trước-phải, cửa sổ tường phải giống phòng 201. AI xóa dấu ✦, cắt 16:9 → `art-source/room204/room204.png` (2731×1536) + `frontend/public/assets/images/backgrounds/room204.webp` (1920×1080), ghi vào máy `C:\The-Unspoken_Psychological-Detective-Game` (người dùng đã commit "Add room 204 background for Chapter 1" trên nhánh `Nhan`). Ảnh còn lệch gói: tờ khảo sát có dấu X + chữ, gạt tàn có khói, giấy thành xấp, hộp thuốc trên sàn, vòng bụi mờ (→ TD-51).
+- 31/10: hoạt ảnh đi ngang 6 khung (tấm 8 hình nền xanh, dùng hình 1,2,3,5,6,7) → `scripts/art/build_detective_walk.py`, thay 6 ô `walk-side-*` trong `detective.webp` (giữ idle), `WALK_ANIM_FPS` 10 → 8 (TẠM, khớp bước chân ở WALK_SPEED 220); chạy thật trong phòng 201: đúng khung, lật gương đúng, không lỗi console. Chưa chạy `npm run check`.
+- 31/10 → 02/11: người dùng chuyển sang thiết kế thám tử mới (gói 4 hướng do GPT dựng). AI đo từng bản: V1 bước quá ngắn (chân lướt ×7), giày nhân đôi; V3 đầu không nhấp nhô; V4 hướng lên/xuống khóa chân theo 220 px/giây → chân sau cao ngang gối, cả 2 bàn chân lơ lửng; V5 số đo đạt nhưng thân trên đứng yên tuyệt đối + chân lên/xuống bị bóp méo như ống; V6 (vẽ lại 12 khung) GPT tự báo KHÔNG đạt (thứ tự tư thế lộn, thừa tay, chân trượt 10–22 px). Đề xuất cách A (V6b: giữ rig V5 + thân trên chuyển động + vẽ lại 6 hình thân dưới lên/xuống, lật gương bước kia) — đang chờ GPT. Đề xuất tốc độ đi dọc 0,4 × 220 = 88 px/giây (TD-47) — chờ duyệt.
+- Không sửa code game ngoài `gameplay.js` + atlas ở trên.
+
+### T-027 — Lập bảng việc sống `docs/TODO.md`
+- Ngày giao: 03/11/2026 09:51 — "hãy tạo ra todo list các việc cần làm trước vào project sau đó chúng ta sẽ thống nhất xem nên làm việc nào trước".
+- Đã kiểm tra máy `dangthenhan` (`C:\The-Unspoken_Psychological-Detective-Game`, nhánh `Nhan`): commit gần nhất "Add room 204 background for Chapter 1"; `PROGRESS_LOG.md`, `PROJECT_MEMORY.md`, `docs/PROJECT_PLAN.md` trên máy này là bản T-024 (chưa có T-025 vốn chỉ nằm ở máy Desktop) → ghi bản T-025 + T-026 + T-027 vào máy này để hai máy hội tụ (TD-46).
+- **Đã làm:** tạo `docs/TODO.md` — 9 nhóm A–I (dọn nền, quyết định, map, Chương 1, lưu/tải, hoạt ảnh, asset, Admin, kiểm thử), mã TD-01..TD-45 giữ như PROJECT_PLAN 2a + TD-46..TD-63 mới (đồng bộ 2 máy, tốc độ dọc, thiết kế thám tử, thi thể Tùng, phòng 204, hoạt ảnh V6b, chân dung, ảnh vật chứng); mỗi việc có Ai/Ưu tiên/Cỡ/Chặn bởi/Trạng thái/Đề xuất + cột "Thứ tự (chốt)" để trống. PROJECT_PLAN 2a và PROJECT_MEMORY G4 trỏ tới TODO.md. Không sửa code.
+- **Self-Check:** mọi việc lấy từ PROJECT_PLAN 2a (27/10), CHAPTER1_PLAN, CHAPTER1_MEMORY §8 (asset, biểu cảm), nhật ký T-024..T-026; trạng thái ❓ ở TD-01/TD-03 vì AI chưa được báo kết quả. Thứ tự là đề xuất, chờ nhóm chốt.
+
+### T-028 — Dọn nền: TD-01, TD-02, TD-46, TD-03
+- Ngày giao: 03/11/2026 09:54 — "Dọn nền: TD-01, TD-02, TD-46, rồi TD-03." (nhóm chốt thứ tự đầu tiên trong `docs/TODO.md`).
+- **TD-02 (xong phần AI):** `backend/src/main/resources/application.yml` trên máy `C:\The-Unspoken…`: `password: ${DB_PASSWORD:<giá trị cũ>}` → `${DB_PASSWORD:}` + chú thích; không đổi dòng nào khác (đã đối chiếu: chỉ 1 chỗ DB_PASSWORD). Giá trị cũ KHÔNG được ghi vào tài liệu. Mật khẩu cũ vẫn còn trong lịch sử git (commit `b744ce7`) → bắt buộc TD-01. `JWT_SECRET` vẫn có giá trị mặc định cho dev (thiết kế T-002, Project.docx §4.2) — không thuộc TD-02.
+- **TD-01, TD-46, TD-03:** việc trên máy người dùng (đổi mật khẩu, git, chạy kiểm tra) — AI gửi hướng dẫn từng bước; AI không tự nhập/đổi mật khẩu (quy tắc an toàn), không chạy git trong thư mục máy.
+- `docs/TODO.md`: cột "Thứ tự (chốt)" TD-01=1, TD-02=2, TD-46=3, TD-03=4; TD-02 → 🔄.
+- **Self-Check:** đọc lại file sau sửa (LF, 1 dòng thay). Chưa chạy backend với cấu hình mới — nếu máy chưa đặt biến `DB_PASSWORD` thì backend báo `Access denied` (README bước 6 đã hướng dẫn đặt biến).
+
+### T-029 — TD-03: chạy kiểm tra thật trên máy + sửa lỗi test
+- Ngày giao: 03/11/2026 — "chạy kiểm tra" (`npm install`, `npm run check`, `mvn clean test`), sau đó "Có, sửa đi".
+- Máy: Node v24.18.0, npm 11.16.0, Maven 3.10.0, JDK 21.0.12. `_migration/` không còn.
+- **Lần chạy 1:** `npm install` xong (npm audit: 10 lỗ hổng — 8 moderate, 2 high, chưa xử lý). Lint ✅, Prettier ✅, Vitest ❌ 109/110 — `inspectContent.test.js`: `R201_COATS` và `R201_WINDOW` trong `frontend/public/assets/dialogues/room201-inspect.json` là chuỗi, không phải danh sách. Build ✅ (cảnh báo font BeVietnamPro resolve lúc chạy — không phải lỗi). `mvn clean test` ✅ (mã thoát 0).
+- **Sửa (người dùng đồng ý):** bọc 2 giá trị thành `["..."]`, GIỮ NGUYÊN chữ do nhóm viết (chữ hiện là nội dung thử, nhóm cần thay bằng lời thật).
+- **Lần chạy 2:** `npm run check` ✅ — 20 file test, 110/110 test qua, build qua.
+- TD-04 (CRLF `index.html`): kiểm `git ls-files --eol` → `i/lf w/lf`, Prettier qua → đánh dấu ✅.
+- `docs/TODO.md`: TD-03, TD-04 → ✅. Chưa commit.
