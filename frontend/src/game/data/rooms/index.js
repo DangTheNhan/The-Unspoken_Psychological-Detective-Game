@@ -1,12 +1,10 @@
 import { HALLWAY } from './hallway'
 import { ROOM_201 } from './room201'
-import { ROOM_204 } from './room204'
 
 /** Danh sách phòng 2.5D theo id (RoomInvestigationScene nạp theo data.roomId). Thêm phòng: thêm file + khai báo ở đây. */
 export const ROOMS = Object.freeze({
   [ROOM_201.id]: ROOM_201,
   [HALLWAY.id]: HALLWAY,
-  [ROOM_204.id]: ROOM_204,
 })
 
 /** Phòng mở đầu Chương 1 (Bible 1.3: New Game ở phòng 201) — DEC-013. */

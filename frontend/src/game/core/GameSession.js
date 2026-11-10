@@ -18,8 +18,6 @@ export class GameSession {
     this.chapter = chapter
     this.credibility = credibility
     this.notebook = notebook
-    this.story = null
-    this.player = null
     // Tutorial phòng 201 (DEC-013): một phần file lưu bình thường (Q-R9)
     this.tutorial = normalizeTutorialState(tutorial)
   }
@@ -44,20 +42,6 @@ export class GameSession {
    * PENDING(ISS-06): schema chi tiết của saveDataJson.
    */
   toSaveSnapshot() {
-    if (this.story) {
-      return {
-        currentChapter: this.story.chapter,
-        credibilityScore: this.story.credibility,
-        saveDataJson: JSON.stringify({
-          state: this.story,
-          player: this.player,
-          tutorial: this.tutorial,
-          ...(Object.values(this.notebook).some((entries) => entries.length)
-            ? { legacyNotebook: this.notebook }
-            : {}),
-        }),
-      }
-    }
     return {
       currentChapter: this.chapter,
       credibilityScore: this.credibility,
@@ -67,21 +51,11 @@ export class GameSession {
 
   static fromSaveSnapshot({ currentChapter, credibilityScore, saveDataJson }) {
     const data = saveDataJson ? JSON.parse(saveDataJson) : {}
-    const session = new GameSession({
+    return new GameSession({
       chapter: currentChapter,
       credibility: credibilityScore,
-      notebook: { ...createEmptyNotebook(), ...(data.legacyNotebook ?? data.notebook) },
+      notebook: data.notebook ?? createEmptyNotebook(),
       tutorial: data.tutorial,
     })
-    if (data.state?.schema_version === 2) session.setStory(data.state)
-    session.player = data.player ?? null
-    return session
-  }
-
-  setStory(state) {
-    if (this.story?.scene_location !== state.scene_location) this.player = null
-    this.story = state
-    this.chapter = state.chapter
-    this.credibility = state.credibility
   }
 }

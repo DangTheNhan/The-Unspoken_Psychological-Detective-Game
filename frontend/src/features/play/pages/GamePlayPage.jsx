@@ -8,10 +8,7 @@ import { useGameBridge } from '../hooks/useGameBridge'
 export function GamePlayPage() {
   const { session, logout } = useAuth()
   // PENDING(ISS-29): session chưa có userId -> lưu server chưa khả dụng, vẫn lưu localStorage
-  const { statusMessage } = useGameBridge({
-    userId: session?.userId ?? null,
-    username: session?.username,
-  })
+  const { statusMessage } = useGameBridge({ userId: session?.userId ?? null })
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-3 p-4">
