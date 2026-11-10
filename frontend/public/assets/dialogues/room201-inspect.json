@@ -1,0 +1,8 @@
+{
+  "_huong_dan": "Lời hiện ra khi thám tử XEM đồ vật trong phòng 201. Mỗi đồ vật là một danh sách câu; mỗi câu là một khung thoại, người chơi nhấn E để sang câu sau. Để trống [] = game hiện '[Chờ nội dung]'. Chỉ viết tiếng Việt, giữ nguyên các mã R201_..., nhớ dấu phẩy giữa các câu và đặt mỗi câu trong ngoặc kép. Lưu file rồi tải lại trang (Ctrl+F5) là thấy.",
+  "R201_BOARD": ["Con chó hoàng"],
+  "R201_DESK": ["con chó nhân"],
+  "R201_CALENDAR": ["con chó tín"],
+  "R201_COATS": "con chó mèo",
+  "R201_WINDOW": "nhiều con chó"
+}

@@ -1,0 +1,160 @@
+{
+  "id": "CH1_COMPLETE_MANIFEST",
+  "version": "1.0.0",
+  "scope": [
+    "Phase 1",
+    "Phase 2",
+    "Phase 3",
+    "Final Deduction",
+    "Phase 4"
+  ],
+  "phase4Decision": "authorized recommended A+S1+S2",
+  "storyBibleVersion": "1.3",
+  "sourceFilesUseApprovedCorrections": true,
+  "runtimeEntry": "data/chapter1.json",
+  "humanReadableCombinedScript": "CHAPTER_1_ALL_SCRIPTS.md",
+  "integrationPrompt": "CLAUDE_INTEGRATION_PROMPT.md",
+  "externalBoundary": "CH2_ENTRY (future chapter, intentionally not implemented)",
+  "files": [
+    {
+      "path": "CHAPTER_1_ALL_SCRIPTS.md",
+      "bytes": 228185,
+      "sha256": "c411da24454b3221086e013c5d8cc7f45b81bc1f02da5391d3ffaac0013bdba8"
+    },
+    {
+      "path": "CLAUDE_INTEGRATION_PROMPT.md",
+      "bytes": 4519,
+      "sha256": "50fd6317fe4dfe593c2fbbb17e659ebe8aaa26e3ba9a63cf30dacbfae28186c3"
+    },
+    {
+      "path": "DATA_CONTRACT.md",
+      "bytes": 9374,
+      "sha256": "ff1be1fdccba99de0a81336cfbeac7cb6e6d505b9a624d4f56e0638b66f7c4fd"
+    },
+    {
+      "path": "README_FIRST.md",
+      "bytes": 4878,
+      "sha256": "180676f7798e301f2c494c992ed31ade2c6febd8e7f23fb22e642c6ec2041a82"
+    },
+    {
+      "path": "STORY_AND_GAMEPLAY_BIBLE.md",
+      "bytes": 71233,
+      "sha256": "078c603e565cbc580814c7e798297a1b01b7821ae39e61b8ac586aa62508ba85"
+    },
+    {
+      "path": "data/assets.integration.json",
+      "bytes": 3581,
+      "sha256": "5536fa16c50185eb8e0f14fa63342734167c32e07ac62ca54a50f33a9c19d3ea"
+    },
+    {
+      "path": "data/chapter.schema.json",
+      "bytes": 9298,
+      "sha256": "b415aff7ed2bf65fdeccd70bd2f7b327fc14f12eeef01f221047921a382e6adb"
+    },
+    {
+      "path": "data/chapter1.json",
+      "bytes": 836242,
+      "sha256": "cc7a1029e185d9825f8a651b6769bf0d3470f4571b0fbd92d4487c99a73bc280"
+    },
+    {
+      "path": "data/evidence.json",
+      "bytes": 5644,
+      "sha256": "a4f59deea48bbb20c324e63457eb9bd7162ee93b77cb9998ccbcfac53e9dc6c8"
+    },
+    {
+      "path": "data/game-state.definitions.json",
+      "bytes": 5856,
+      "sha256": "8e4e191b340a05e7995d389d264d68922cdee93dba395a472828c897abb6a3d7"
+    },
+    {
+      "path": "data/people.json",
+      "bytes": 621,
+      "sha256": "70429337bc01f50f2225ae764156aa2956d87a448695fb067d6696c00400d3b2"
+    },
+    {
+      "path": "data/source-map.json",
+      "bytes": 120325,
+      "sha256": "7332f2fdd901d991efe630697fc3c9a9c454075275f891db4dc14b139234c6ff"
+    },
+    {
+      "path": "data/statements.json",
+      "bytes": 8112,
+      "sha256": "b294429f15547cb0b0eb000d901520d9349641323e1e2f446d8f6aab8b55c8c0"
+    },
+    {
+      "path": "reference/LOGIC_REPAIR_HISTORICAL.md",
+      "bytes": 63031,
+      "sha256": "acbbed8f6e6460b1980b048faf44fd150d922a6e5899d89a7ce5909ee266e97c"
+    },
+    {
+      "path": "reference/MASTER_PROMPT.txt",
+      "bytes": 22143,
+      "sha256": "a19c5d2623448b9b9dbad986014cb27829595fbd098642ad4a120d53515efcfb"
+    },
+    {
+      "path": "reference/PHASE_4_PROPOSALS_HISTORICAL.md",
+      "bytes": 29812,
+      "sha256": "bdebf3d1b9ec512098179f1b8f6c498e58d330ea18e327e4e93f6144548d9d96"
+    },
+    {
+      "path": "reference/Phase.docx",
+      "bytes": 33189,
+      "sha256": "d55d287f405e7dd7f241e115263028856bbcdf7742eccd1df2d3fe44f46dff06"
+    },
+    {
+      "path": "reference/Project.docx",
+      "bytes": 45326,
+      "sha256": "caea2bf7384e63229525a126992ec7bce532483e25d1654d649a4e1e28bbe44f"
+    },
+    {
+      "path": "reference/Story.txt",
+      "bytes": 12059,
+      "sha256": "45d7846adf2d6ac5a88f4221d4b67834b9a2539764a543963d0731ca0e331378"
+    },
+    {
+      "path": "scripts/CHAPTER_1_FINAL_DEDUCTION.md",
+      "bytes": 42987,
+      "sha256": "73a30abebbd332861b4eafab1dda936de4a162329279e9cff9baae021f536ba9"
+    },
+    {
+      "path": "scripts/CHAPTER_1_PHASE_1.md",
+      "bytes": 47344,
+      "sha256": "4b2d42ac6417303762ae0b22fd4a779b1d5b561cc2b611900acabd9191550830"
+    },
+    {
+      "path": "scripts/CHAPTER_1_PHASE_2.md",
+      "bytes": 33896,
+      "sha256": "7aaf9b7c0481dcb9ef08e3069a8fd1c40dfebcd311ed91e39d35edd8e8c31d31"
+    },
+    {
+      "path": "scripts/CHAPTER_1_PHASE_3.md",
+      "bytes": 84707,
+      "sha256": "bb932ab3d1487537e083ae9e175b6fbf4293ae0e93d604b35064db921d4b708a"
+    },
+    {
+      "path": "scripts/CHAPTER_1_PHASE_4.md",
+      "bytes": 18863,
+      "sha256": "2b9eed9815aefecc7d3c5da051b99c0f39c2d1d23b4678e94c652458a213cee6"
+    },
+    {
+      "path": "validation/PLAYTEST_CHECKLIST.md",
+      "bytes": 3202,
+      "sha256": "3b74d4b9c59bafdde54a6ef8e3f344977797ef2f03174c4cdae5b2def1985993"
+    },
+    {
+      "path": "validation/VALIDATION_REPORT.md",
+      "bytes": 1511,
+      "sha256": "b3cd11fa08c92e883e1541efd0994ecd6053c141a6e52472c41efb00b1cdbd53"
+    },
+    {
+      "path": "validation/validate_data.py",
+      "bytes": 15988,
+      "sha256": "1fed3c1f73cdf26ab3be8b13ecbb262da68dca08d76e9eb96cf4ba48d1dd6394"
+    },
+    {
+      "path": "validation/validation.results.json",
+      "bytes": 1021,
+      "sha256": "6549ae1d679748ca3209a8767ed6f1274aad97a3502b86fa89be166d144cfb5b"
+    }
+  ]
+}

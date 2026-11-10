@@ -1,0 +1,453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chapter1.local/chapter.schema.json",
+  "title": "Chapter 1 Narrative Data Contract 2.0",
+  "type": "object",
+  "required": [
+    "contractVersion",
+    "id",
+    "type",
+    "chapter",
+    "entryNode",
+    "completionNode",
+    "phaseEntries",
+    "externalNodes",
+    "predicates",
+    "bindings",
+    "statementRules",
+    "nodes",
+    "deduction",
+    "runtimePolicy"
+  ],
+  "properties": {
+    "contractVersion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "chapter": {
+      "type": "integer"
+    },
+    "entryNode": {
+      "type": "string"
+    },
+    "completionNode": {
+      "type": "string"
+    },
+    "sourcePolicy": {
+      "type": "string"
+    },
+    "phaseEntries": {
+      "type": "object"
+    },
+    "externalNodes": {
+      "type": "array"
+    },
+    "predicates": {
+      "type": "object"
+    },
+    "bindings": {
+      "type": "object"
+    },
+    "statementRules": {
+      "type": "object"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "deduction": {
+      "type": "object"
+    },
+    "runtimePolicy": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "literal"
+          ],
+          "properties": {
+            "literal": {}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "ref"
+          ],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "pattern": "^/"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "predicate"
+          ],
+          "properties": {
+            "predicate": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "op",
+            "args"
+          ],
+          "properties": {
+            "op": {
+              "enum": [
+                "all",
+                "any",
+                "not",
+                "eq",
+                "ne",
+                "gt",
+                "gte",
+                "lt",
+                "lte",
+                "exists",
+                "contains",
+                "add",
+                "subtract",
+                "max",
+                "min"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expr"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "route": {
+      "type": "object",
+      "required": [
+        "conditions",
+        "targetNode"
+      ],
+      "properties": {
+        "conditions": {
+          "$ref": "#/$defs/expr"
+        },
+        "targetNode": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "choice": {
+      "type": "object",
+      "required": [
+        "text",
+        "condition",
+        "targetNode"
+      ],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/$defs/expr"
+        },
+        "targetNode": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "op"
+      ],
+      "properties": {
+        "op": {
+          "enum": [
+            "set",
+            "increment",
+            "upsert_record",
+            "merge_record",
+            "collect_evidence",
+            "save_checkpoint"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "before": {
+          "$ref": "#/$defs/expr"
+        },
+        "after": {
+          "$ref": "#/$defs/expr"
+        },
+        "evidenceId": {
+          "type": "string"
+        },
+        "checkpointId": {
+          "type": "string"
+        },
+        "overwrite": {
+          "type": "boolean"
+        },
+        "sourceNode": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "const": "save_checkpoint"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "checkpointId",
+              "overwrite"
+            ]
+          },
+          "else": {
+            "required": [
+              "path",
+              "before",
+              "after"
+            ]
+          }
+        }
+      ]
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "action",
+            "checklist",
+            "checkpoint_restore",
+            "choice",
+            "cross_examination",
+            "deduction",
+            "dialogue",
+            "investigation",
+            "narration",
+            "notebook_update",
+            "notebook_view",
+            "record_view",
+            "router",
+            "source_view",
+            "transition",
+            "ui"
+          ]
+        },
+        "speaker": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "next": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "conditions",
+                  "targetNode"
+                ],
+                "properties": {
+                  "conditions": {
+                    "$ref": "#/$defs/expr"
+                  },
+                  "targetNode": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "text",
+              "condition",
+              "targetNode"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "condition": {
+                "$ref": "#/$defs/expr"
+              },
+              "targetNode": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "conditions": {
+          "$ref": "#/$defs/expr"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          }
+        },
+        "evidenceId": {
+          "type": "string"
+        },
+        "statementId": {
+          "type": "string"
+        },
+        "observationId": {
+          "type": "string"
+        },
+        "credibilityPenalty": {
+          "type": "integer"
+        },
+        "hotspots": {
+          "type": "array"
+        },
+        "resumePolicy": {
+          "type": "string"
+        },
+        "tabs": {
+          "type": "array"
+        },
+        "statementIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "statementRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checkpointId": {
+          "type": "string"
+        },
+        "possibleTargets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "predicateId": {
+          "type": "string"
+        },
+        "showMissingSourcesOnly": {
+          "type": "boolean"
+        },
+        "commitHandlerId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "dialogue"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "speaker",
+              "expression",
+              "text",
+              "next"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "narration",
+                  "action",
+                  "ui"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text",
+              "next"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "choice"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "choices"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
