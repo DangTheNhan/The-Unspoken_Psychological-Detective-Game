@@ -32,7 +32,9 @@ export function AdminLayout() {
             </Link>
             <button
               type="button"
-              onClick={logout}
+              onClick={() => {
+                if (window.confirm('Đăng xuất khỏi trang quản trị?')) logout()
+              }}
               className="rounded border border-[#5c5266] px-3 py-1.5 text-xs font-medium text-[#a89f94] transition hover:border-[#d9534f] hover:text-[#f28b88]"
             >
               Đăng xuất

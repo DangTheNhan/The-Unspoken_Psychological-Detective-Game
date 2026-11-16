@@ -195,3 +195,9 @@ cd backend
 Trang `/admin/story-content` dành cho ROLE_ADMIN: chỉnh chữ trên node có sẵn → lưu nháp → kiểm tra → xem trước → xuất bản; lịch sử và khôi phục vào nháp. Nội dung áp dụng ở đầu phiên Ván mới/Tiếp tục, không thay đổi graph hoặc save schema.
 
 **Cần chạy thêm** `backend/src/main/resources/db/story-content.sql` trên database hiện có trước khi khởi động backend. Tạo manifest bằng `node scripts/chapter1/prepare-story-content.mjs` trước khi build backend (npm dev/test/build tự tạo). Hướng dẫn, API và giới hạn: [docs/STORY_CONTENT.md](docs/STORY_CONTENT.md). Kế hoạch đã duyệt: [docs/STORY_CONTENT_PLAN.md](docs/STORY_CONTENT_PLAN.md).
+
+### Tài khoản, menu và bảo trì (DEC-027)
+
+Chạy thêm `backend/src/main/resources/db/account-operations.sql`, rồi khởi động lại backend và đăng nhập lại. Có menu tạm dừng/cài đặt/báo lỗi trong game, lưu/tải theo đúng tài khoản, một phiên đăng nhập hiện hành và thống kê online. Admin vào thẳng trang quản trị; mục **Kết nối & Bảo trì** cho phép công bố thông báo và lịch tự dừng game, kết thúc bảo trì để mở lại.
+
+Quên mật khẩu dùng SMTP; đăng nhập ngoài chỉ hỗ trợ Google. Khi chưa cấu hình, giao diện báo rõ chưa sẵn sàng. [Hướng dẫn cấu hình và API](docs/ACCOUNT_AND_OPERATIONS.md), [kiểm thử](docs/ACCOUNT_OPERATIONS_QA.md). Không thêm bí mật Google/SMTP vào Git.

@@ -70,6 +70,8 @@ public class User {
         return passwordHash;
     }
 
+    public void changePassword(String encodedPassword) { this.passwordHash = encodedPassword; }
+
     public String getRole() {
         return role;
     }

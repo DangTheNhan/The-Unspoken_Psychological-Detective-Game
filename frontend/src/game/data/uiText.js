@@ -6,6 +6,12 @@
  */
 export const UI_TEXT = Object.freeze({
   vi: Object.freeze({
+    'menu.report': 'Báo lỗi',
+    'pause.title': 'Tạm dừng điều tra',
+    'pause.resume': 'Tiếp tục chơi',
+    'pause.settings': 'Cài đặt',
+    'pause.menu': 'Về menu chính',
+    'pause.note': 'Tiến độ đang chơi được giữ trong phiên này. Lưu tiến trình nằm trong Sổ tay.',
     'storyContent.loading': 'Đang lấy nội dung kịch bản…',
     'storyContent.base': 'Đang dùng nội dung kịch bản gốc.',
     'storyContent.published': 'Đã nạp nội dung kịch bản được xuất bản cho phiên chơi này.',
@@ -147,6 +153,12 @@ export const UI_TEXT = Object.freeze({
     'badEnding.reload': 'Tải lại checkpoint gần nhất',
   }),
   en: Object.freeze({
+    'menu.report': 'Report a bug',
+    'pause.title': 'Investigation paused',
+    'pause.resume': 'Resume game',
+    'pause.settings': 'Settings',
+    'pause.menu': 'Main menu',
+    'pause.note': 'Your current progress stays in this session. Save progress from the Notebook.',
     'storyContent.loading': 'Loading story content…',
     'storyContent.base': 'Using the original story text.',
     'storyContent.published': 'Published story text loaded for this play session.',

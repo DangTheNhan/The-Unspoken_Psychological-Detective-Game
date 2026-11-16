@@ -39,6 +39,21 @@ export function createRuntime() {
   const autosave = createAutosaveScheduler({ onSave: requestSave })
 
   return {
+    get hasStarted() {
+      return started
+    },
+    setPaused(value) {
+      if (value) autosave.stop()
+      else if (started) autosave.start()
+    },
+    saveLocal(reason) {
+      if (started)
+        EventBus.emit(GAME_EVENTS.SAVE_REQUESTED, {
+          reason,
+          snapshot: session.toSaveSnapshot(),
+          localOnly: true,
+        })
+    },
     get session() {
       return session
     },

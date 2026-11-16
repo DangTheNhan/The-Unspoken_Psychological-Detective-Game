@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { TYPEWRITER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { CHAPTER_DATA } from '../data/chapters'
 import { ROOMS, roomBackground } from '../data/rooms'
 import { ROOM_204_NECK_PHOTO } from '../data/rooms/room204'
@@ -89,7 +90,7 @@ export class StoryScene extends Phaser.Scene {
       if (!over.length) this.advanceLine?.()
     })
     this.events.on(Phaser.Scenes.Events.RESUME, this.render, this)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    onSceneEnd(this, () => {
       this.events.off(Phaser.Scenes.Events.RESUME, this.render, this)
       this.clearView()
     })

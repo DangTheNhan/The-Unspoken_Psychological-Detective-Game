@@ -28,7 +28,9 @@ class StoryTextSecurityTest {
         @Bean StoryTextAdminController admin(StoryTextService s) { return new StoryTextAdminController(s); }
         @Bean PublishedStoryTextController published(StoryTextService s) { return new PublishedStoryTextController(s); }
         @Bean JwtTokenProvider tokens() { return new JwtTokenProvider(new JwtProperties("story-content-test-secret-at-least-32-bytes",60000)); }
-        @Bean JwtAuthenticationFilter jwt(JwtTokenProvider p) { return new JwtAuthenticationFilter(p); }
+        @Bean com.capstone.detectivegame.auth.SessionService sessions() { var sessions=mock(com.capstone.detectivegame.auth.SessionService.class);when(sessions.valid(anyString(),anyString())).thenReturn(true);return sessions; }
+        @Bean JwtAuthenticationFilter jwt(JwtTokenProvider p,com.capstone.detectivegame.auth.SessionService s) { return new JwtAuthenticationFilter(p,s); }
+        @Bean MaintenanceFilter maintenance() { var service=mock(com.capstone.detectivegame.common.MaintenanceService.class);when(service.status()).thenReturn(new com.capstone.detectivegame.common.MaintenanceService.Status(java.time.Instant.now(),false,false,null,"",0));return new MaintenanceFilter(service,new com.fasterxml.jackson.databind.ObjectMapper()); }
         @Bean CorsProperties cors() { return new CorsProperties(List.of("http://localhost:5173")); }
     }
     @BeforeEach void setup() {

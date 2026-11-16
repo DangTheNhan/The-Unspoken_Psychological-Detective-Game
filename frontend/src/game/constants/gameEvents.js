@@ -3,6 +3,9 @@
  * Quy ước: '<miền>:<hành động>'. Payload ghi trong comment để bên nghe biết dữ liệu nhận được.
  */
 export const GAME_EVENTS = Object.freeze({
+  CONTROL_REQUEST: 'game:control-request',
+  CONTROL_STATE: 'game:control-state',
+  REPORT_REQUESTED: 'game:report-requested',
   /** Phaser -> React: { requestId, chapterId, baseHash, contractVersion, graph, language }. */
   STORY_TEXT_REQUESTED: 'story-text:requested',
   /** React -> Phaser: { requestId, graph, versionId, status }; only the matching session accepts it. */

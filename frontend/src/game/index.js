@@ -5,6 +5,7 @@ import { createGameConfig } from './config/gameConfig'
 import { GAME_EVENTS } from './constants/gameEvents'
 import { EventBus } from './core/EventBus'
 import { createRuntime, registerRuntime } from './core/runtime'
+import { installGameControls } from './core/gameControls'
 import { toSoundManagerState } from './systems/settings'
 
 const log = createLogger('Game')
@@ -18,6 +19,7 @@ export function createGame(parent) {
   const game = new Phaser.Game(createGameConfig(parent))
   const runtime = createRuntime()
   registerRuntime(game, runtime)
+  installGameControls(game, runtime)
 
   // Thiết lập âm lượng (DEC-012): áp dụng ngay khi tạo game và mỗi lần người chơi bấm Lưu
   const applySound = (settings) => Object.assign(game.sound, toSoundManagerState(settings))

@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleBadJson(HttpMessageNotReadableException ex, HttpServletRequest request) {
-        log.warn("{} {} -> JSON không hợp lệ: {}", request.getMethod(), request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+        log.warn("{} {} -> JSON không hợp lệ", request.getMethod(), request.getRequestURI());
         return build(HttpStatus.BAD_REQUEST, "Request body không phải JSON hợp lệ", request);
     }
 

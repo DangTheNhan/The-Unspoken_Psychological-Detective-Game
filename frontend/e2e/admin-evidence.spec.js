@@ -19,6 +19,20 @@ const canonicalRows = () =>
 
 // These UI tests isolate the existing API. They do not write to the user's database.
 async function mockCatalog(page, rows = []) {
+  await page.route('**/api/auth/session', (route) =>
+    route.fulfill({
+      json: {
+        maintenance: {
+          serverNow: new Date().toISOString(),
+          active: false,
+          scheduled: false,
+          startsAt: null,
+          message: '',
+          revision: 0,
+        },
+      },
+    }),
+  )
   const state = {
     rows,
     calls: { create: 0, update: 0, remove: 0, seed: 0 },

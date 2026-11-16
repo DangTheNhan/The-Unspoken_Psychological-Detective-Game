@@ -67,6 +67,20 @@ class ChapterPlaytest {
   }
 
   async start(withTutorial, { textSpeed = 'instant', stopAtOpening = false } = {}) {
+    await this.page.route('**/api/auth/session', (route) =>
+      route.fulfill({
+        json: {
+          maintenance: {
+            serverNow: new Date().toISOString(),
+            active: false,
+            scheduled: false,
+            startsAt: null,
+            message: '',
+            revision: 0,
+          },
+        },
+      }),
+    )
     // Phiên giả chỉ ở trình duyệt test. Luồng lưu cục bộ chạy qua React và Phaser thật.
     await this.page.addInitScript((speed) => {
       localStorage.setItem(

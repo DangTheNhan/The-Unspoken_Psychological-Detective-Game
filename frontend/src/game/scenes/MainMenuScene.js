@@ -6,6 +6,7 @@ import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { GameSession } from '../core/GameSession'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { CHAPTER_DATA } from '../data/chapters'
 import { FIRST_ROOM_ID } from '../data/rooms'
 import { ensureValidSelection, stepSelection } from '../systems/menuNavigation'
@@ -56,8 +57,15 @@ export class MainMenuScene extends Phaser.Scene {
 
     const items = [
       { key: 'menu.newGame', onSelect: () => this.onNewGame() },
-      { key: 'menu.continue', onSelect: () => EventBus.emit(GAME_EVENTS.LOAD_REQUESTED) },
+      {
+        key: 'menu.continue',
+        onSelect: () =>
+          this.runtime.menuResumeAvailable
+            ? EventBus.emit(GAME_EVENTS.CONTROL_REQUEST, { action: 'resume-menu' })
+            : EventBus.emit(GAME_EVENTS.LOAD_REQUESTED),
+      },
       { key: 'menu.settings', onSelect: () => this.openSettings() },
+      { key: 'menu.report', onSelect: () => EventBus.emit(GAME_EVENTS.REPORT_REQUESTED) },
     ]
     this.items = items.map(
       (item, index) =>
@@ -110,7 +118,7 @@ export class MainMenuScene extends Phaser.Scene {
     // Cài đặt đóng bằng nút Lưu -> vẽ lại menu theo ngôn ngữ / trạng thái tiếng mới
     const onSettingsChanged = () => this.scene.restart()
     EventBus.on(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    onSceneEnd(this, () => {
       this.contentRequest = null
       this.contentCleanup?.()
 
@@ -118,6 +126,7 @@ export class MainMenuScene extends Phaser.Scene {
       EventBus.off(GAME_EVENTS.LOAD_RESULT, onLoad)
       EventBus.off(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
     })
+    EventBus.emit(GAME_EVENTS.CONTROL_REQUEST, { action: 'status' })
   }
 
   update(time, delta) {
@@ -185,13 +194,13 @@ export class MainMenuScene extends Phaser.Scene {
   refreshAvailability() {
     if (this.preparingContent) return
     const continueItem = this.items[1]
-    continueItem.setEnabled(this.runtime.saveAvailable)
+    continueItem.setEnabled(this.runtime.saveAvailable || this.runtime.menuResumeAvailable)
     this.select(ensureValidSelection(this.enabledStates(), this.selectedIndex))
   }
 
   onNewGame() {
     if (this.preparingContent) return
-    if (!this.runtime.saveAvailable) {
+    if (!this.runtime.saveAvailable && !this.runtime.menuResumeAvailable) {
       this.startNewGame()
       return
     }
@@ -235,6 +244,7 @@ export class MainMenuScene extends Phaser.Scene {
    */
   startNewGame() {
     this.prepareContent((content) => {
+      EventBus.emit(GAME_EVENTS.CONTROL_REQUEST, { action: 'discard-menu' })
       this.runtime.startNewGame(this.initialStoryState(), content)
       this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
         chapter: FIRST_CHAPTER,

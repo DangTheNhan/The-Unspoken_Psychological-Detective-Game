@@ -6,6 +6,7 @@ import { ROOM_MOVEMENT } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { FIRST_ROOM_ID, ROOMS, entrancePoint, roomBackground } from '../data/rooms'
 import { getInspectLines } from '../data/rooms/inspectContent'
 import { isStoryMapNode, openingMapObjective, storyMapHotspots } from '../data/storyMap'
@@ -128,7 +129,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     // this.events tồn tại qua các lần restart -> gỡ listener khi tắt scene để không bị gọi lặp
     const onResume = () => this.onResume()
     this.events.on(Phaser.Scenes.Events.RESUME, onResume)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    onSceneEnd(this, () => {
       this.events.off(Phaser.Scenes.Events.RESUME, onResume)
       this.player?.destroy()
     })
@@ -202,9 +203,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     const onCredibilityChanged = ({ value }) => credibilityBar.setValue(value)
     EventBus.on(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged)
     // Gỡ listener khi rời scene -> tránh rò rỉ và gọi vào object đã hủy
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
-      EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged),
-    )
+    onSceneEnd(this, () => EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged))
   }
 
   /** Phòng chưa có dữ liệu/asset (ISS-27) -> nền tạm như trước. */

@@ -35,10 +35,17 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(String username, String role) {
+        return generateToken(username, role, java.util.UUID.randomUUID().toString());
+    }
+
+    public long expirationMs() { return expirationMs; }
+
+    public String generateToken(String username, String role, String sid) {
         Date now = new Date();
         return Jwts.builder()
                 .subject(username)
                 .claim(ROLE_CLAIM, role)
+                .claim("sid", sid)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationMs))
                 .signWith(key)

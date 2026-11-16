@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { PasswordRecoveryPage } from '@/features/auth/pages/PasswordRecoveryPage'
 import { AdminRoute } from './AdminRoute'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from './routePaths'
@@ -39,6 +40,11 @@ const AdminStoryContentPage = lazy(() =>
     default: m.AdminStoryContentPage,
   })),
 )
+const AdminOperationsPage = lazy(() =>
+  import('@/features/admin/pages/AdminOperationsPage').then((m) => ({
+    default: m.AdminOperationsPage,
+  })),
+)
 
 const Loading = () => <p className="p-8 text-stone-400">Đang tải…</p>
 
@@ -48,6 +54,8 @@ export function AppRouter() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<PasswordRecoveryPage />} />
+          <Route path={ROUTES.RESET_PASSWORD} element={<PasswordRecoveryPage reset />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.PLAY} element={<GamePlayPage />} />
@@ -56,6 +64,7 @@ export function AppRouter() {
             <Route path={ROUTES.ADMIN} element={<AdminLayout />}>
               <Route index element={<AdminOverviewPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="operations" element={<AdminOperationsPage />} />
               <Route path="bugs" element={<AdminBugReportsPage />} />
               <Route path="evidence" element={<AdminEvidencePage />} />
               <Route path="story-content" element={<AdminStoryContentPage />} />

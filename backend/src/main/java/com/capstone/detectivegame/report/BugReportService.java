@@ -6,6 +6,7 @@ import com.capstone.detectivegame.user.User;
 import com.capstone.detectivegame.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.capstone.detectivegame.security.CurrentUser;
 
 /**
  * Tiếp nhận báo cáo lỗi (Project.docx §4.3). Trạng thái mặc định PENDING (§2.1).
@@ -16,10 +17,12 @@ public class BugReportService {
 
     private final BugReportRepository bugReportRepository;
     private final UserRepository userRepository;
+    private final CurrentUser current;
 
-    public BugReportService(BugReportRepository bugReportRepository, UserRepository userRepository) {
+    public BugReportService(BugReportRepository bugReportRepository, UserRepository userRepository, CurrentUser current) {
         this.bugReportRepository = bugReportRepository;
         this.userRepository = userRepository;
+        this.current = current;
     }
 
     @Transactional
@@ -27,10 +30,8 @@ public class BugReportService {
         if (request.reportContent() == null || request.reportContent().isBlank()) {
             throw ApiException.badRequest("Thiếu reportContent");
         }
-        User user = request.userId() == null
-                ? null
-                : userRepository.findById(request.userId())
-                        .orElseThrow(() -> ApiException.notFound("Không tìm thấy userId " + request.userId()));
+        if(request.reportContent().getBytes(java.nio.charset.StandardCharsets.UTF_8).length>60000) throw ApiException.badRequest("Nội dung báo lỗi quá dài.");
+        User user = current.ownForWrite(request.userId());
         bugReportRepository.save(new BugReport(user, request.reportContent()));
     }
 }

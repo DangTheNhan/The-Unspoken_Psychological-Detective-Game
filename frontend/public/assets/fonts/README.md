@@ -6,8 +6,10 @@ Ba họ chữ trong bản thiết kế đã chốt — đều có đủ dấu ti
 | Họ chữ | Dùng cho | File cần có trong thư mục này | Trạng thái |
 |---|---|---|---|
 | JetBrains Mono | Nhãn nhỏ kiểu đánh máy, số phòng, phím tắt | `JetBrainsMono-Regular.woff` + `OFL-JetBrainsMono.txt` | **Đã có** (bản rút gọn: Latin + tiếng Việt, 29 KB) |
-| Playfair Display | Tiêu đề "THE UNSPOKEN", tiêu đề bảng | `PlayfairDisplay-Bold.ttf` + `OFL-PlayfairDisplay.txt` | **Cần thêm** |
-| Be Vietnam Pro | Chữ thường, mục menu, nút | `BeVietnamPro-Regular.ttf`, `BeVietnamPro-Medium.ttf`, `BeVietnamPro-SemiBold.ttf` + `OFL-BeVietnamPro.txt` | **Cần thêm** |
+| Playfair Display | Tiêu đề "THE UNSPOKEN", tiêu đề bảng | `PlayfairDisplay-Bold.ttf` + `OFL-PlayfairDisplay.txt` | **Đã có (T-062)** — font variable chính thức, dùng weight 700 |
+| Be Vietnam Pro | Chữ thường, mục menu, nút | `BeVietnamPro-Regular.ttf`, `BeVietnamPro-Medium.ttf`, `BeVietnamPro-SemiBold.ttf` + `OFL-BeVietnamPro.txt` | **Đã có (T-062)** |
+
+T-062 lấy nguyên file từ kho `google/fonts` chính thức: `ofl/playfairdisplay/PlayfairDisplay[wght].ttf` (đặt tên file phục vụ theo @font-face hiện có), `ofl/bevietnampro/BeVietnamPro-{Regular,Medium,SemiBold}.ttf` và OFL của từng họ. Không sửa dữ liệu font.
 
 ## Cách thêm 2 font còn thiếu
 1. Mở https://fonts.google.com/specimen/Playfair+Display → **Get font** → **Download all**. Trong file zip lấy

@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.capstone.detectivegame.auth.SessionService;
 
 /**
  * Project.docx §4.2 & §1.2 Bước 3:
@@ -25,9 +26,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider tokenProvider;
+    private final SessionService sessions;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, SessionService sessions) {
         this.tokenProvider = tokenProvider;
+        this.sessions = sessions;
     }
 
     @Override
@@ -37,10 +40,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(BEARER_PREFIX)) {
             String token = header.substring(BEARER_PREFIX.length()).trim();
             tokenProvider.parseValidClaims(token).ifPresent(claims -> {
+                String sid=claims.get("sid",String.class);
+                if(!sessions.valid(claims.getSubject(),sid)) return;
                 String role = claims.get(JwtTokenProvider.ROLE_CLAIM, String.class);
                 List<SimpleGrantedAuthority> authorities =
                         role == null ? List.of() : List.of(new SimpleGrantedAuthority(role));
                 var authentication = new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
+                authentication.setDetails(sid);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }

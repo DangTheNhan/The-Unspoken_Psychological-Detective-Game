@@ -4,12 +4,15 @@ import { ROUTES } from '@/app/router/routePaths'
 import { fetchAdminOverview } from '../api/adminApi'
 import { ChapterFunnelChart } from '../components/ChapterFunnelChart'
 import { StatCard } from '../components/StatCard'
+import { httpClient } from '@/shared/api/httpClient'
+import { ENDPOINTS } from '@/shared/api/endpoints'
 
 /**
  * Trang 1: Thống kê tổng quan & Phân tích hành vi người chơi.
  */
 export function AdminOverviewPage() {
   const [overview, setOverview] = useState(null)
+  const [onlineCount, setOnlineCount] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -44,9 +47,36 @@ export function AdminOverviewPage() {
       active = false
     }
   }, [])
+  useEffect(() => {
+    let active = true
+    const refresh = () =>
+      httpClient
+        .get(ENDPOINTS.admin.online)
+        .then(({ data }) => {
+          if (active) setOnlineCount(data.onlineCount)
+        })
+        .catch(() => {
+          if (active) setOnlineCount(null)
+        })
+    refresh()
+    const timer = setInterval(refresh, 5000)
+    return () => {
+      active = false
+      clearInterval(timer)
+    }
+  }, [])
 
   return (
     <div className="space-y-6">
+      <Link
+        to={ROUTES.ADMIN_OPERATIONS}
+        className="inline-flex flex-wrap items-center gap-2 text-sm text-amber-300 hover:underline"
+      >
+        {onlineCount === null
+          ? 'Chưa kiểm tra được số người online'
+          : `Đang online: ${onlineCount} người chơi`}{' '}
+        <span className="text-xs text-stone-400">Xem kết nối & lịch bảo trì →</span>
+      </Link>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
@@ -79,9 +109,9 @@ export function AdminOverviewPage() {
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard
                 code="Người chơi"
-                label="Tài khoản hoạt động"
+                label="Người chơi có bản lưu"
                 value={`${overview.activePlayers} / ${overview.totalPlayers}`}
-                subtitle="Số người chơi đã bắt đầu điều tra trên tổng tài khoản"
+                subtitle="Có tiến độ trên máy chủ / tổng người chơi; xem online ở Kết nối & Bảo trì"
                 tone="amber"
               />
               <StatCard

@@ -4,7 +4,15 @@
  * Đường dẫn tương đối với env.apiBaseUrl (mặc định http://localhost:8080/api).
  */
 export const ENDPOINTS = Object.freeze({
+  system: { status: '/system/status' },
   auth: {
+    config: '/auth/config',
+    forgot: '/auth/forgot-password',
+    reset: '/auth/reset-password',
+    googleChallenge: '/auth/google/challenge',
+    google: '/auth/google',
+    session: '/auth/session',
+    logout: '/auth/logout',
     register: '/auth/register', // POST  -> 201 Created
     login: '/auth/login', // POST  -> 200 { token, type, username, role }
   },
@@ -17,6 +25,8 @@ export const ENDPOINTS = Object.freeze({
     bug: '/reports/bug', // POST  -> 201 Created
   },
   admin: {
+    online: '/admin/online',
+    maintenance: '/admin/maintenance',
     storyChapters: '/admin/story/chapters',
     storyNodes: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/nodes`,
     storyDraft: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/draft`,

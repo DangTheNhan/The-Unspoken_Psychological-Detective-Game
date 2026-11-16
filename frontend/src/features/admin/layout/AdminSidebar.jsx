@@ -37,6 +37,13 @@ const NAV_ITEMS = [
     label: 'Nội dung kịch bản',
     sub: 'Biên tập chữ · duyệt · xuất bản',
   },
+  {
+    to: ROUTES.ADMIN_OPERATIONS,
+    end: false,
+    code: '06',
+    label: 'Kết nối & Bảo trì',
+    sub: 'Người đang online · lịch thông báo',
+  },
 ]
 
 export function AdminSidebar() {

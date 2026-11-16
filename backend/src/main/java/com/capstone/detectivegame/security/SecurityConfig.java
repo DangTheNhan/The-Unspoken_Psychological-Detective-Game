@@ -31,22 +31,37 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter, MaintenanceFilter maintenanceFilter)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {})
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/session", "/api/auth/logout").authenticated()
+                        .requestMatchers("/api/system/status").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/game/**").authenticated()
                         .requestMatchers("/api/admin/**").hasAuthority(User.ROLE_ADMIN)
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .authenticationEntryPoint((request,response,error)-> {
+                            response.setStatus(401);response.setContentType("application/json");response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write("{\"message\":\"Phiên đăng nhập đã kết thúc hoặc tài khoản đã đăng nhập ở nơi khác. Hãy đăng nhập lại.\"}");
+                        })
                         // Do not sendError: Tomcat's /error dispatch would turn an Admin 403 into 401.
                         .accessDeniedHandler((request, response, denied) -> response.setStatus(HttpStatus.FORBIDDEN.value())))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(maintenanceFilter, JwtAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public org.springframework.boot.web.servlet.FilterRegistrationBean<JwtAuthenticationFilter> jwtRegistration(JwtAuthenticationFilter filter) {
+        var registration=new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);registration.setEnabled(false);return registration;
+    }
+    @Bean
+    public org.springframework.boot.web.servlet.FilterRegistrationBean<MaintenanceFilter> maintenanceRegistration(MaintenanceFilter filter) {
+        var registration=new org.springframework.boot.web.servlet.FilterRegistrationBean<>(filter);registration.setEnabled(false);return registration;
     }
 
     @Bean
