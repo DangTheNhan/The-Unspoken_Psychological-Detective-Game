@@ -1,3 +1,4 @@
+import { storyTextBaseHash, applyStoryText } from '../narrative/storyText'
 import Phaser from 'phaser'
 import { GAME_EVENTS } from '../constants/gameEvents'
 import { FIRST_CHAPTER } from '../constants/gameplay'
@@ -47,6 +48,8 @@ export class MainMenuScene extends Phaser.Scene {
     this.runtime = getRuntime(this)
     const t = (key, params) => this.runtime.t(key, params)
     this.dialog = null
+    this.contentRequest = null
+    this.preparingContent = false
 
     this.backdrop = new MenuBackdrop(this, { note: t('menu.backdropNote') })
     this.drawTitleBlock(t)
@@ -91,6 +94,12 @@ export class MainMenuScene extends Phaser.Scene {
       .setOrigin(1, 1)
       .setDepth(DEPTH.HUD)
 
+    this.contentLabel = this.add.text(
+      LAYOUT.COLUMN_X,
+      height - 90,
+      '',
+      menuTextStyle({ size: 13, wrapWidth: 520 }),
+    )
     this.bindKeys()
 
     // React báo có/không bản lưu (vd vừa lưu xong) trong lúc menu đang mở
@@ -102,6 +111,9 @@ export class MainMenuScene extends Phaser.Scene {
     const onSettingsChanged = () => this.scene.restart()
     EventBus.on(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.contentRequest = null
+      this.contentCleanup?.()
+
       EventBus.off(GAME_EVENTS.SAVE_AVAILABILITY, onAvailability)
       EventBus.off(GAME_EVENTS.LOAD_RESULT, onLoad)
       EventBus.off(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
@@ -171,12 +183,14 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   refreshAvailability() {
+    if (this.preparingContent) return
     const continueItem = this.items[1]
     continueItem.setEnabled(this.runtime.saveAvailable)
     this.select(ensureValidSelection(this.enabledStates(), this.selectedIndex))
   }
 
   onNewGame() {
+    if (this.preparingContent) return
     if (!this.runtime.saveAvailable) {
       this.startNewGame()
       return
@@ -198,11 +212,13 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   openSettings() {
+    if (this.preparingContent) return
     this.scene.launch(SCENE_KEYS.SETTINGS, { returnTo: this.scene.key })
     this.scene.pause()
   }
 
   toggleMute() {
+    if (this.preparingContent) return
     const { settings } = this.runtime
     const current = settings.get()
     // set() phát SETTINGS_CHANGED -> menu tự vẽ lại; game/index.js áp dụng vào SoundManager
@@ -218,10 +234,57 @@ export class MainMenuScene extends Phaser.Scene {
    * PENDING: chèn cảnh intro trước phòng 201 khi có nội dung.
    */
   startNewGame() {
-    this.runtime.startNewGame(this.initialStoryState())
-    this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
-      chapter: FIRST_CHAPTER,
-      roomId: FIRST_ROOM_ID,
+    this.prepareContent((content) => {
+      this.runtime.startNewGame(this.initialStoryState(), content)
+      this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
+        chapter: FIRST_CHAPTER,
+        roomId: FIRST_ROOM_ID,
+      })
+    })
+  }
+
+  async prepareContent(onReady) {
+    if (this.preparingContent) return
+    this.preparingContent = true
+    this.items.forEach((item) => item.setEnabled(false))
+    this.contentLabel.setText(this.runtime.t('storyContent.loading'))
+    const requestId = globalThis.crypto.randomUUID()
+    this.contentRequest = requestId
+    const chapter = CHAPTER_DATA[FIRST_CHAPTER]
+    const graph = this.cache.json.get(chapter.files.graph.key)
+    let baseHash
+    try {
+      baseHash = await storyTextBaseHash(this.cache.text.get(`${chapter.files.graph.key}-raw`))
+    } catch {
+      if (this.contentRequest === requestId)
+        onReady({ graph: applyStoryText(graph, []), versionId: null, status: 'rejected' })
+      return
+    }
+    if (this.contentRequest !== requestId) return
+    const finish = (result) => {
+      if (this.contentRequest !== requestId) return
+      this.contentRequest = null
+      this.contentCleanup?.()
+      onReady(result)
+    }
+    const onResult = (result) => {
+      if (result.requestId === requestId) finish(result)
+    }
+    const timer = this.time.delayedCall(7000, () =>
+      finish({ graph: applyStoryText(graph, []), versionId: null, status: 'offlineBase' }),
+    )
+    this.contentCleanup = () => {
+      timer.remove(false)
+      EventBus.off(GAME_EVENTS.STORY_TEXT_RESULT, onResult)
+    }
+    EventBus.on(GAME_EVENTS.STORY_TEXT_RESULT, onResult)
+    EventBus.emit(GAME_EVENTS.STORY_TEXT_REQUESTED, {
+      requestId,
+      chapterId: FIRST_CHAPTER,
+      graph,
+      baseHash,
+      contractVersion: chapter.contractVersion,
+      language: this.runtime.settings.get().language,
     })
   }
 
@@ -231,6 +294,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   startSavedGame(snapshot) {
+    if (this.preparingContent) return
     let session
     try {
       session = GameSession.fromSaveSnapshot(snapshot)
@@ -249,14 +313,16 @@ export class MainMenuScene extends Phaser.Scene {
       })
       return
     }
-    this.runtime.startSession(session, this.initialStoryState())
-    if (session.tutorial.status === 'active') {
-      this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
-        chapter: FIRST_CHAPTER,
-        roomId: FIRST_ROOM_ID,
-      })
-    } else {
-      this.scene.start(SCENE_KEYS.STORY, {})
-    }
+    this.prepareContent((content) => {
+      this.runtime.startSession(session, this.initialStoryState(), content)
+      if (session.tutorial.status === 'active') {
+        this.scene.start(SCENE_KEYS.ROOM_INVESTIGATION, {
+          chapter: FIRST_CHAPTER,
+          roomId: FIRST_ROOM_ID,
+        })
+      } else {
+        this.scene.start(SCENE_KEYS.STORY, {})
+      }
+    })
   }
 }

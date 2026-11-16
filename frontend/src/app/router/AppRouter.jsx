@@ -34,6 +34,12 @@ const AdminEvidencePage = lazy(() =>
   })),
 )
 
+const AdminStoryContentPage = lazy(() =>
+  import('@/features/admin/pages/AdminStoryContentPage').then((m) => ({
+    default: m.AdminStoryContentPage,
+  })),
+)
+
 const Loading = () => <p className="p-8 text-stone-400">Đang tải…</p>
 
 export function AppRouter() {
@@ -52,6 +58,7 @@ export function AppRouter() {
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="bugs" element={<AdminBugReportsPage />} />
               <Route path="evidence" element={<AdminEvidencePage />} />
+              <Route path="story-content" element={<AdminStoryContentPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to={ROUTES.PLAY} replace />} />

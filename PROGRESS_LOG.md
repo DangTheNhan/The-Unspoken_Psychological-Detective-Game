@@ -9,13 +9,13 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 12/11/2026 — T-052 (Xây dựng phân hệ Website Admin tách biệt phong cách Noir Archive — DEC-024) |
-| Tác vụ đang làm | T-052 xong (`npm run check` xanh 183 test + build; `mvn test` xanh 7 test). Còn T-043 chờ ảnh 24 khung, playtest tay TD-38 và chốt ISS-29 |
-| Đã xong gần nhất | T-052: Website Admin 4 phân trang + API `/api/admin/**` + phân quyền `ROLE_ADMIN` + `AdminSeeder` + nút nối trên `/play` chỉ hiện cho Admin. Trước đó: T-050, T-051 |
-| Trạng thái dở dang | Không có code dở. Cả frontend (`npm run check`) và backend (`mvn test`) đều PASS |
-| Việc tiếp theo | Playtest tay theo TD-38 và chốt ISS-29 (userId cho lưu server) |
-| Đang bị chặn bởi | ISS-29 (lưu server) |
-| Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `npm run test:e2e` · `python scripts/chapter1/validate.py` (tự chạy validator của gói trên bản sao tạm — KHÔNG chạy thẳng `docs/sources/.../validate_data.py` vì nó ghi đè `validation.results.json`) |
+| Cập nhật lần cuối | 16/11/2026 — T-060 (Danh mục chứng cứ: xác nhận và trạng thái nạp) |
+| Tác vụ đang làm | Không — T-060 đã hoàn thành trên duy; chưa commit/push |
+| Đã xong gần nhất | T-060: xác nhận thêm/sửa/xóa/nạp; trạng thái CSDL từng mã và tổng Chương 1; frontend check 208 test/build và 3 browser test qua |
+| Trạng thái dở dang | Không có bước dở của T-060. Ảnh danh mục hiện chỉ dùng trong Admin theo luồng sẵn có |
+| Việc tiếp theo | Người dùng kiểm tra /admin/evidence. Chỉ triển khai ảnh trong game khi có yêu cầu và phạm vi cụ thể |
+| Đang bị chặn bởi | Không có chặn cho T-060; ISS-29 còn chặn save server |
+| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không cần chạy lại cho T-060 nếu không sửa tiếp. Frontend: `npm run check`; browser riêng `e2e/admin-evidence.spec.js` qua Playwright bundle (xem checkpoint T-060). Chỉ khi sửa chapter: `python scripts/chapter1/validate.py`; KHÔNG chạy thẳng validator trong docs/sources vì nó ghi file nguồn |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
 
 ---
@@ -533,3 +533,193 @@
   - **Frontend (`frontend/src/features/admin/` & `app/router/AdminRoute.jsx`):** Thiết kế theo phong cách *Noir Detective Archive* đồng bộ màu/font với game; tạo `AdminRoute.jsx` chặn người chơi thường; sửa `GamePlayPage.jsx` chỉ hiển thị nút `"HỒ SƠ QUẢN TRỊ →"` khi `session?.role === 'ROLE_ADMIN'`; tách rõ `admin/{api,layout,components,pages}` với 4 trang: `AdminOverviewPage`, `AdminUsersPage` (kèm `SaveJsonModal` soi 4 tab Sổ tay JSON cho E2E §5.2), `AdminBugReportsPage` (polling 5s, đổi `PENDING` ⇄ `RESOLVED`), `AdminEvidencePage` (quản lý & nạp nhanh 12 vật chứng Chương 1).
 - **Kiểm tra:** `cd frontend; npm run check` PASS (ESLint 0 lỗi, Prettier sạch, Vitest 25 file / 183 tests PASS, Vite build thành công); `cd backend; mvn test` PASS (7/7 tests, BUILD SUCCESS).
 
+### T-053 — Rà soát tính năng Website Admin (chỉ đọc)
+- Ngày giao: 16/11/2026 — người dùng yêu cầu đọc và kiểm tra phần Admin, trọng tâm website; chỉ nêu tính năng và tác dụng, không thay đổi code.
+- REQ / nguồn liên quan: REQ-050..055; SRC-1 Project.docx §4.2, §5.1–5.2; DEC-024; `PROJECT_MEMORY.md` mục C5, D5.6, E, F.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** lập danh sách chức năng website Admin và tác động thực tế theo mã hiện tại.
+- **Ảnh hưởng & thay đổi:** chỉ đọc frontend, backend, cấu hình, quyết định và tài liệu nguồn; không sửa code, dữ liệu ứng dụng hay API. Ghi checkpoint này vào `PROGRESS_LOG.md`.
+- **Rủi ro bug / lỗi:** rà soát tĩnh không xác nhận giao diện đang chạy hoặc kết nối CSDL tại thời điểm này.
+- **Đề xuất hướng phát triển (chờ duyệt):** không đưa đề xuất thay đổi trong phạm vi yêu cầu.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra đã chạy & kết quả |
+|---|---|---|---|---|
+| B1 | Đọc điểm khôi phục, phần Admin trong Project Memory và tài liệu nguồn §4.2, §5.1–5.2 | Xong | Không sửa | Đối chiếu Project.docx và bản tham chiếu mới; nội dung Admin §5.1 nhất quán |
+| B2 | Rà soát route, bốn trang Admin, API, service và phân quyền | Xong | Không sửa code | Ghi nhận tác dụng của số liệu, tra cứu bản lưu, báo lỗi, danh mục vật chứng và giới hạn tích hợp hiện tại |
+| B3 | Tổng hợp kết quả và tự kiểm tra phạm vi | Xong | Chỉ cập nhật PROGRESS_LOG.md | Không chạy test hoặc khởi động dịch vụ theo yêu cầu chỉ đọc |
+
+#### Kết quả
+- **Đã hoàn thành:** rà soát chức năng website Admin và tác động backend; xác định trang báo lỗi cập nhật định kỳ 5 giây; danh mục `evidence_master` hiện chưa được game runtime đọc trực tiếp.
+- **Chưa hoàn thành:** không kiểm tra thao tác trên website đang chạy/CSDL thật.
+- **Điểm cần xác nhận:** không có yêu cầu xác nhận phát sinh.
+- **Self-Check (A4):** không sửa code hoặc dữ liệu; không tuyên bố đã kiểm thử runtime; kết quả dựa trên mã và tài liệu đã đọc.
+- **Bước tiếp theo:** tiếp tục T-043 theo điểm khôi phục; chờ ảnh 24 khung, playtest tay TD-38 và chốt ISS-29.
+
+### T-054 — Xác định khả năng chỉnh cốt truyện từ Admin (chỉ đọc)
+- Ngày giao: 16/11/2026 — người dùng hỏi Admin có thể tự thêm, xóa, sửa và cập nhật cốt truyện từ phần Tiến độ cốt truyện hay không.
+- REQ / nguồn liên quan: Project.docx §5.1; SRC-5 `CHAPTER1_MEMORY.md` mục 0, 7, 9; DEC-016; DEC-024.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** xác định Admin hiện chỉnh được nội dung kịch bản hay chỉ xem thống kê tiến độ.
+- **Ảnh hưởng & thay đổi:** chỉ đọc luồng nạp kịch bản, trang/API Admin và hợp đồng dữ liệu; không sửa code, kịch bản, API hoặc dữ liệu ứng dụng. Ghi checkpoint này vào `PROGRESS_LOG.md`.
+- **Rủi ro bug / lỗi:** rà soát tĩnh không xác nhận website đang chạy; không có thay đổi phần mềm.
+- **Đề xuất hướng phát triển (chờ duyệt):** không lập đặc tả mới hoặc áp dụng thay đổi trong tác vụ này.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra đã chạy & kết quả |
+|---|---|---|---|---|
+| B1 | Đọc điểm khôi phục, quy tắc làm việc, bộ nhớ và kế hoạch tích hợp Chương 1 | Xong | Không sửa | Data Contract 2.0 và yêu cầu giữ nguồn/chính sách runtime đã được đối chiếu |
+| B2 | Đọc nơi khai báo/nạp dữ liệu chương và toàn bộ endpoint Admin | Xong | Không sửa | Graph kịch bản được cấu hình là JSON trong `public/assets/chapters`; không có route/API Admin cho story/chapter |
+| B3 | Trả lời phạm vi hiện tại và ghi checkpoint | Xong | Chỉ cập nhật PROGRESS_LOG.md | Không chạy app hoặc test |
+
+#### Kết quả
+- **Đã hoàn thành:** xác nhận trang “Tiến độ cốt truyện” chỉ hiển thị thống kê; website Admin hiện chưa hỗ trợ thêm, xóa, sửa hoặc xuất bản graph/lời thoại.
+- **Chưa hoàn thành:** không triển khai hoặc lập kế hoạch chi tiết tính năng chỉnh kịch bản.
+- **Điểm cần xác nhận:** nếu người dùng muốn thực hiện tiếp, cần chốt rõ phạm vi nội dung chỉnh sửa và duyệt kế hoạch trước khi thay đổi API/dữ liệu/cấu trúc.
+- **Self-Check (A4):** không thay đổi mã nguồn, kịch bản hoặc dữ liệu game; kết luận dựa trên luồng nạp JSON hiện tại và endpoint đã đọc.
+- **Bước tiếp theo:** tiếp tục T-043 theo điểm khôi phục; tính năng Admin chỉnh cốt truyện chưa được yêu cầu triển khai.
+
+### T-055 — Đề xuất ý tưởng quản lý kịch bản từ Admin (chờ duyệt)
+- Ngày giao: 16/11/2026 — người dùng yêu cầu nêu ý tưởng cùng lợi ích và bất lợi cho chức năng Admin tự thêm/xóa/sửa/cập nhật cốt truyện.
+- REQ / nguồn liên quan: Project.docx §5.1–5.2; DEC-016; DEC-024; SRC-5 `DATA_CONTRACT.md`, `CHAPTER1_MEMORY.md` mục 0, 7; `CHAPTER1_PLAN.md` mục 1–3.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** đề xuất hướng xây dựng khả năng quản lý nội dung kịch bản từ website Admin mà vẫn giữ Data Contract 2.0.
+- **Ảnh hưởng & thay đổi:** chỉ đọc tài liệu/mã hiện hành, so sánh phạm vi editor chữ và editor toàn graph; không sửa code, JSON kịch bản, API hoặc CSDL. Ghi checkpoint này vào `PROGRESS_LOG.md`.
+- **Rủi ro bug / lỗi:** chưa triển khai; rủi ro thiết kế cần nêu gồm graph hỏng, save cũ tham chiếu node bị xóa và nội dung lệch canon.
+- **Đề xuất hướng phát triển (chờ duyệt):** editor theo quy trình bản nháp → kiểm tra → xem trước → xuất bản; có thể chia giai đoạn sửa text node hiện có rồi mới mở chỉnh graph. Cơ chế lưu/truyền kịch bản và chính sách tương thích save chưa được chốt.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra đã chạy & kết quả |
+|---|---|---|---|---|
+| B1 | Đọc điểm khôi phục, quyết định và tài liệu Data Contract 2.0 | Xong | Không sửa | Xác nhận kịch bản là graph JSON; current node và state nằm trong bản lưu |
+| B2 | Đối chiếu luồng nạp game với phạm vi Admin hiện có | Xong | Không sửa | Runtime nạp JSON tĩnh; API Admin chưa có quản lý story/chapter |
+| B3 | Soạn phương án và ghi nhận ưu/nhược điểm | Xong | Chỉ cập nhật PROGRESS_LOG.md | Chưa áp dụng phương án, không chạy test |
+
+#### Kết quả
+- **Đã hoàn thành:** đề xuất hai mức: sửa chữ trên node hiện có; hoặc editor toàn graph cho phép thêm/xóa node và sửa nhánh, điều kiện, hiệu ứng. Hướng khuyến nghị là triển khai theo giai đoạn, validate và xem trước trước khi xuất bản, kèm quản lý phiên bản.
+- **Chưa hoàn thành:** chưa chốt lưu nội dung ở đâu, cách game lấy bản đã xuất bản, phạm vi người được duyệt, và cách xử lý save khi node bị xóa/đổi.
+- **Điểm cần xác nhận:** người dùng chọn phạm vi editor và duyệt kế hoạch trước khi thay đổi API/dữ liệu/cấu trúc.
+- **Self-Check (A4):** đề xuất được gắn nhãn chờ duyệt; không sửa code, API, CSDL hay cốt truyện.
+- **Bước tiếp theo:** chờ hướng dẫn người dùng; nếu được yêu cầu, lập PLAN chi tiết trước khi triển khai.
+
+### T-056 — Lập kế hoạch Admin chỉnh nội dung kịch bản và prompt tiếng Anh
+- Ngày giao: 16/11/2026 — người dùng chọn chỉ cho Admin nhập/chỉnh nội dung văn bản vì phạm vi này ít rủi ro; yêu cầu kế hoạch và prompt bằng tiếng Anh.
+- REQ / quyết định liên quan: REQ-056, DEC-025; DEC-016; SRC-5 Data Contract 2.0; Project.docx §5.1.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** đề xuất một editor chỉ sửa nội dung văn bản trên node kịch bản hiện có, giữ nguyên graph và trình bày kế hoạch/prompt tiếng Anh.
+- **Ảnh hưởng & thay đổi:** chỉ soạn kế hoạch và prompt; cập nhật PROJECT_MEMORY.md ghi nhận phạm vi do người dùng chốt và PROGRESS_LOG.md. Không sửa code, API, CSDL hay JSON kịch bản.
+- **Rủi ro bug / lỗi:** chưa triển khai; kế hoạch nêu rủi ro lưu/xuất bản, nội dung sai, và tương thích giữa runtime với bản text đã cập nhật.
+- **Đề xuất hướng phát triển (chờ duyệt):** text-only overrides trên node hiện có; bước lưu trữ/API, trường text được sửa, và workflow xuất bản phải được duyệt trước khi code.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra đã chạy & kết quả |
+|---|---|---|---|---|
+| B1 | Đọc điểm khôi phục, yêu cầu Admin, quyết định và nguồn Data Contract | Xong | Không sửa | Xác nhận runtime dùng graph JSON; node có các trường văn bản, ID/đường đi/điều kiện/hiệu ứng là cấu trúc |
+| B2 | Lập kế hoạch theo phạm vi text-only, nêu ưu/nhược và điểm chưa chốt | Xong | Không sửa code | Khuyến nghị giai đoạn editor, validation, preview và publish; persistence còn cần duyệt |
+| B3 | Soạn prompt tiếng Anh có rào chắn phạm vi và yêu cầu chờ duyệt trước implementation | Xong | Chỉ cập nhật PROJECT_MEMORY.md và PROGRESS_LOG.md | Không chạy test |
+
+#### Kết quả
+- **Đã hoàn thành:** cung cấp kế hoạch và prompt tái sử dụng bằng tiếng Anh; ghi nhận scope text-only ở REQ-056/DEC-025.
+- **Chưa hoàn thành:** chưa chọn trường text chính xác, cơ chế lưu/publish, và chính sách nội dung cho save đang chơi.
+- **Điểm cần xác nhận:** kế hoạch chi tiết và các lựa chọn kỹ thuật cần người dùng duyệt trước khi sửa code.
+- **Self-Check (A4):** không thêm/xóa node hoặc thay graph; không viết cốt truyện; không thay đổi code, API, CSDL hoặc dữ liệu game.
+- **Bước tiếp theo:** chờ người dùng duyệt kế hoạch hoặc chỉ định phạm vi trường text/lưu trữ.
+
+### T-057 — Tạo skill frontend-design-craft
+- Ngày giao: 16/11/2026 — người dùng yêu cầu dùng skill-creator tạo skill frontend tránh thiết kế AI rập khuôn.
+- Nguồn: yêu cầu hiện tại; skill-creator/SKILL.md và references/openai_yaml.md. Không bổ sung đặc tả game.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** tạo skill tái sử dụng cho thiết kế UI có cá tính dựa trên sản phẩm và tác vụ người dùng.
+- **Ảnh hưởng:** tạo SKILL.md và agents/openai.yaml trong thư mục skill cá nhân; chỉ cập nhật nhật ký trong repo, không sửa frontend/backend.
+- **Rủi ro:** tránh biến hướng dẫn thành một template mới; không áp đặt màu/font cụ thể hoặc cấp quyền thay đổi công nghệ/nội dung dự án.
+- **Hướng phát triển:** giữ skill ngắn, tự động áp dụng cho công việc thiết kế frontend phù hợp; chỉnh tiếp khi có phản hồi thực tế.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra |
+|---|---|---|---|---|
+| B1 | Đọc skill-creator, metadata reference và điểm khôi phục dự án | Xong | Không sửa | Đã đối chiếu phạm vi |
+| B2 | Soạn skill tiếng Anh trong thư mục artifact tạm | Xong | frontend-design-craft/SKILL.md, agents/openai.yaml ngoài repo | quick_validate.py PASS; bổ sung PyYAML chỉ trong thư mục kiểm tra tạm |
+| B3 | Cài skill cá nhân và kiểm tra lại | Xong | C:/Users/Admin/.codex/skills/frontend-design-craft; PROGRESS_LOG.md | quick_validate.py PASS; metadata hợp lệ; file cài giống bản đã kiểm; automatic selection mặc định bật |
+
+#### Kết quả
+- Đã hoàn thành: skill thiết kế frontend theo ngữ cảnh, bố cục/nội dung/typography có chủ đích, tránh mô típ rập khuôn, trạng thái tương tác, accessibility và rà soát viewport.
+- Điểm cần xác nhận: không có. Không thay đổi mã, dữ liệu hoặc nội dung cốt truyện.
+- Self-Check: chỉ tuyên bố kiểm tra cấu trúc/metadata đã chạy; chưa đánh giá skill qua tác vụ thiết kế thực tế.
+- Bước tiếp theo: dùng $frontend-design-craft khi làm UI; T-056 chờ duyệt thiết kế editor nội dung.
+
+### T-058 — Kế hoạch chi tiết Story Content cho Admin (chờ duyệt)
+- Ngày giao: 16/11/2026 — người dùng yêu cầu rà soát nguồn/schema/loader/Admin, lập kế hoạch cho editor chỉ sửa text, so sánh persistence và dừng xin duyệt trước khi triển khai.
+- Nguồn/REQ: REQ-056, DEC-016/019/023/024/025; Project.docx §5.1–5.2; Data Contract 2.0; CHAPTER1_MEMORY và CHAPTER1_PLAN.
+
+#### Kế hoạch (DEC-003)
+- **Mục đích:** xác định trường text thực có, tác động hiển thị, storage/API/phiên bản cần duyệt và các gói triển khai sau duyệt.
+- **Ảnh hưởng & thay đổi:** chỉ đọc tài liệu và mã; soạn artifact kế hoạch ngoài cấu trúc repo, cập nhật checkpoint. Không sửa code/API/SQL/JSON hoặc cài thêm dependency.
+- **Rủi ro:** baseline runtime khác schema nguồn; narration/action bị engine bỏ qua; text đối thoại không tự đồng bộ với hồ sơ trong effect/state; race khi publish và nội dung đang chơi.
+- **Đề xuất chờ duyệt:** MySQL lưu sparse overrides, nháp riêng/phiên bản bất biến/pointer publish; runtime chụp phiên bản theo phiên New/Continue; hash bảo vệ baseline.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra thực tế |
+|---|---|---|---|---|
+| B1 | Đọc AGENTS, restore point, bộ nhớ/nguồn Project.docx và Data Contract | Xong | Không sửa | Đọc §5.1 trực tiếp từ cả hai Project.docx bằng ZIP/XML; không chỉnh nguồn |
+| B2 | Rà schema, đếm trường runtime, kiểm tra loader/runner/bridge/Admin/security/SQL và validator | Xong | Không sửa | Runtime 1.264 node; 733 text + 80 choice labels; 9 hotspot labels chưa được schema định kiểu; 3 lựa chọn mở đầu thiếu condition mà runtime/validator hiện cho phép mặc định true |
+| B3 | Hoàn thiện artifact kế hoạch, contract đề xuất và xác nhận ranh giới | Xong | Artifact ngoài repo, PROGRESS_LOG.md; cập nhật trạng thái REQ-056 trong PROJECT_MEMORY.md | Đọc lại artifact; git diff chỉ có 2 file bộ nhớ đang sửa từ trước; không có thay đổi code/API/SQL/JSON |
+
+#### Kết quả
+- **Đã hoàn thành:** kế hoạch tiếng Anh tại `C:/Users/Admin/.codex/visualizations/2026/11/16/01a1e1cf-f362-7163-89d7-571f1146147e/story-content-implementation-plan.md` (10 mục). Đề xuất allowlist 733 node.text + 80 choices[].text; 9 hotspot text và notebook_update.text chỉ đọc. Schema paths/type đã đối chiếu nguồn.
+- **Đề xuất chờ duyệt:** sparse overrides trong MySQL (draft/version/published pointer), supplemental SQL giữ nguyên schema.sql gốc, các API Admin/published-text, deployment manifest lấy từ registry runtime, fingerprint chống lệch baseline, publication cố định trong phiên New/Continue, phục hồi thành draft và publish mới.
+- **Giới hạn đã công khai:** runtime hiện 1.264 node khác nguồn 1.257; narration/action bị bỏ qua; sửa thoại không đổi record text bên trong state/effect; 3 choice mở đầu thiếu condition theo schema nguồn, validator/runner hiện chấp nhận mặc định true. Không tự sửa dữ liệu hoặc schema để làm PASS.
+- **Chưa hoàn thành:** chưa triển khai; chưa chạy validator, test, build, UI hoặc CSDL. Các thao tác Python thực tế chỉ đọc ZIP/XML và thống kê JSON.
+- **Điểm cần xác nhận:** 4 nhóm quyết định ở §10 của artifact; mọi lựa chọn kỹ thuật là đề xuất, chưa ghi thành DEC mới.
+- **Self-Check (A4):** đã đọc nguồn/loader/schema/API liên quan; không sáng tác cốt truyện, không sửa công nghệ/dependency hoặc cấu trúc repo. Nhánh hiện tại `duy` được giữ nguyên trong giai đoạn kế hoạch; trước khi code cần làm đúng nhánh `Nhan`.
+- **Bước tiếp theo:** chờ phê duyệt cụ thể của người dùng; không xem prompt lập kế hoạch là đồng ý triển khai.
+
+
+### T-059 — Triển khai Story Content (DEC-026)
+- Người dùng 16/11/2026 đồng ý cả 4 nhóm quyết định T-058; sau đó chỉ định nhánh duy.
+- Căn cứ: REQ-056, DEC-026; Project.docx §5.1, Data Contract 2.0, kế hoạch đã duyệt.
+- Kế hoạch: (B1) pure merge/manifest và schema bổ sung; (B2) API draft/version/publish bảo vệ Admin; (B3) editor theo phong cách Admin hiện tại; (B4) lấy published qua EventBus ở New/Continue; (B5) kiểm thử unit, validator trên bản tạm, frontend/backend check và E2E/manual.
+- Ảnh hưởng: module/admin/game bridge, 3 bảng mới bằng SQL bổ sung, API đã duyệt; không sửa graph/state schema/source hoặc schema.sql gốc.
+- Rủi ro: race publish, baseline khác hash, xung đột bản nháp, giữ nguyên state/history, offline fallback. Phòng bằng khóa/revision/fingerprint, allowlist trên server và client, kiểm tra invariant.
+- Checkpoint B0: đọc nguồn và skill frontend, lưu kế hoạch vào docs; nhánh duy giữ các thay đổi bộ nhớ sẵn có. Nhánh Nhan vừa tạo chưa có commit, không xóa vì không cần thiết.
+
+- Checkpoint B1–B4 (đang tích hợp): đã tạo pure allowlist/merge + manifest registry; bổ sung SQL 3 bảng giữ nguyên schema.sql; API/server lifecycle theo revision/fingerprint; trang Admin Story Content; game fetch qua EventBus theo phiên. `mvn test` đã qua 7 test cũ sau khi biên dịch Java mới, chưa phải kiểm tra toàn tính năng. Lần chạy đầu bị chặn Maven repository C:/.m2; chạy lại dùng C:/Users/Admin/.m2/repository thành công.
+- Bước tiếp theo: thêm test có ý nghĩa cho graph invariant, lifecycle, offline và E2E; format/lint/check; áp dụng schema bổ sung trên MySQL rồi thử thật.
+
+- Checkpoint B5.1: frontend check qua 204 test + build; có 1 lint warning đang sửa và các cảnh báo font có sẵn. Backend test qua 16 ca gồm lifecycle và SecurityFilterChain thật qua MockMvc. Đã áp dụng đúng 3 bảng supplemental SQL trên MySQL cục bộ; schema.sql và graph JSON không sửa.
+- Việc tiếp theo: chạy validator baseline/overrides, kiểm tra backend khởi động với schema bổ sung và browser E2E trên dữ liệu thật; bổ sung docs.
+
+- Checkpoint cuối T-059: tất cả 4 E2E qua (2.4 phút); frontend check lần cuối sạch lint/format + 204 test/build; backend `mvn clean test` qua **17** ca theo Surefire XML (sửa con số tạm 16 ở checkpoint trước); validator baseline và merged đều qua 6.290 assertion. Manifest idempotent đã xác nhận mtime không đổi.
+- Đã sửa các lỗi thực tế khi kiểm tra: ánh xạ CHAR(64), Tomcat error dispatch làm 403 thành 401, manifest ghi lại làm Vite reload khi test đang chạy. Có ghi nhận lần chạy fail và cách xử lý trong docs/STORY_CONTENT_QA.md.
+- Đã áp dụng supplemental SQL trên detective_game; các bảng story mới còn rỗng (0/0/0). Database E2E dùng một lần đã dọn; cổng test 18981/5196 đã đóng. Không sửa nguồn, chapter runtime JSON hoặc schema.sql gốc.
+
+#### Kết quả T-059
+- Hoàn thành B1–B5: editor/API/persistence/runtime/validator/test/docs theo DEC-026. Giao diện desktop/mobile đã chụp và xem lại; ảnh artifact trong thư mục visualizations cùng phiên.
+- File chính: frontend/features/admin/pages/AdminStoryContentPage.jsx; game/narrative/storyText.js; play/services/storyTextService.js; backend/admin/story/*; db/story-content.sql; docs/STORY_CONTENT.md, STORY_CONTENT_PLAN.md, STORY_CONTENT_QA.md. Tài liệu và endpoint list đã cập nhật.
+- Giới hạn: runner Playwright khai báo trong package chưa cài; E2E dùng bundle Playwright thật 1.62.1 bằng alias tooling ngoài repo, không đổi dependency/lockfile. Font game Playfair/BeVietnam bị thiếu từ trước nên có fallback warning; không tự thêm ảnh/font. ISS-29 giữ nguyên.
+- Self-Check: scope chỉ sửa text hiện có; không tạo truyện/lời thoại; role guard được thử trên server thật; revisions/fingerprints/hash/copy kiểm tra. Không commit/push, làm trên duy theo yêu cầu mới nhất.
+- Bước tiếp theo: người dùng dùng trang biên tập theo hướng dẫn; không còn xác nhận bắt buộc cho tính năng đã duyệt.
+
+### T-060 — Xác nhận thao tác và trạng thái nạp danh mục chứng cứ
+- Ngày giao 16/11/2026: người dùng hỏi thêm/xóa thiếu xác nhận, thêm có ghi DB không, ảnh có hiện game không và yêu cầu chứng cứ hiện đã nạp/chưa nạp.
+- Căn cứ: phản hồi người dùng, DEC-024; Project.docx §2.1 (evidence_master), §5.1; SRC-5 evidence.json và cấu hình chapters.js.
+- Kế hoạch: B1 rà CRUD/ảnh/nguồn game; B2 xác nhận trước thêm/xóa/nạp và trạng thái theo code; B3 unit/UI test + frontend check, cập nhật kết quả.
+- Ảnh hưởng: frontend Admin, helper trạng thái, tests và bộ nhớ. Không đổi API, SQL, graph hoặc nơi game đọc chứng cứ; tích hợp ảnh vào game chưa được yêu cầu triển khai.
+- Rủi ro: không được nhầm lỗi kết nối với chưa nạp; phân biệt đã có trong danh mục DB với người chơi đã thu; đếm theo mã chuẩn thay vì số dòng. Dùng danh mục runtime chính thức và kết quả API để đối chiếu.
+- Checkpoint B1 xong: CRUD dùng JPA save/delete, ảnh packed trong description; Notebook game đọc state/effect, không lấy ảnh Admin.
+- Checkpoint B2 xong: AdminEvidencePage có xác nhận trước thêm/sửa/xóa/nạp, khóa thao tác khi đang gửi; mỗi mã hiện đã nạp/chưa nạp theo GET danh mục. Helper đối chiếu mã với evidence.json runtime, hiển thị các mã chuẩn còn thiếu và tổng 0/12, một phần hoặc đủ. Khi lỗi DB/catalog, hiện chưa kiểm tra được và cho làm mới. Thêm liên kết nhãn biểu mẫu và trạng thái hỗ trợ trình đọc màn hình; không thay API/backend/SQL/game.
+- B3 đang làm: đã viết 4 unit test đối chiếu mã và 3 browser test dùng API giả lập cho xác nhận/hủy, lỗi xóa, trạng thái, ảnh khi lưu và lỗi tải; chưa có kết quả. Prettier đã chạy trên 4 file frontend của T-060.
+- Checkpoint B3 cuối: `npm run check` chạy thật và qua lần cuối sau sửa căn lề mobile: ESLint sạch, Prettier sạch, 28 file/208 test Vitest qua, Vite build thành công. Có 4 cảnh báo font có sẵn (Playfair/BeVietnam), không thêm font/dependency.
+- Browser: `playwright/cli.js test e2e/admin-evidence.spec.js` qua **3/3**, lần cuối 8,5 giây. Đã thử hủy/xác nhận thêm/sửa/xóa/nạp; lỗi xóa giữ nguyên trạng thái; 0/12 → 12/12 → 11/12 và reload; chọn ảnh không gọi lưu cho tới khi xác nhận, ảnh gửi trong payload và hiện lại ở Admin; lỗi API/catalog hiện chưa kiểm tra được. Đây là API giả lập trong Chrome, không phải kiểm thử CRUD MySQL trực tiếp.
+- Runner browser dùng Playwright bundle 1.62.1 và loader ngoài repo như T-059 do runner khai báo chưa được cài. Không thay package/lockfile trong T-060. Vite test 5196 đã dừng, không thay dữ liệu DB thật.
+- Đã xem ảnh chụp desktop 1280px và mobile 390px; chỉnh grid một cột để thẻ nằm đúng lề mobile rồi chạy lại check và 3 browser test. Ảnh lưu tại `C:/Users/Admin/.codex/visualizations/2026/11/16/01a1e1cf-f362-7163-89d7-571f1146147e/admin-evidence-desktop.png` và `admin-evidence-mobile.png` cùng thư mục.
+
+#### Kết quả T-060
+- Hoàn thành B1–B3, REQ-057. File tác vụ: AdminEvidencePage.jsx, evidenceInventory.js, evidenceInventory.test.js, e2e/admin-evidence.spec.js, PROGRESS_LOG.md và PROJECT_MEMORY.md.
+- Thêm/sửa/xóa hiện có API ghi/xóa evidence_master qua JPA; ảnh được packed cùng description trong DB sau lưu thành công. Chọn tệp riêng chỉ tạo preview trong trình duyệt. Game đọc state/asset chapter, chưa dùng imageUrl của danh mục Admin; không tự tích hợp hoặc thay API/SQL/game.
+- Không chạy lại Maven/validator ở T-060 vì không sửa backend hoặc dữ liệu chapter; kết quả T-059 vẫn ghi riêng ở trên. Không phát sinh yêu cầu xác nhận cho phần sửa UX đã giao. Tích hợp ảnh vào game chưa triển khai.
+- Self-Check: dùng dữ liệu chuẩn có sẵn, không sáng tác chứng cứ/truyện; không nhầm dữ liệu DB với người chơi thu thập; lỗi tải không bị hiển thị thành chưa nạp; giữ nhánh duy và các thay đổi T-059 có sẵn, không commit/push.

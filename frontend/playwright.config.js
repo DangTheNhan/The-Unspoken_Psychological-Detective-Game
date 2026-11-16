@@ -16,8 +16,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   webServer: {
+    reuseExistingServer: Boolean(process.env.STORY_TEST_API),
     command: 'npm run dev -- --host 127.0.0.1 --port 5196 --strictPort',
-    env: { VITE_DEBUG: 'true' },
+    env: {
+      VITE_DEBUG: 'true',
+      ...(process.env.STORY_TEST_API ? { VITE_API_URL: process.env.STORY_TEST_API } : {}),
+    },
     url,
   },
 })

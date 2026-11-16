@@ -3,6 +3,8 @@ import { GAME_EVENTS } from '@/game/constants/gameEvents'
 import { EventBus } from '@/game/core/EventBus'
 import { createLogger } from '@/shared/logger/logger'
 import { persistProgress, readLocalBackup } from '../services/saveService'
+import { loadStoryText } from '../services/storyTextService'
+import { translate } from '@/game/systems/i18n'
 
 const log = createLogger('GameBridge')
 
@@ -22,6 +24,23 @@ export function useGameBridge({ userId = null, username } = {}) {
   const [statusMessage, setStatusMessage] = useState('')
 
   useEffect(() => {
+    let active = true
+    let latestRequest = null
+    let lastContentStatus = null
+    const onStoryTextRequested = async (input) => {
+      latestRequest = input.requestId
+      const result = await loadStoryText(input)
+      if (!active || latestRequest !== input.requestId) return
+      lastContentStatus = result.status
+      setStatusMessage(translate(input.language, `storyContent.${result.status}`))
+      EventBus.emit(GAME_EVENTS.STORY_TEXT_RESULT, { requestId: input.requestId, ...result })
+    }
+    const onSettingsChanged = (settings) => {
+      if (lastContentStatus)
+        setStatusMessage(translate(settings.language, `storyContent.${lastContentStatus}`))
+    }
+    EventBus.on(GAME_EVENTS.STORY_TEXT_REQUESTED, onStoryTextRequested)
+    EventBus.on(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
     const onSaveRequested = async ({ reason, snapshot }) => {
       try {
         const result = await persistProgress(snapshot, { userId, username, reason })
@@ -52,6 +71,9 @@ export function useGameBridge({ userId = null, username } = {}) {
     EventBus.on(GAME_EVENTS.LOAD_REQUESTED, onLoadRequested)
     EventBus.on(GAME_EVENTS.CHECKPOINT_RELOAD_REQUESTED, onCheckpointReload)
     return () => {
+      active = false
+      EventBus.off(GAME_EVENTS.STORY_TEXT_REQUESTED, onStoryTextRequested)
+      EventBus.off(GAME_EVENTS.SETTINGS_CHANGED, onSettingsChanged)
       EventBus.off(GAME_EVENTS.SAVE_REQUESTED, onSaveRequested)
       EventBus.off(GAME_EVENTS.LOAD_REQUESTED, onLoadRequested)
       EventBus.off(GAME_EVENTS.CHECKPOINT_RELOAD_REQUESTED, onCheckpointReload)

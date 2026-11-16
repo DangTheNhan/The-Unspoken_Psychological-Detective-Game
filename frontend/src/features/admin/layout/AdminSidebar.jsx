@@ -30,6 +30,13 @@ const NAV_ITEMS = [
     label: 'Danh mục Chứng cứ',
     sub: 'Thêm, sửa, xóa vật chứng các chương',
   },
+  {
+    to: ROUTES.ADMIN_STORY,
+    end: false,
+    code: '05',
+    label: 'Nội dung kịch bản',
+    sub: 'Biên tập chữ · duyệt · xuất bản',
+  },
 ]
 
 export function AdminSidebar() {

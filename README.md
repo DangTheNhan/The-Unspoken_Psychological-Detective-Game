@@ -188,3 +188,10 @@ Chạy test backend bằng Maven vừa cài:
 cd backend
 & (Join-Path $HOME "tools\apache-maven-3.9.11\bin\mvn.cmd") test
 ```
+
+
+### Story Content Admin (DEC-026)
+
+Trang `/admin/story-content` dành cho ROLE_ADMIN: chỉnh chữ trên node có sẵn → lưu nháp → kiểm tra → xem trước → xuất bản; lịch sử và khôi phục vào nháp. Nội dung áp dụng ở đầu phiên Ván mới/Tiếp tục, không thay đổi graph hoặc save schema.
+
+**Cần chạy thêm** `backend/src/main/resources/db/story-content.sql` trên database hiện có trước khi khởi động backend. Tạo manifest bằng `node scripts/chapter1/prepare-story-content.mjs` trước khi build backend (npm dev/test/build tự tạo). Hướng dẫn, API và giới hạn: [docs/STORY_CONTENT.md](docs/STORY_CONTENT.md). Kế hoạch đã duyệt: [docs/STORY_CONTENT_PLAN.md](docs/STORY_CONTENT_PLAN.md).

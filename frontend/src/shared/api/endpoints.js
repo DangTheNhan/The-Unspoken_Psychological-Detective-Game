@@ -9,6 +9,7 @@ export const ENDPOINTS = Object.freeze({
     login: '/auth/login', // POST  -> 200 { token, type, username, role }
   },
   game: {
+    storyText: (id) => `/game/chapters/${encodeURIComponent(id)}/story-text`,
     save: '/game/save', // POST  -> 200 { message, updatedAt }
     load: (userId) => `/game/load/${encodeURIComponent(userId)}`, // GET -> 200
   },
@@ -16,6 +17,17 @@ export const ENDPOINTS = Object.freeze({
     bug: '/reports/bug', // POST  -> 201 Created
   },
   admin: {
+    storyChapters: '/admin/story/chapters',
+    storyNodes: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/nodes`,
+    storyDraft: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/draft`,
+    storyValidate: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/draft/validate`,
+    storyPreview: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/draft/preview`,
+    storyPublish: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/publish`,
+    storyVersions: (id) => `/admin/story/chapters/${encodeURIComponent(id)}/versions`,
+    storyVersion: (id, version) =>
+      `/admin/story/chapters/${encodeURIComponent(id)}/versions/${encodeURIComponent(version)}`,
+    storyRestore: (id, version) =>
+      `/admin/story/chapters/${encodeURIComponent(id)}/versions/${encodeURIComponent(version)}/restore-draft`,
     overview: '/admin/overview', // GET -> 200 AdminOverviewResponse
     users: '/admin/users', // GET -> 200 List<AdminUserItemDto>
     userSave: (userId) => `/admin/users/${encodeURIComponent(userId)}/save`, // GET -> 200 AdminUserSaveDetailDto

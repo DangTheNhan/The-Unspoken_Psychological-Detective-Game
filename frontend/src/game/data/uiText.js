@@ -6,6 +6,12 @@
  */
 export const UI_TEXT = Object.freeze({
   vi: Object.freeze({
+    'storyContent.loading': 'Đang lấy nội dung kịch bản…',
+    'storyContent.base': 'Đang dùng nội dung kịch bản gốc.',
+    'storyContent.published': 'Đã nạp nội dung kịch bản được xuất bản cho phiên chơi này.',
+    'storyContent.cached': 'Mất kết nối: đang dùng bản nội dung đã lưu trên máy.',
+    'storyContent.offlineBase': 'Mất kết nối: đang dùng nội dung gốc của trò chơi.',
+    'storyContent.rejected': 'Không thể áp dụng bản cập nhật nội dung; đang dùng bản gốc.',
     'menu.kicker': 'HỒ SƠ VỤ ÁN  ·  21:35  ·  ĐÊM MƯA',
     'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
     'menu.newGame': 'Ván mới',
@@ -141,6 +147,12 @@ export const UI_TEXT = Object.freeze({
     'badEnding.reload': 'Tải lại checkpoint gần nhất',
   }),
   en: Object.freeze({
+    'storyContent.loading': 'Loading story content…',
+    'storyContent.base': 'Using the original story text.',
+    'storyContent.published': 'Published story text loaded for this play session.',
+    'storyContent.cached': 'Offline: using previously saved published text.',
+    'storyContent.offlineBase': 'Offline: using the original game text.',
+    'storyContent.rejected': 'The text update could not be applied; using the original text.',
     'menu.kicker': 'CASE FILE  ·  21:35  ·  RAINY NIGHT',
     'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
     'menu.newGame': 'New Game',

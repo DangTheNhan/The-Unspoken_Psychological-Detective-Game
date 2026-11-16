@@ -41,7 +41,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/game/**").authenticated()
                         .requestMatchers("/api/admin/**").hasAuthority(User.ROLE_ADMIN)
                         .anyRequest().authenticated())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        // Do not sendError: Tomcat's /error dispatch would turn an Admin 403 into 401.
+                        .accessDeniedHandler((request, response, denied) -> response.setStatus(HttpStatus.FORBIDDEN.value())))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

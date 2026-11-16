@@ -7,4 +7,5 @@ export const ROUTES = Object.freeze({
   ADMIN_USERS: '/admin/users',
   ADMIN_BUGS: '/admin/bugs',
   ADMIN_EVIDENCE: '/admin/evidence',
+  ADMIN_STORY: '/admin/story-content',
 })

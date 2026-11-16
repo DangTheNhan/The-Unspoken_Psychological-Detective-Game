@@ -217,3 +217,10 @@ Tìm `PENDING(ISS-` trong mã nguồn để thấy toàn bộ điểm chờ xác
 ```powershell
 git grep -n "PENDING(ISS-"
 ```
+
+
+## Story Content (DEC-026)
+
+`features/admin/pages/AdminStoryContentPage` và `api/storyContentApi` → `/api/admin/story/chapters/**` → `admin.story` (catalog, lifecycle service, draft/version/pointer repositories). ROLE_ADMIN bắt buộc; game chỉ đọc published qua `/api/game/chapters/{id}/story-text`.
+
+`CHAPTER_DATA` → script prepare manifest → frontend raw graph + Maven classpath bản graph đúng byte. New/Continue → EventBus request ID → React Axios/cache → pure `game/narrative/storyText.js` merge → runtime graph riêng cho phiên. Graph cache nguồn và state v2 giữ nguyên. SQL bổ sung 3 bảng ở `db/story-content.sql`; schema.sql gốc không thay. Chi tiết contract và vận hành: [STORY_CONTENT.md](STORY_CONTENT.md).

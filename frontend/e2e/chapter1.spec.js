@@ -75,6 +75,20 @@ class ChapterPlaytest {
       )
       localStorage.setItem('theUnspoken.settings.v1', JSON.stringify({ textSpeed: speed }))
     }, textSpeed)
+    // These canvas-only playtests use a fake auth session; story text uses its untouched baseline.
+    // The separate Story Content E2E verifies the real protected API and publishing.
+    await this.page.route('**/api/game/chapters/*/story-text?*', (route) =>
+      route.fulfill({
+        json: {
+          chapterId: 1,
+          baseHash: new URL(route.request().url()).searchParams.get('baseHash'),
+          contractVersion: graph.contractVersion,
+          allowlistVersion: 1,
+          versionId: null,
+          overrides: [],
+        },
+      }),
+    )
     await this.page.goto('/play')
     await this.waitForScene('MainMenuScene')
     await this.key('Enter')

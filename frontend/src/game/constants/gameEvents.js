@@ -3,6 +3,10 @@
  * Quy ước: '<miền>:<hành động>'. Payload ghi trong comment để bên nghe biết dữ liệu nhận được.
  */
 export const GAME_EVENTS = Object.freeze({
+  /** Phaser -> React: { requestId, chapterId, baseHash, contractVersion, graph, language }. */
+  STORY_TEXT_REQUESTED: 'story-text:requested',
+  /** React -> Phaser: { requestId, graph, versionId, status }; only the matching session accepts it. */
+  STORY_TEXT_RESULT: 'story-text:result',
   /** Phaser -> React. payload: { reason: string, snapshot: SaveSnapshot } */
   SAVE_REQUESTED: 'save:requested',
   /** Phaser -> React. payload: none — người chơi bấm Load Game ở MainMenu */

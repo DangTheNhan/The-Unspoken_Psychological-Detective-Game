@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { chapterFileUrl } from '../data/chapters'
 import { notebookSourceKey } from '../systems/notebook'
 import { createStoryRunner } from './storyRunner'
+import { applyStoryText, storyTextFields } from './storyText'
 
 const load = (name) =>
   JSON.parse(
@@ -10,6 +11,17 @@ const load = (name) =>
   )
 const graph = load('graph')
 const { initialState } = load('state')
+const textEditedGraph = applyStoryText(
+  graph,
+  graph.nodes.flatMap((node) =>
+    storyTextFields(node).map((field) => ({
+      nodeId: node.id,
+      field: field.field,
+      ...(field.choiceIndex === undefined ? {} : { choiceIndex: field.choiceIndex }),
+      value: field.baseText + '\n',
+    })),
+  ),
+)
 
 function readThrough(runner) {
   for (let i = 0; i < 150 && runner.node?.next && runner.node.type !== 'checklist'; i += 1) {
@@ -42,8 +54,8 @@ function present(runner, statement, evidence) {
 }
 
 // Lộ trình chính và lộ trình thu nguồn tùy chọn của validate_data.py, qua API người chơi.
-function play(optional) {
-  const runner = createStoryRunner(graph, initialState)
+function play(optional, storyGraph = graph) {
+  const runner = createStoryRunner(storyGraph, initialState)
   expect(readThrough(runner)).toBe('P1_HALL_204')
   expect(runner.choices().map(({ targetNode }) => targetNode)).toEqual(['P1_ENTER_204'])
   choose(runner, 'P1_ENTER_204')
@@ -163,8 +175,13 @@ function fillBoard(runner, who) {
 }
 
 describe('Chương 1 — Data Contract 2.0', () => {
-  it.each([false, true])('đi từ phòng 201 tới CH2_ENTRY (nguồn tùy chọn sớm: %s)', (optional) => {
-    const runner = play(optional)
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ])('đi từ phòng 201 tới CH2_ENTRY (nguồn sớm: %s, sửa chữ: %s)', (optional, edited) => {
+    const runner = play(optional, edited ? textEditedGraph : graph)
     if (!optional) {
       choose(runner, 'FD_SUBMIT')
       expect(runner.state.credibility).toBe(85)
