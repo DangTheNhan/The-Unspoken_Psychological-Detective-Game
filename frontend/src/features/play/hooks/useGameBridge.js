@@ -6,7 +6,7 @@ import { persistProgress, readLocalBackup } from '../services/saveService'
 
 const log = createLogger('GameBridge')
 
-/** Báo Phaser: trình duyệt có bản lưu không (MainMenu mờ "Tiếp tục điều tra" / hỏi trước khi ghi đè). */
+/** Báo Phaser: tài khoản hiện tại có bản lưu không (hiện Tiếp tục / hỏi trước khi ghi đè). */
 function announceSaveAvailability(username) {
   EventBus.emit(GAME_EVENTS.SAVE_AVAILABILITY, { hasSave: readLocalBackup(username) !== null })
 }

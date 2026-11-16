@@ -17,6 +17,10 @@ Ba họ chữ trong bản thiết kế đã chốt — đều có đủ dấu ti
    (đổi tên thành `OFL-BeVietnamPro.txt`).
 3. Chép vào thư mục này (`frontend/public/assets/fonts/`), giữ đúng tên file ở bảng trên → tải lại trang (Ctrl+F5).
 
-Chưa thêm thì game **vẫn chạy**: tiêu đề dùng Georgia, chữ thường dùng font hệ thống (khai báo trong
+Chưa thêm thì game **vẫn chạy**: tiêu đề dùng Times New Roman, chữ thường dùng font hệ thống (khai báo trong
 `src/game/ui/theme.js` → `FONTS`); console trình duyệt có thể báo 404 cho 2 file còn thiếu.
 `@font-face` khai báo trong `src/styles/index.css`; game chờ font tải xong ở `src/game/core/fonts.js`.
+
+T-054 (16/11/2026): bỏ Georgia khỏi chuỗi dự phòng vì kiểm thử trên Chrome/Windows tái hiện dấu tiếng Việt
+bị lệch trong tiêu đề “Bắt đầu ván mới?”. Ảnh kiểm thử sau khi dùng Times New Roman hiển thị đúng dấu.
+Các tệp Playfair Display và Be Vietnam Pro ở bảng trên vẫn chưa được bổ sung (TD-43).

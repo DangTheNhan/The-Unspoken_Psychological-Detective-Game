@@ -4,6 +4,14 @@ import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
 import { NOTEBOOK_TABS, notebookSourceKey } from '../systems/notebook'
+import {
+  timelineGroups,
+  timelineSourceLabel,
+  timelineSources,
+  timelineSourceSummary,
+  timelineStatus,
+  timelineTitle,
+} from '../systems/timeline'
 import { ChoiceMenu } from '../ui/ChoiceMenu'
 import { PanelButton } from '../ui/PanelButton'
 import { TextButton } from '../ui/TextButton'
@@ -44,6 +52,8 @@ export class NotebookScene extends Phaser.Scene {
     this.conversation = null
     this.menu = null
     this.detailControls = []
+    this.timelineGroup = 'timed'
+    this.timelineOrigin = null
   }
 
   create() {
@@ -141,6 +151,7 @@ export class NotebookScene extends Phaser.Scene {
           (entry) => !Object.hasOwn(state[group], entry.id),
         ),
       ]
+      if (tabId === 'timeline') return this.showTimeline(entries)
       if (!entries.length) this.content.setText(runtime.t('notebook.empty'))
       this.menu = new ChoiceMenu(
         this,
@@ -153,6 +164,7 @@ export class NotebookScene extends Phaser.Scene {
       return
     }
     const entries = runtime.session.notebook[tabId]
+    if (tabId === 'timeline') return this.showTimeline(entries)
     this.content.setText(
       entries.length === 0
         ? runtime.t('notebook.empty')
@@ -170,12 +182,100 @@ export class NotebookScene extends Phaser.Scene {
     return entry.name ?? entry.title ?? entry.display_time ?? entry.text ?? entry.id
   }
 
-  showEntry(entry) {
+  showTimeline(entries, selectedGroup = this.timelineGroup) {
+    this.clearDetails()
+    const runtime = getRuntime(this)
+    const t = (key, params) => runtime.t(key, params)
+    const groups = Object.entries(timelineGroups(entries)).filter(([, rows]) => rows.length)
+    if (!groups.length) {
+      this.content.setText(t('notebook.empty'))
+      return
+    }
+    const [group, records] = groups.find(([key]) => key === selectedGroup) ?? groups[0]
+    this.timelineGroup = group
+    groups.forEach(([key, rows], index) => {
+      this.detailControls.push(
+        new TextButton(
+          this,
+          245 + index * 380,
+          150,
+          `${t(`notebook.timeline.${key}`)} (${rows.length})`,
+          () => this.showTimeline(entries, key),
+          menuTextStyle({ size: 18 }),
+        )
+          .setAlpha(key === group ? 1 : 0.5)
+          .setDepth(DEPTH.OVERLAY),
+      )
+    })
+    this.menu = new ChoiceMenu(
+      this,
+      records.map((entry) => {
+        const title = timelineTitle(entry, t)
+        const heading = group === 'timed' ? `${entry.display_time} — ${title}` : title
+        return {
+          text: `${heading}\n${timelineSourceSummary(entry, runtime.session.story, t)} · ${timelineStatus(entry, t, runtime.session.story)}`,
+          onSelect: () => this.showTimelineEntry(entry),
+        }
+      }),
+      { y: 190, rowHeight: 76, rowsPerPage: 4 },
+    )
+  }
+
+  showTimelineEntry(entry) {
     this.clearDetails()
     this.entry = entry
     const runtime = getRuntime(this)
+    const t = (key, params) => runtime.t(key, params)
+    const sources = timelineSources(entry, runtime.session.story)
+    this.content.setText(
+      [
+        timelineTitle(entry, t),
+        entry.display_time ?? t('notebook.timeline.timeUnknown'),
+        timelineStatus(entry, t, runtime.session.story),
+        timelineSourceSummary(entry, runtime.session.story, t),
+        entryProvenance(entry, runtime),
+      ]
+        .filter(Boolean)
+        .join('\n\n'),
+    )
+    this.detailButton(80, 'story.back', () => this.selectTab('timeline'))
+    if (sources.length) {
+      this.detailButton(
+        260,
+        'notebook.timeline.viewSources',
+        () => this.showTimelineSources(entry),
+        {
+          count: sources.length,
+        },
+      )
+    }
+  }
+
+  showTimelineSources(entry) {
+    this.clearDetails()
+    this.timelineOrigin = entry
+    const runtime = getRuntime(this)
+    this.content.setText(timelineTitle(entry, (key) => runtime.t(key)))
+    this.menu = new ChoiceMenu(
+      this,
+      timelineSources(entry, runtime.session.story).map((source) => ({
+        text: timelineSourceLabel(source, (key, params) => runtime.t(key, params)),
+        onSelect: () => this.showEntry(source, { fromTimeline: entry }),
+      })),
+      { y: 230 },
+    )
+    this.detailButton(80, 'story.back', () => this.showTimelineEntry(entry))
+  }
+
+  showEntry(entry, { fromTimeline = null } = {}) {
+    this.clearDetails()
+    this.entry = entry
+    this.timelineOrigin = fromTimeline
+    const runtime = getRuntime(this)
     const state = runtime.session.story
-    const title = this.entryTitle(entry)
+    const title = fromTimeline
+      ? timelineSourceLabel(entry, (key, params) => runtime.t(key, params))
+      : this.entryTitle(entry)
     const replacement = state.statements[entry.superseded_by]
     const sources = (entry.source_ids ?? [])
       .map((id) => {
@@ -193,6 +293,7 @@ export class NotebookScene extends Phaser.Scene {
         title,
         entryProvenance(entry, runtime),
         entry.text && !title.includes(entry.text) ? entry.text : null,
+        fromTimeline ? entry.description : null,
         entry.role,
         entry.scope,
         entry.corroborated_scope,
@@ -206,7 +307,9 @@ export class NotebookScene extends Phaser.Scene {
         .filter(Boolean)
         .join('\n\n'),
     )
-    this.detailButton(80, 'story.back', () => this.selectTab(this.activeTab))
+    this.detailButton(80, 'story.back', () =>
+      fromTimeline ? this.showTimelineSources(fromTimeline) : this.selectTab(this.activeTab),
+    )
     if (this.activeTab === 'statements' && this.canPress?.(entry.id)) {
       this.detailButton(230, 'story.press', () => {
         if (this.onPress(entry.id)) this.close(false)
@@ -250,12 +353,12 @@ export class NotebookScene extends Phaser.Scene {
       this.detailButton(405, 'story.continue', () => this.showConversation(conversation, index + 1))
   }
 
-  detailButton(x, key, onClick) {
+  detailButton(x, key, onClick, params) {
     this.detailControls.push(
       new PanelButton(this, {
         x,
         y: 545,
-        label: getRuntime(this).t(key),
+        label: getRuntime(this).t(key, params),
         onClick,
       }).setDepth(DEPTH.OVERLAY),
     )
@@ -264,6 +367,7 @@ export class NotebookScene extends Phaser.Scene {
   clearDetails() {
     this.content.setText('')
     this.entry = null
+    this.timelineOrigin = null
     this.conversation = null
     this.menu?.destroy()
     this.menu = null
@@ -272,7 +376,10 @@ export class NotebookScene extends Phaser.Scene {
   }
 
   back() {
-    if (this.conversation) this.showHistory()
+    if (this.timelineOrigin) {
+      if (this.entry) this.showTimelineSources(this.timelineOrigin)
+      else this.showTimelineEntry(this.timelineOrigin)
+    } else if (this.conversation) this.showHistory()
     else if (this.entry || this.history) this.selectTab(this.activeTab)
     else this.close()
   }

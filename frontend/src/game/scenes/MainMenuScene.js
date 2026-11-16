@@ -31,8 +31,8 @@ const LAYOUT = Object.freeze({
 /**
  * Sảnh chờ — Project.docx §3.2: New Game, Load Game (từ CSDL), bảng điều khiển âm thanh.
  * Thiết kế: DEC-012 — "Ván mới / Tiếp tục điều tra / Cài đặt" + nút loa; chuột hoặc ↑ ↓ Enter.
- * - Ván mới: nếu trình duyệt đã có bản lưu -> hộp xác nhận trước khi bắt đầu.
- * - Tiếp tục điều tra = Load Game: mờ khi chưa có bản lưu (React báo qua SAVE_AVAILABILITY).
+ * - Ván mới: nếu tài khoản hiện tại có bản lưu -> hộp xác nhận trước khi bắt đầu.
+ * - Tiếp tục điều tra = Load Game: chỉ hiện khi tài khoản có bản lưu (SAVE_AVAILABILITY).
  *   PENDING(ISS-05, ISS-29): chỉ phát LOAD_REQUESTED; React xử lý khi API load khả dụng.
  * - Cài đặt: mở SettingsScene chồng lên (menu tạm dừng tới khi đóng).
  * - Âm lượng/tắt tiếng chi tiết nằm trong Cài đặt; nút loa = tắt/bật nhanh (lưu vào thiết lập).
@@ -43,6 +43,8 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create() {
+    // React có thể vừa hủy canvas cũ khi đổi tài khoản / StrictMode, làm canvas mới đổi vị trí.
+    this.scale.updateBounds()
     const { width, height } = this.scale
     this.runtime = getRuntime(this)
     const t = (key, params) => this.runtime.t(key, params)
@@ -63,7 +65,6 @@ export class MainMenuScene extends Phaser.Scene {
           y: LAYOUT.ITEMS_Y + index * (MENU_ITEM.HEIGHT + LAYOUT.ITEM_GAP),
           number: String(index + 1).padStart(2, '0'),
           label: t(item.key),
-          note: item.key === 'menu.continue' ? t('menu.noSave') : '',
           onHover: () => this.select(index),
           onSelect: item.onSelect,
         }),
@@ -157,7 +158,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   enabledStates() {
-    return this.items.map((item) => item.enabled)
+    return this.items.map((item) => item.enabled && item.visible)
   }
 
   move(direction) {
@@ -172,7 +173,13 @@ export class MainMenuScene extends Phaser.Scene {
 
   refreshAvailability() {
     const continueItem = this.items[1]
-    continueItem.setEnabled(this.runtime.saveAvailable)
+    continueItem.setEnabled(this.runtime.saveAvailable).setVisible(this.runtime.saveAvailable)
+    this.items
+      .filter((item) => item.visible)
+      .forEach((item, index) => {
+        item.setY(LAYOUT.ITEMS_Y + index * (MENU_ITEM.HEIGHT + LAYOUT.ITEM_GAP))
+        item.numberText.setText(String(index + 1).padStart(2, '0'))
+      })
     this.select(ensureValidSelection(this.enabledStates(), this.selectedIndex))
   }
 

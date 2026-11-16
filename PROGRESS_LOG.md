@@ -9,11 +9,11 @@
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 10/11/2026 — T-050. Đã đổi mở đầu và nối chân dung Linh, Minh, Hào |
-| Tác vụ đang làm | T-043 chờ ảnh 24 khung. Chương 1 còn playtest tay TD-38 |
-| Đã xong gần nhất | T-050 nối hướng dẫn đến A204 trước khi lấy lời khai. T-048 hoàn thành ảnh Tùng và vùng cổ |
-| Trạng thái dở dang | Mã Chương 1 bản trước đã đẩy lên `origin/Nhan` tại `fff5ed8`. T-048 và T-050 đang ở máy |
-| Việc tiếp theo | Playtest tay theo TD-38 và chốt ISS-29 |
+| Cập nhật lần cuối | 16/11/2026 — T-054 sửa font dự phòng và menu theo bản lưu của tài khoản |
+| Tác vụ đang làm | T-054 hoàn tất sửa lỗi và kiểm thử. T-043 vẫn chờ ảnh 24 khung |
+| Đã xong gần nhất | T-054: bỏ đọc bản lưu chung khi đăng nhập, ẩn Tiếp tục nếu chưa có bản lưu; thay Georgia bằng Times New Roman trong font dự phòng để sửa dấu bị lệch |
+| Trạng thái dở dang | Nhánh Nhan tại 18b6aa1. T-052, T-053 và T-054 đang ở máy, chưa commit. Các phần S1–S4 ngoài phạm vi Dòng thời gian vẫn theo kế hoạch |
+| Việc tiếp theo | Nhóm thử menu/font đã sửa, bổ sung font thiết kế còn thiếu ở TD-43 khi có tệp. Tiếp tục nghiệm thu T-053 và S1/S2; chốt ISS-29 cho S3 |
 | Đang bị chặn bởi | ISS-29 (lưu server) |
 | Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `npm run test:e2e` · `python scripts/chapter1/validate.py` (tự chạy validator của gói trên bản sao tạm — KHÔNG chạy thẳng `docs/sources/.../validate_data.py` vì nó ghi đè `validation.results.json`) |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
@@ -524,3 +524,31 @@
 ### T-051 — Khôi phục luồng đăng nhập và đăng ký cục bộ
 - Cổng 8080 trả 404 từ Steam WebHelper, backend game chưa nghe ở 8081. Đã khởi động backend 8081 và Vite 5173. `frontend/.env.local` đặt API thành `http://localhost:8081/api` cho máy này.
 - Chrome kiểm tra qua form thật. Đăng ký trả HTTP 201, đăng nhập trả HTTP 200 và chuyển đến `/play`. Đã dọn đúng tài khoản thử trong MySQL cục bộ. Hai dịch vụ vẫn chạy để người dùng tiếp tục thử.
+
+### T-052 — Rà soát statement và kế hoạch hoàn thiện
+- Ngày 16/11/2026. Người dùng yêu cầu kiểm tra dự án và lập kế hoạch cho phần statement chưa có.
+- Xác nhận chức năng cốt lõi đã triển khai ở T-044/T-045, gồm ghi nhận lời khai theo graph, Lịch sử trò chuyện riêng, revision trong state, Press/Present và lưu/tải cục bộ. Dữ liệu có 43 template và 38 statementRules.
+- Tạo `docs/STATEMENT_PLAN.md` với hiện trạng và S1 nghiệm thu giao diện, S2 lời khai sửa/tương thích bản lưu, S3 lưu/tải máy chủ phụ thuộc ISS-29. S4 ghi các đề xuất cần chốt về hiển thị revisions và dùng Statement làm nguồn Present.
+- Cập nhật TD-24 và trạng thái REQ-024/028/029 để phản ánh code. UI hiện chưa đọc revisions, Present Chương 1 chỉ có route Evidence, tải máy chủ chưa được nối ở bridge. Lịch sử mở đầu được gom tới hub theo test hiện có, cần chốt nếu đổi ranh giới đoạn.
+- `npm run check` đạt lint, format, 183 test và build. Validator đạt 6.290 assertion, 1.264 node, 43 lời khai. Build cảnh báo thiếu các font ở TD-43.
+- `npm run test:e2e` đạt 3/3 bài trên Chrome, gồm hoạt ảnh và hai lượt chơi Chương 1 tới CH2_ENTRY. Các luồng có Press/Present, lời khai bị thay thế, blocked miễn phạt và wrong bấm đúp chỉ trừ một lần. Chưa kiểm tra lưu/tải statement lên MySQL trong tác vụ này.
+
+### T-053 — Dòng thời gian theo sự kiện và nguồn
+- Ngày 16/11/2026. Người dùng phản ánh mốc lộn xộn và trùng Lịch sử trò chuyện, sau đó duyệt hướng sắp theo giờ, tách quan hệ trước/sau, tên sự kiện ngắn và mở nguồn khi cần.
+- Thêm `systems/timeline.js` để nhóm, sắp bản ghi thực có và dựng nhãn theo 13 mốc đã có trong graph. Mốc ước lượng giữ cách ghi gốc, mốc quan hệ không bị suy thành giờ. Bản lưu thiếu giờ vào nhóm chưa rõ thời điểm, thiếu record nguồn không hiện nút xem nguồn.
+- `NotebookScene` có nhóm Mốc có giờ / Trước và sau / Chưa rõ thời điểm khi có dữ liệu, bốn mục mỗi trang, chi tiết sự kiện gọn, nút xem nguồn thực có và đường quay lại bằng Esc. Lời nguồn đầy đủ chỉ đọc sau khi mở bản ghi nguồn. Lời nguồn bị thay thế có nhãn tương ứng.
+- `ChoiceMenu` nhận tùy chọn chiều cao và số dòng mỗi trang, các màn cũ dùng mặc định. Chuỗi UI VI/EN nằm trong `uiText.js`.
+- Thêm 5 test về thứ tự, state không đổi, mốc quan hệ, bản lưu cũ, nguồn thiếu và nhãn của dữ liệu thật. Playwright có bước kiểm thứ tự năm mốc P1, phân trang, mở nguồn Hòa, quay lại, xem quan hệ Cảnh sát tới và state không thay đổi sau đọc.
+- Đã xem ảnh chụp Chrome cho cả hai nhóm. Bản cuối `npm run check` đạt lint, format, 188 test và build. Playwright đạt 3/3 bài gồm hoạt ảnh, hai lượt chơi Chương 1 và các bước nghiệm thu Dòng thời gian. Validator đạt 6.290 assertion. Font dự phòng được dùng do thiếu các tệp ở TD-43.
+
+### T-054 — Font dự phòng và menu theo bản lưu tài khoản
+- Ngày giao: 16/11/2026. Người dùng gửi ảnh tiêu đề bị lệch dấu, yêu cầu người mới không thấy Tiếp tục điều tra và không nhận cảnh báo Ván mới; chỉ người có dữ liệu đã lưu mới thấy hai phần này.
+- Căn cứ: yêu cầu hiện tại (DEC-025), Project.docx §3.2/§6.3, thiết kế font DEC-012.
+- Kế hoạch (DEC-003): kiểm tra font và nguồn bản lưu → sửa đọc/lưu theo tài khoản → ẩn và dồn hàng menu, giữ điều kiện cảnh báo theo dữ liệu → kiểm thử người mới/cũ/đổi tài khoản, kiểm tra ảnh và chạy npm run check. Rủi ro: nhận nhầm bản lưu cũ chung, điều hướng bàn phím qua mục bị ẩn, khác font trên máy khác. Không thêm đặc tả/API/cốt truyện.
+- B1 hoàn tất: thiếu Playfair Display/Be Vietnam Pro (TD-43); bản lưu riêng không tồn tại lại fallback sang khóa chung, gây nhận nhầm người mới. Tái hiện lệch dấu trong tiêu đề bằng ảnh Chrome trước sửa.
+- B2 hoàn tất: saveService chỉ đọc/lưu theo username; không tạo bản lưu chung khi thiếu danh tính. Giữ nguyên dữ liệu chung cũ, không tự gán chủ sở hữu. MainMenu ẩn mục Tiếp tục khi chưa có bản lưu, đánh lại số và vị trí hàng; bàn phím bỏ qua mục bị ẩn. Ván mới dùng cùng điều kiện saveAvailable của tài khoản.
+- B3 hoàn tất: bỏ Georgia khỏi chuỗi font dự phòng, dùng Times New Roman. Đã xem ảnh Chrome sau sửa, tiêu đề “Bắt đầu ván mới?” đúng dấu. Không đổi nội dung UI. Các font thiết kế vẫn thiếu: tải qua shell không kết nối được, chạy ngoài sandbox bị Access denied; Computer Use dừng vì không xác minh được URL Edge. Không tiếp tục điều khiển trình duyệt đó.
+- B4: thêm 3 unit test saveService và 4 bài Playwright cho người mới, người cũ, xác nhận/hủy Ván mới, đổi tài khoản rồi lưu. Kiểm thử phát hiện lỗi thật khi React dựng lại canvas: ScaleManager giữ bounds lệch một chiều cao canvas, chuột không bấm trúng nút. MainMenu cập nhật lại bounds sau preload. Bài đổi tài khoản → ván mới → lưu → tải lại đã qua sau sửa; đang chạy lại toàn bộ với chuột/phím.
+- `npm run check` sau sửa bounds đã qua lint, format, 191 test và build. Vẫn cảnh báo 4 font thiết kế bị thiếu (TD-43).
+- Toàn bộ 7/7 ca Playwright qua trên Chrome: nhép miệng, hai lượt chơi tới CH2_ENTRY, người mới không đọc bản lưu chung/của người khác và vào thẳng bằng chuột, bàn phím bỏ qua mục ẩn, người cũ tiếp tục đúng bản lưu, cảnh báo/hủy/xác nhận Ván mới, đổi tài khoản rồi chơi/lưu/tải lại. Kiểm tra ảnh new-player-menu.png (hai mục, không hàng trống) và new-game-confirmation.png (tiêu đề đúng dấu). Chỉ dùng phiên giả trong trình duyệt test, không tạo tài khoản thật hay thay dữ liệu MySQL.
+- Self-Check: đạt phạm vi T-054; không đổi backend/API/CSDL/nội dung game. Bản lưu chung cũ được giữ nguyên nhưng không tự gán chủ sở hữu. Font Playfair Display/Be Vietnam Pro đầy đủ vẫn chờ TD-43; lưu máy chủ vẫn chờ ISS-29. Chưa commit.

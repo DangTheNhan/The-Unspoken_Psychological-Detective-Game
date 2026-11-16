@@ -66,6 +66,20 @@ class ChapterPlaytest {
     await this.page.mouse.click(box.x + (x * box.width) / 1280, box.y + (y * box.height) / 720)
   }
 
+  async notebookButton(label) {
+    const point = await this.page.evaluate((text) => {
+      const scene = window.__THE_UNSPOKEN__.game.scene.getScene('NotebookScene')
+      const button = scene.children.list.find(
+        (object) => object.text === text || object.text?.text === text,
+      )
+      if (!button) return null
+      const bounds = button.getBounds()
+      return [bounds.centerX, bounds.centerY]
+    }, label)
+    expect(point, label).not.toBeNull()
+    await this.click(...point)
+  }
+
   async start(withTutorial, { textSpeed = 'instant', stopAtOpening = false } = {}) {
     // Phiên giả chỉ ở trình duyệt test. Luồng lưu cục bộ chạy qua React và Phaser thật.
     await this.page.addInitScript((speed) => {
@@ -407,6 +421,74 @@ for (const early of [true, false]) {
       )
       expect((await game.state()).evidence_collected).toEqual([])
       await game.choose('P1_END_CHECK')
+    })
+
+    await test.step('Dòng thời gian theo giờ, nguồn và nhóm trước/sau', async () => {
+      const before = await game.state()
+      await game.key('n')
+      await game.waitForScene('NotebookScene')
+      await game.notebookButton('Dòng thời gian')
+      const rows = await page.evaluate(() =>
+        window.__THE_UNSPOKEN__.game.scene
+          .getScene('NotebookScene')
+          .menu.rows.map(({ text }) => text),
+      )
+      expect(rows).toHaveLength(5)
+      expect(rows[0]).toContain('khoảng 20:00 hoặc hơn — Linh khai đã đi ngủ')
+      expect(rows[1]).toContain('Minh khai đến gặp Tùng')
+      expect(rows[2]).toContain('Hào khai đến thu nợ')
+      expect(rows[3]).toContain('khoảng 21:30 — Hòa khai đã phát hiện Tùng')
+      expect(rows[3]).toContain('Chưa đối chứng')
+      expect(rows[4]).toContain('21:35 — Hòa gõ cửa phòng 201')
+      const overflow = await page.evaluate(() => {
+        const { menu } = window.__THE_UNSPOKEN__.game.scene.getScene('NotebookScene')
+        return menu.objects.some((object, index) => {
+          const panel = menu.objects[index - 1]
+          return (
+            object.type === 'Text' &&
+            panel?.type === 'Rectangle' &&
+            object.getBounds().bottom > panel.getBounds().bottom
+          )
+        })
+      })
+      expect(overflow).toBe(false)
+      await page.screenshot({ path: test.info().outputPath('timeline-events.png') })
+      for (let index = 0; index < 4; index += 1) await game.key('ArrowDown')
+      const visible = await page.evaluate(() => {
+        const { menu } = window.__THE_UNSPOKEN__.game.scene.getScene('NotebookScene')
+        return menu.objects.filter((object) => object.type === 'Text').map(({ text }) => text)
+      })
+      expect(visible.some((text) => text.includes('21:35 — Hòa gõ cửa phòng 201'))).toBe(true)
+      await game.key('ArrowUp')
+      await game.key('Enter')
+      const content = () =>
+        page.evaluate(
+          () => window.__THE_UNSPOKEN__.game.scene.getScene('NotebookScene').content.text,
+        )
+      const statement = before.statements.ST_P1_HOA_INITIAL.text
+      expect(await content()).toContain('Hòa khai đã phát hiện Tùng')
+      expect(await content()).not.toContain(statement)
+      await game.notebookButton('Xem nguồn (1)')
+      await game.key('Enter')
+      expect(await content()).toContain(statement)
+      await game.key('Escape')
+      await game.key('Escape')
+      expect(await content()).toContain('Hòa khai đã phát hiện Tùng')
+      await game.key('Escape')
+      await game.notebookButton('Trước và sau (1)')
+      const relations = await page.evaluate(() =>
+        window.__THE_UNSPOKEN__.game.scene
+          .getScene('NotebookScene')
+          .menu.rows.map(({ text }) => text),
+      )
+      expect(relations).toHaveLength(1)
+      expect(relations[0]).toContain('Cảnh sát đến khu trọ')
+      expect(relations[0]).not.toContain('21:45')
+      await page.screenshot({ path: test.info().outputPath('timeline-relations.png') })
+      await game.key('Enter')
+      expect(await content()).toContain('Sau lượt hỏi')
+      await game.key('n')
+      expect(await game.state()).toEqual(before)
     })
 
     await test.step('Phòng 204, lối ra và nguồn thu thập', async () => {

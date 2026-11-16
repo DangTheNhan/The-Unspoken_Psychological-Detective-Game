@@ -46,7 +46,7 @@ export function createRuntime() {
     },
     /** Kho thiết lập người chơi (core/settingsStore.js): settings.get() / settings.set(next). */
     settings,
-    /** Trình duyệt có bản lưu không (để mờ "Tiếp tục điều tra", hỏi trước khi ghi đè). */
+    /** Tài khoản hiện tại có bản lưu không (hiện Tiếp tục, hỏi trước khi ghi đè). */
     get saveAvailable() {
       return saveAvailable
     },

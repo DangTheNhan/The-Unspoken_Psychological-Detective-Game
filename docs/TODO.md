@@ -1,5 +1,9 @@
 # TODO — The Unspoken (bảng việc sống)
 
+> Rà soát **16/11/2026 (T-052)** — Statement cốt lõi đã có. Kế hoạch nghiệm thu và hoàn thiện ở `docs/STATEMENT_PLAN.md`, theo S1–S3. S4 ghi riêng các đề xuất cần chốt.
+
+> **T-053 (16/11/2026)** — Dòng thời gian đã có tên sự kiện, thứ tự theo giờ, nhóm quan hệ trước/sau và nút mở nguồn. Phần Lời khai/Lịch sử còn nghiệm thu theo S1/S2.
+
 > Cập nhật **10/11/2026 (T-050)** — Phase 1 hướng dẫn vào phòng 204 quan sát Tùng trước khi lấy lời khai. Hộp thoại hiện lời nói, chân dung Linh, Minh và Hào dùng bảng thiết kế nhóm gửi.
 
 > Cập nhật: **03/11/2026 (T-042)** — DEC-021: quay về nhân vật thám tử cũ, thiết kế mới V6c cất lại (TD-47/48/59/61). Trước đó (T-034) — Q3 (DEC-016), Q4/Q5/N-Q1 (DEC-017), N-Q2 (DEC-018: NPC trên map, tới gần nhấn E), N-Q3 (DEC-019: lưu vị trí nhân vật — cách B) đã chốt; TD-16 (N0) ✅; TD-17: N1 ✅ (T-035); N2 xong phần AI (T-036), chờ `npm run check` + trả lời N2-Q1/Q2. Trước đó (T-028) — nhóm chốt thứ tự đầu tiên: TD-01 → TD-02 → TD-46 → TD-03. Đây là danh sách việc DUY NHẤT cần theo dõi; `docs/PROJECT_PLAN.md` mục 2a là bản chụp ngày 27/10.
@@ -74,6 +78,8 @@
 | TD-25 | Final Deduction 8 ô + tái dựng RECON_01–06 | C6 | AI | P1 | M | TD-17, TD-09 | ✅ Playwright T-046 qua nộp thiếu, sai và đúng | 6 | |
 | TD-26 | Phase 4 + fallback xu/khảo sát/giấy khen. Bad Ending → load checkpoint. Kết chương tại CH2_ENTRY | C7 | AI | P1 | M | TD-25 | ✅ Hai lượt Playwright T-046 qua | 6 | |
 
+Rà soát T-052 xác nhận TD-23/24 có triển khai. Phần tiếp theo là nghiệm thu giao diện Lời khai/Lịch sử và tương thích bản lưu theo S1/S2 của `STATEMENT_PLAN.md`. UI chưa đọc `revisions`, đề xuất hiển thị chi tiết cần chốt ở S4. Lưu/tải máy chủ theo TD-28/29 và ISS-29.
+
 ## E. Lưu / tải
 
 | Mã | Việc | Ai | Ưu tiên | Cỡ | Chặn bởi | Trạng thái | Thứ tự (chốt) |
@@ -102,7 +108,7 @@
 |---|---|---|---|---|---|---|
 | TD-63 | Ảnh xem cận 12 vật chứng Chương 1 (+ ảnh đối chiếu mảnh hộp, báo cáo phân tích, tờ khảo sát, ảnh đồng xu, giấy khen) | Bạn → AI | P1 | TD-10 | ⏸ | |
 | TD-42 | WC phòng 201 (Q-R7), intro trước phòng 201 | Bạn → AI | P2 | nội dung | ⏸ | |
-| TD-43 | Font Playfair Display + Be Vietnam Pro (OFL) vào `public/assets/fonts/` | Bạn | P2 | — | ⬜ | |
+| TD-43 | Font Playfair Display + Be Vietnam Pro (OFL) vào `public/assets/fonts/` | Bạn | P2 | — | ⬜ | T-054 sửa lệch dấu bằng Times New Roman dự phòng; tệp font thiết kế vẫn thiếu, chưa tải được trong môi trường hiện tại |
 | TD-44 | BGM/SFX (mưa, gõ cửa, bước chân, bật lửa, còi, bộ đàm) nối với âm lượng trong Cài đặt | Bạn → AI | P3 | asset | ⏸ | |
 
 ## H. Admin Dashboard (mốc Tuần 8)

@@ -36,7 +36,7 @@ export const FONT_FAMILY = 'system-ui, "Segoe UI", Roboto, sans-serif'
  * src/styles/index.css, file đặt ở public/assets/fonts/. Thiếu file -> trình duyệt dùng font kế tiếp.
  */
 export const FONTS = Object.freeze({
-  display: '"Playfair Display", Georgia, "Times New Roman", serif', // tiêu đề
+  display: '"Playfair Display", "Times New Roman", serif', // tiêu đề, dự phòng có đủ dấu tiếng Việt
   body: '"Be Vietnam Pro", system-ui, "Segoe UI", Roboto, sans-serif', // chữ thường, nút
   mono: '"JetBrains Mono", Consolas, "Courier New", monospace', // nhãn nhỏ kiểu đánh máy
 })

@@ -21,6 +21,7 @@ export async function persistProgress(
   snapshot,
   { userId = null, username, reason = 'unknown' } = {},
 ) {
+  if (!username) throw new Error('Không xác định được tài khoản để lưu tiến trình.')
   const local = storage.set(backupKey(username), {
     ...snapshot,
     reason,
@@ -47,10 +48,11 @@ export async function persistProgress(
 }
 
 function backupKey(username) {
-  const key = STORAGE_KEYS.LOCAL_SAVE_BACKUP
-  return username ? `${key}.${encodeURIComponent(username)}` : key
+  return `${STORAGE_KEYS.LOCAL_SAVE_BACKUP}.${encodeURIComponent(username)}`
 }
 
 export function readLocalBackup(username) {
-  return storage.get(backupKey(username)) ?? storage.get(STORAGE_KEYS.LOCAL_SAVE_BACKUP)
+  // Bản lưu chung cũ không có chủ sở hữu: không gán nhầm cho tài khoản vừa đăng nhập.
+  if (!username) return null
+  return storage.get(backupKey(username))
 }
