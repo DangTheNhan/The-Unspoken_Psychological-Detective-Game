@@ -67,46 +67,46 @@ export function AdminOverviewPage() {
   }, [])
 
   return (
-    <div className="space-y-6">
+    <div className="admin-page space-y-6">
       <Link
         to={ROUTES.ADMIN_OPERATIONS}
-        className="inline-flex flex-wrap items-center gap-2 text-sm text-amber-300 hover:underline"
+        className="inline-flex flex-wrap items-center gap-2 text-sm text-[var(--admin-accent)] hover:underline"
       >
         {onlineCount === null
           ? 'Chưa kiểm tra được số người online'
           : `Đang online: ${onlineCount} người chơi`}{' '}
-        <span className="text-xs text-stone-400">Xem kết nối & lịch bảo trì →</span>
+        <span className="text-xs text-[var(--admin-muted)]">Xem kết nối & lịch bảo trì →</span>
       </Link>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="admin-page-heading flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
             Bảng điều khiển trung tâm
           </span>
-          <h1 className="mt-0.5 text-2xl font-bold text-[#f4efe6]">
+          <h1 className="mt-0.5 text-2xl font-bold text-[var(--admin-ink)]">
             Tổng quan Hệ thống & Phân tích Người chơi
           </h1>
         </div>
         <button
           type="button"
           onClick={loadData}
-          className="rounded border border-[#5c5266] bg-[#241f2b] px-3.5 py-1.5 text-xs font-medium text-[#f4efe6] transition hover:border-amber-400 hover:text-amber-300"
+          className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3.5 py-1.5 text-xs font-medium text-[var(--admin-ink)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)]"
         >
           ↻ Làm mới số liệu
         </button>
       </div>
 
       {error && (
-        <div className="rounded border border-[#d9534f] bg-[#d9534f]/10 p-4 text-xs text-[#f28b88]">
+        <div className="rounded border border-[var(--admin-danger-border)] bg-[var(--admin-danger-wash)] p-4 text-xs text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
       {loading && !overview ? (
-        <p className="text-sm text-[#a89f94]">Đang tải số liệu thống kê…</p>
+        <p className="text-sm text-[var(--admin-muted)]">Đang tải số liệu thống kê…</p>
       ) : (
         overview && (
           <>
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <section className="admin-overview-stats">
               <StatCard
                 code="Người chơi"
                 label="Người chơi có bản lưu"
@@ -171,17 +171,17 @@ export function AdminOverviewPage() {
 
 function QuickLinkCard({ badge, title, description, to, actionText }) {
   return (
-    <div className="flex flex-col justify-between rounded border border-[#5c5266]/60 bg-[#241f2b] p-5 transition hover:border-amber-400/50">
+    <div className="flex flex-col justify-between admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-5 transition hover:border-[var(--admin-accent-border)]">
       <div>
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-400">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
           {badge}
         </span>
-        <h3 className="mt-1 text-base font-bold text-[#f4efe6]">{title}</h3>
-        <p className="mt-1.5 text-xs leading-relaxed text-[#a89f94]">{description}</p>
+        <h3 className="mt-1 text-base font-bold text-[var(--admin-ink)]">{title}</h3>
+        <p className="mt-1.5 text-xs leading-relaxed text-[var(--admin-muted)]">{description}</p>
       </div>
       <Link
         to={to}
-        className="mt-4 inline-block text-xs font-semibold text-amber-300 hover:underline"
+        className="mt-4 inline-block text-xs font-semibold text-[var(--admin-accent)] hover:underline"
       >
         {actionText}
       </Link>

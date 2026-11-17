@@ -470,6 +470,8 @@ Mức ưu tiên: **P0** = chặn công việc ngay · P1 = chặn trước mốc
 
 | DEC-034 | 17/11/2026 | **Căn tiếp tỷ lệ204 sau phản hồi G5** (T-070). Nhân vật vẫn lùn so với cửa/Tùng theo người dùng chơi thực tế: tăng đều25% vào height riêng204, giữ near/farY và speedFactor201, sàn≤615. Căn stand khóa255/580, thùng rác511/575 theo footprint. Thay phần cùng chiều cao tuyệt đối204/201 của DEC-033; không đổi phòng201/atlas/ảnh/nội dung/API/save schema. Hệ số và ngưỡng QA là thông số căn từ ảnh, không phải nội dung nguồn quy định | Người dùng phản ánh sau G5: nhân vật so với cửa/thi thể vẫn quá lùn, không phù hợp (gọi G4 nhưng mô tả204) | room204.js + unit/E2E/QA, giữ dữ liệu/ảnh/graph/DB; docs/ROOM204_PROPORTION_QA.md | Check248, validator6290, Chrome2043/3 + chapter13/3 gồm hai lượt tớiCH2_ENTRY; alpha388px ở cửa,395px cạnh Tùng; đã xem ảnh, không commit/push |
 
+| DEC-035 | 17/11/2026 | Thiết kế lại toàn bộ6 trang Admin bằng design-taste-frontend; dashboard vận hành sidebar graphite/nền sáng/hổ phách, token/component trình bày và responsive/focus/modal. Giữ nguyên nội dung, tính năng, quyền, route/API/request/response/validation/phép tính. Không backend/database/auth/dependency; không quy tắc landing page mâu thuẫn | Yêu cầu trực tiếp của người dùng trong T-072 | features/admin + E2E/QA; docs/ADMIN_REDESIGN_PLAN.md | T-072 hoàn tất: check248/lint/format/build, Chrome27/27 +12/12 sau tinh chỉnh cuối; QA docs/ADMIN_REDESIGN_QA.md. Fixture, chưa live DB; không commit/push |
+
 ---
 
 ## G. TIẾN ĐỘ VÀ KIỂM TRA
@@ -477,6 +479,8 @@ Mức ưu tiên: **P0** = chặn công việc ngay · P1 = chặn trước mốc
 > Nhật ký chi tiết từng tác vụ & điểm khôi phục: xem **PROGRESS_LOG.md**. Mục này chỉ giữ bản tổng hợp.
 
 ### G1. Việc đã thực sự hoàn thành
+
+- **17/11/2026 — T-072 / DEC-035:** Redesign6trang Admin bằng hệ thống graphite/sáng/hổ phách, typography/control/table/editor và modal keyboard, mobile nav. Giữ route/API/nội dung/quyền/logic; AST6page+chart khớp phần nghiệp vụ. Check248 (37file), lint/format/build; Chrome27/27 +12/12 lặp Admin sau CSScuối;30layout ở1440/1024/768/390/320 không tràn trang. Đã xem ảnh, kiểm contrast/focus; QA docs/ADMIN_REDESIGN_QA.md. Không backend/auth/DB/dependency/source, không live transaction/thiết bị thật, không commit/push; G3 chưa giao.
 
 - **17/11/2026 — T-070 / DEC-034:** Chỉnh tiếp G5 theo phản hồi nhân vật204 còn quá lùn: tăng25% riêng204, giữ201/atlas/ảnh, speedFactor không đổi; dời hai stand theo footprint. Đo alpha thật388.04px ở cửa (~85% khung454px),395.39px cạnh thi thể. Check248, validator6290, Chrome2043/3 + Chương1 3/3 (hai lượt đầy đủ tớiCH2_ENTRY) qua; đã xem ảnh calibrated. Không sửa API/DB/graph/nội dung/save schema, không commit/push. QA mới docs/ROOM204_PROPORTION_QA.md thay tiêu chí chiều cao bằng201 ở T-069; G3 chưa thực hiện.
 - **17/11/2026 — T-069 / DEC-033:** G5 hoàn tất: 204 dùng depth 201, sàn gần y≤615, căn spawn/khóa/cửa theo footprint, giữ ảnh/rect/graph/sprite. Số đo y550/587/605 sau sửa khớp 201: 276.99/307.16/321.84px. Check 248 (37 file), validator6290, hai lượt Chương 1 tới CH2_ENTRY + nhép miệng qua; 3 ca G5 (ảnh, WASD/chuột/va chạm, load save cũ→lưu Sổ tay→reload) qua sau sửa selector fixture. Đã xem ảnh; không sửa code game sau các lượt Chương 1. Không đổi backend/API/DB/schema/nội dung, không commit/push; G3 chưa thực hiện. Chi tiết docs/TEETS2_G5_QA.md.

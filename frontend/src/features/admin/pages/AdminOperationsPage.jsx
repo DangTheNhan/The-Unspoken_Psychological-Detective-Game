@@ -95,32 +95,32 @@ export function AdminOperationsPage() {
     }
   }
   return (
-    <div className="space-y-7">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="admin-page admin-operations">
+      <div className="admin-page-heading flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Kết nối & Bảo trì</h1>
         <button
           type="button"
           onClick={refresh}
-          className="rounded border border-stone-600 px-3 py-2 text-sm"
+          className="rounded border border-[var(--admin-line)] px-3 py-2 text-sm"
         >
           Làm mới
         </button>
       </div>
       {error && (
-        <p role="alert" className="text-sm text-red-300">
+        <p role="alert" className="text-sm text-[var(--admin-danger)]">
           {error}
         </p>
       )}
       {success && (
-        <p role="status" className="text-sm text-emerald-300">
+        <p role="status" className="text-sm text-[var(--admin-success)]">
           {success}
         </p>
       )}
-      <section className="rounded border border-[#5c5266] bg-[#241f2b] p-5">
+      <section className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-5">
         <h2 className="text-lg font-semibold">
           Người chơi đang online {online ? `· ${online.onlineCount}` : ''}
         </h2>
-        <details className="mt-2 text-xs text-stone-400">
+        <details className="mt-2 text-xs text-[var(--admin-muted)]">
           <summary className="cursor-pointer">Cách cập nhật trạng thái</summary>
           <p className="mt-2">
             Tự cập nhật mỗi 5 giây. Mỗi tài khoản được tính một lần; mất tín hiệu quá 60 giây sẽ rời
@@ -130,16 +130,16 @@ export function AdminOperationsPage() {
         {!online ? (
           <p className="mt-4 text-sm">Đang tải trạng thái…</p>
         ) : online.players.length === 0 ? (
-          <p className="mt-4 text-sm text-stone-400">Chưa có người chơi đang kết nối.</p>
+          <p className="mt-4 text-sm text-[var(--admin-muted)]">Chưa có người chơi đang kết nối.</p>
         ) : (
-          <ul className="mt-4 divide-y divide-stone-700">
+          <ul className="mt-4 divide-y divide-[var(--admin-line)]">
             {online.players.map((player) => (
               <li key={player.userId} className="flex flex-wrap justify-between gap-2 py-3 text-sm">
                 <strong>{player.username}</strong>
-                <span className="text-emerald-300">
+                <span className="text-[var(--admin-success)]">
                   {player.area === 'PLAY' ? 'Đang ở trang game' : 'Đang truy cập website'}
                 </span>
-                <time className="text-stone-400">
+                <time className="text-[var(--admin-muted)]">
                   {formatVietnamTime(player.lastSeenAt)} (giờ Việt Nam)
                 </time>
               </li>
@@ -147,9 +147,9 @@ export function AdminOperationsPage() {
           </ul>
         )}
       </section>
-      <section className="rounded border border-[#5c5266] bg-[#241f2b] p-5">
+      <section className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-5">
         <h2 className="text-lg font-semibold">Lịch bảo trì</h2>
-        <p role="status" className="mt-3 font-medium text-amber-300">
+        <p role="status" className="mt-3 font-medium text-[var(--admin-accent)]">
           {maintenance.active
             ? 'Đang bảo trì'
             : maintenance.scheduled
@@ -158,19 +158,24 @@ export function AdminOperationsPage() {
         </p>
         {(maintenance.active || maintenance.scheduled) && (
           <>
-            <p className="mt-2 whitespace-pre-wrap text-sm text-stone-300">{maintenance.message}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--admin-ink)]">
+              {maintenance.message}
+            </p>
             <button
               disabled={busy}
               type="button"
               onClick={end}
-              className="mt-4 rounded border border-amber-400 px-4 py-2 text-sm text-amber-300 disabled:opacity-50"
+              className="mt-4 rounded border border-[var(--admin-accent-border)] px-4 py-2 text-sm text-[var(--admin-accent)] disabled:opacity-50"
             >
               {maintenance.active ? 'Kết thúc bảo trì' : 'Hủy lịch bảo trì'}
             </button>
           </>
         )}
         {!maintenance.active && (
-          <form onSubmit={schedule} className="mt-5 space-y-4 border-t border-stone-700 pt-5">
+          <form
+            onSubmit={schedule}
+            className="mt-5 space-y-4 border-t border-[var(--admin-line)] pt-5"
+          >
             <label className="block text-sm">
               Thời điểm bắt đầu
               <input
@@ -179,10 +184,10 @@ export function AdminOperationsPage() {
                 required
                 value={startsAt}
                 onChange={(e) => setStartsAt(e.target.value)}
-                className="mt-2 block w-full rounded border border-stone-600 bg-[#17151b] p-3"
+                className="mt-2 block w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] p-3"
               />
             </label>
-            <p className="text-xs text-stone-400">
+            <p className="text-xs text-[var(--admin-muted)]">
               Nhập theo giờ Việt Nam (UTC+7), kể cả khi máy đang dùng múi giờ khác. Người chơi nhận
               thông báo trước và game tự dừng đến khi bạn mở lại.
             </p>
@@ -194,12 +199,12 @@ export function AdminOperationsPage() {
                 maxLength={1000}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="mt-2 block w-full rounded border border-stone-600 bg-[#17151b] p-3"
+                className="mt-2 block w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] p-3"
               />
             </label>
             <button
               disabled={busy}
-              className="rounded bg-amber-400 px-4 py-2 text-sm font-semibold text-stone-950 disabled:opacity-50"
+              className="rounded bg-[var(--admin-accent)] px-4 py-2 text-sm font-semibold text-[var(--admin-on-accent)] disabled:opacity-50"
             >
               {busy ? 'Đang lưu…' : 'Công bố lịch bảo trì'}
             </button>

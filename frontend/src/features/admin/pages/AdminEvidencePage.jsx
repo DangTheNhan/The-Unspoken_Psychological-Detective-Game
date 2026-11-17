@@ -271,13 +271,13 @@ export function AdminEvidencePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="admin-page space-y-6">
+      <div className="admin-page-heading flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
             Kho dữ liệu vụ án
           </span>
-          <h1 className="mt-0.5 text-2xl font-bold text-[#f4efe6]">
+          <h1 className="mt-0.5 text-2xl font-bold text-[var(--admin-ink)]">
             Quản lý Danh mục Chứng cứ Toàn hệ thống
           </h1>
         </div>
@@ -287,7 +287,7 @@ export function AdminEvidencePage() {
             type="button"
             disabled={busy || !inventoryReady}
             onClick={openCreateForm}
-            className="rounded border border-amber-400 bg-amber-400 px-3.5 py-1.5 text-xs font-semibold text-[#17151b] transition hover:bg-amber-300"
+            className="rounded border border-[var(--admin-accent-border)] bg-[var(--admin-accent)] px-3.5 py-1.5 text-xs font-semibold text-[var(--admin-on-accent)] transition hover:bg-[var(--admin-accent-strong)]"
           >
             + Thêm vật chứng mới
           </button>
@@ -295,7 +295,7 @@ export function AdminEvidencePage() {
             type="button"
             disabled={busy || !inventoryReady || inventory.missingCount === 0}
             onClick={handleSeedChapter1}
-            className="rounded border border-[#5c5266] bg-[#241f2b] px-3.5 py-1.5 text-xs font-medium text-[#f4efe6] transition hover:border-amber-400 hover:text-amber-300 disabled:opacity-50"
+            className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3.5 py-1.5 text-xs font-medium text-[var(--admin-ink)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)] disabled:opacity-50"
           >
             {seeding
               ? 'Đang nạp…'
@@ -310,10 +310,10 @@ export function AdminEvidencePage() {
 
       <section
         aria-label="Trạng thái nạp chứng cứ"
-        className="rounded border border-[#5c5266]/60 bg-[#241f2b] p-4 text-sm"
+        className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4 text-sm"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p role="status" className="font-semibold text-amber-300">
+          <p role="status" className="font-semibold text-[var(--admin-accent)]">
             {loading
               ? 'Đang kiểm tra trạng thái nạp…'
               : !inventoryReady
@@ -328,12 +328,12 @@ export function AdminEvidencePage() {
             type="button"
             disabled={busy}
             onClick={reloadInventory}
-            className="rounded border border-[#5c5266] px-3 py-1 text-xs text-[#f4efe6] disabled:opacity-50"
+            className="rounded border border-[var(--admin-line)] px-3 py-1 text-xs text-[var(--admin-ink)] disabled:opacity-50"
           >
             Làm mới trạng thái
           </button>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-[#a89f94]">
+        <p className="mt-2 text-xs leading-relaxed text-[var(--admin-muted)]">
           Đã nạp nghĩa là mã chứng cứ đã có trong danh mục CSDL, không phải người chơi đã thu thập.
           Ảnh lưu tại đây hiện chỉ dùng trong Admin; game chưa đọc ảnh từ danh mục này.
         </p>
@@ -342,14 +342,14 @@ export function AdminEvidencePage() {
       {error && (
         <div
           role="alert"
-          className="rounded border border-[#d9534f] bg-[#d9534f]/10 p-4 text-xs text-[#f28b88]"
+          className="rounded border border-[var(--admin-danger-border)] bg-[var(--admin-danger-wash)] p-4 text-xs text-[var(--admin-danger)]"
         >
           {error}
         </div>
       )}
 
       {successMsg && (
-        <div className="rounded border border-emerald-500/50 bg-emerald-500/10 p-4 text-xs text-emerald-300">
+        <div className="rounded border border-[var(--admin-success-border)] bg-[var(--admin-success-wash)] p-4 text-xs text-[var(--admin-success)]">
           {successMsg}
         </div>
       )}
@@ -358,16 +358,19 @@ export function AdminEvidencePage() {
         <form
           aria-labelledby="evidence-editor-heading"
           onSubmit={handleSubmitForm}
-          className="space-y-4 rounded border border-amber-400/50 bg-[#241f2b] p-5 shadow-xl"
+          className="space-y-4 rounded border border-[var(--admin-accent-border)] bg-[var(--admin-surface)] p-5 shadow-sm"
         >
-          <div className="flex items-center justify-between border-b border-[#3d3546] pb-3">
-            <h2 id="evidence-editor-heading" className="text-base font-bold text-[#f4efe6]">
+          <div className="flex items-center justify-between border-b border-[var(--admin-line)] pb-3">
+            <h2
+              id="evidence-editor-heading"
+              className="text-base font-bold text-[var(--admin-ink)]"
+            >
               {editingId ? 'Chỉnh sửa thông tin vật chứng' : 'Thêm vật chứng mới vào hệ thống'}
             </h2>
             <button
               type="button"
               onClick={closeForm}
-              className="text-xs text-[#a89f94] hover:text-[#f4efe6]"
+              className="text-xs text-[var(--admin-muted)] hover:text-[var(--admin-ink)]"
             >
               Đóng
             </button>
@@ -377,7 +380,7 @@ export function AdminEvidencePage() {
             <div>
               <label
                 htmlFor="evidence-chapter"
-                className="block text-xs font-medium text-[#a89f94]"
+                className="block text-xs font-medium text-[var(--admin-muted)]"
               >
                 Thuộc chương
               </label>
@@ -385,7 +388,7 @@ export function AdminEvidencePage() {
                 id="evidence-chapter"
                 value={formData.chapterId}
                 onChange={(e) => setFormData((p) => ({ ...p, chapterId: Number(e.target.value) }))}
-                className="mt-1 w-full rounded border border-[#5c5266] bg-[#17151b] px-3 py-2 text-sm text-[#f4efe6] focus:border-amber-400 focus:outline-none"
+                className="mt-1 w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-2 text-sm text-[var(--admin-ink)] focus:border-[var(--admin-accent-border)] "
               >
                 {[1, 2, 3, 4, 5].map((ch) => (
                   <option key={ch} value={ch}>
@@ -396,7 +399,10 @@ export function AdminEvidencePage() {
             </div>
 
             <div>
-              <label htmlFor="evidence-code" className="block text-xs font-medium text-[#a89f94]">
+              <label
+                htmlFor="evidence-code"
+                className="block text-xs font-medium text-[var(--admin-muted)]"
+              >
                 Mã định danh (ví dụ: EV_NewItem)
               </label>
               <input
@@ -407,12 +413,15 @@ export function AdminEvidencePage() {
                 value={formData.evidenceCode}
                 onChange={(e) => setFormData((p) => ({ ...p, evidenceCode: e.target.value }))}
                 placeholder="Nhập mã vật chứng..."
-                className="mt-1 w-full rounded border border-[#5c5266] bg-[#17151b] px-3 py-2 font-mono text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+                className="mt-1 w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-2 font-mono text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
               />
             </div>
 
             <div>
-              <label htmlFor="evidence-name" className="block text-xs font-medium text-[#a89f94]">
+              <label
+                htmlFor="evidence-name"
+                className="block text-xs font-medium text-[var(--admin-muted)]"
+              >
                 Tên hiển thị vật chứng
               </label>
               <input
@@ -423,14 +432,17 @@ export function AdminEvidencePage() {
                 value={formData.evidenceName}
                 onChange={(e) => setFormData((p) => ({ ...p, evidenceName: e.target.value }))}
                 placeholder="Ví dụ: Ống hít hen suyễn"
-                className="mt-1 w-full rounded border border-[#5c5266] bg-[#17151b] px-3 py-2 text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+                className="mt-1 w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-2 text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
               />
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="md:col-span-2">
-              <label htmlFor="evidence-image" className="block text-xs font-medium text-[#a89f94]">
+              <label
+                htmlFor="evidence-image"
+                className="block text-xs font-medium text-[var(--admin-muted)]"
+              >
                 Hình ảnh vật chứng (Tải ảnh từ máy hoặc dán đường dẫn URL)
               </label>
               <div className="mt-1 flex flex-wrap gap-2">
@@ -444,7 +456,7 @@ export function AdminEvidencePage() {
                       ? 'Đã chọn tệp ảnh từ máy tính'
                       : 'Dán đường dẫn ảnh (ví dụ: /assets/images/...)'
                   }
-                  className="min-w-48 flex-1 rounded border border-[#5c5266] bg-[#17151b] px-3 py-2 text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+                  className="min-w-48 flex-1 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-2 text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
                 />
                 <input
                   aria-label="Chọn tệp ảnh vật chứng"
@@ -457,7 +469,7 @@ export function AdminEvidencePage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded border border-amber-400/60 bg-amber-400/10 px-3.5 py-2 text-xs font-semibold text-amber-300 transition hover:bg-amber-400 hover:text-[#17151b]"
+                  className="rounded border border-[var(--admin-accent-border)] bg-[var(--admin-accent-wash)] px-3.5 py-2 text-xs font-semibold text-[var(--admin-accent)] transition hover:bg-[var(--admin-accent-strong)] hover:text-[var(--admin-on-accent)]"
                 >
                   📁 Chọn ảnh từ máy
                 </button>
@@ -465,7 +477,7 @@ export function AdminEvidencePage() {
                   <button
                     type="button"
                     onClick={() => setFormData((p) => ({ ...p, imageUrl: '' }))}
-                    className="rounded border border-[#5c5266] px-3 py-2 text-xs text-[#a89f94] hover:text-[#f28b88]"
+                    className="rounded border border-[var(--admin-line)] px-3 py-2 text-xs text-[var(--admin-muted)] hover:text-[var(--admin-danger)]"
                   >
                     Gỡ ảnh
                   </button>
@@ -474,7 +486,7 @@ export function AdminEvidencePage() {
 
               <label
                 htmlFor="evidence-description"
-                className="mt-3 block text-xs font-medium text-[#a89f94]"
+                className="mt-3 block text-xs font-medium text-[var(--admin-muted)]"
               >
                 Mô tả chi tiết vật chứng
               </label>
@@ -485,12 +497,12 @@ export function AdminEvidencePage() {
                 value={formData.description}
                 onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
                 placeholder="Nhập nội dung mô tả chi tiết của vật chứng tại hiện trường..."
-                className="mt-1 w-full rounded border border-[#5c5266] bg-[#17151b] px-3 py-2 text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+                className="mt-1 w-full rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-2 text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
               />
             </div>
 
-            <div className="flex flex-col items-center justify-center rounded border border-dashed border-[#5c5266] bg-[#17151b] p-3">
-              <span className="mb-2 text-[11px] font-medium text-[#a89f94]">
+            <div className="flex flex-col items-center justify-center rounded border border-dashed border-[var(--admin-line)] bg-[var(--admin-surface-soft)] p-3">
+              <span className="mb-2 text-[11px] font-medium text-[var(--admin-muted)]">
                 Xem trước hình ảnh
               </span>
               {formData.imageUrl ? (
@@ -500,7 +512,7 @@ export function AdminEvidencePage() {
                   className="h-32 w-full rounded object-contain"
                 />
               ) : (
-                <div className="flex h-32 w-full items-center justify-center rounded bg-[#241f2b]/60 text-xs text-[#6f6874]">
+                <div className="flex h-32 w-full items-center justify-center rounded bg-[var(--admin-surface)] text-xs text-[var(--admin-subtle)]">
                   Chưa có ảnh đính kèm
                 </div>
               )}
@@ -511,14 +523,14 @@ export function AdminEvidencePage() {
             <button
               type="button"
               onClick={closeForm}
-              className="rounded border border-[#5c5266] px-4 py-1.5 text-xs font-medium text-[#a89f94] hover:text-[#f4efe6]"
+              className="rounded border border-[var(--admin-line)] px-4 py-1.5 text-xs font-medium text-[var(--admin-muted)] hover:text-[var(--admin-ink)]"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={busy}
-              className="rounded bg-amber-400 px-4 py-1.5 text-xs font-semibold text-[#17151b] hover:bg-amber-300 disabled:opacity-50"
+              className="rounded bg-[var(--admin-accent)] px-4 py-1.5 text-xs font-semibold text-[var(--admin-on-accent)] hover:bg-[var(--admin-accent-strong)] disabled:opacity-50"
             >
               {submitting ? 'Đang lưu…' : editingId ? 'Lưu thay đổi' : 'Tạo vật chứng'}
             </button>
@@ -526,17 +538,18 @@ export function AdminEvidencePage() {
         </form>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded border border-[#5c5266]/60 bg-[#241f2b] p-4">
+      <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4">
         <div className="flex flex-wrap items-center gap-2">
           {['ALL', 1, 2, 3, 4, 5].map((ch) => (
             <button
               key={ch}
               type="button"
               onClick={() => setChapterFilter(ch)}
+              aria-pressed={chapterFilter === ch}
               className={`rounded px-3 py-1.5 text-xs font-medium transition ${
                 chapterFilter === ch
-                  ? 'bg-amber-400 font-semibold text-[#17151b]'
-                  : 'border border-[#5c5266] bg-[#17151b] text-[#a89f94] hover:text-[#f4efe6]'
+                  ? 'bg-[var(--admin-accent)] font-semibold text-[var(--admin-on-accent)]'
+                  : 'border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-[var(--admin-muted)] hover:text-[var(--admin-ink)]'
               }`}
             >
               {ch === 'ALL' ? 'Tất cả chương' : `Chương ${ch}`}
@@ -550,35 +563,35 @@ export function AdminEvidencePage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm theo tên hoặc mã vật chứng..."
-          className="w-full max-w-xs rounded border border-[#5c5266] bg-[#17151b] px-3 py-1.5 text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+          className="w-full max-w-xs rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-1.5 text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
         />
       </div>
 
       {loading ? (
-        <p className="text-sm text-[#a89f94]">Đang tải danh mục chứng cứ…</p>
+        <p className="text-sm text-[var(--admin-muted)]">Đang tải danh mục chứng cứ…</p>
       ) : !inventoryReady ? (
-        <p className="text-sm text-[#a89f94]">
+        <p className="text-sm text-[var(--admin-muted)]">
           Chưa thể đối chiếu dữ liệu với máy chủ. Bấm “Làm mới trạng thái” để thử lại.
         </p>
       ) : filteredList.length === 0 ? (
-        <div className="rounded border border-[#5c5266]/60 bg-[#241f2b] p-8 text-center">
-          <p className="text-base font-semibold text-[#f4efe6]">
+        <div className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-8 text-center">
+          <p className="text-base font-semibold text-[var(--admin-ink)]">
             Không có vật chứng phù hợp với bộ lọc hiện tại.
           </p>
-          <p className="mt-1 text-xs text-[#a89f94]">
+          <p className="mt-1 text-xs text-[var(--admin-muted)]">
             Thử đổi chương hoặc xóa nội dung tìm kiếm để xem lại danh mục.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="admin-evidence-grid">
           {filteredList.map((ev) => (
             <article
               key={ev.id}
               aria-label={ev.evidenceCode}
-              className="flex flex-col justify-between rounded border border-[#5c5266]/60 bg-[#241f2b] p-5 transition hover:border-[#5c5266]"
+              className="flex flex-col justify-between admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-5 transition hover:border-[var(--admin-line)]"
             >
               <div className="flex gap-4">
-                <div className="h-24 w-24 shrink-0 overflow-hidden rounded border border-[#3d3546] bg-[#17151b]">
+                <div className="h-24 w-24 shrink-0 overflow-hidden rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)]">
                   {ev.loaded && ev.imageUrl ? (
                     <img
                       src={ev.imageUrl}
@@ -586,38 +599,42 @@ export function AdminEvidencePage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center p-2 text-center text-[10px] text-[#6f6874]">
+                    <div className="flex h-full w-full flex-col items-center justify-center p-2 text-center text-[10px] text-[var(--admin-subtle)]">
                       <span>{ev.loaded ? 'Chưa có ảnh' : 'Chưa nạp vào CSDL'}</span>
                     </div>
                   )}
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#3d3546] pb-2">
-                    <span className="truncate font-mono text-xs font-bold text-amber-300">
+                  <div className="flex items-center justify-between gap-2 border-b border-[var(--admin-line)] pb-2">
+                    <span className="truncate font-mono text-xs font-bold text-[var(--admin-accent)]">
                       {ev.evidenceCode}
                     </span>
-                    <span className="shrink-0 rounded border border-[#5c5266] bg-[#17151b] px-2.5 py-0.5 text-xs font-medium text-[#a89f94]">
+                    <span className="shrink-0 rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-2.5 py-0.5 text-xs font-medium text-[var(--admin-muted)]">
                       Chương {ev.chapterId}
                     </span>
                   </div>
-                  <h3 className="mt-2 text-base font-bold text-[#f4efe6]">{ev.evidenceName}</h3>
+                  <h3 className="mt-2 text-base font-bold text-[var(--admin-ink)]">
+                    {ev.evidenceName}
+                  </h3>
                   <p
-                    className={`mt-1 text-xs font-semibold ${ev.loaded ? 'text-emerald-300' : 'text-amber-300'}`}
+                    className={`mt-1 text-xs font-semibold ${ev.loaded ? 'text-[var(--admin-success)]' : 'text-[var(--admin-accent)]'}`}
                   >
                     {ev.loaded ? 'Đã nạp vào CSDL' : 'Chưa nạp'}
                   </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[#a89f94]">{ev.description}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-[var(--admin-muted)]">
+                    {ev.description}
+                  </p>
                 </div>
               </div>
 
               {ev.loaded ? (
-                <div className="mt-4 flex justify-end gap-2 border-t border-[#2f2937] pt-3">
+                <div className="mt-4 flex justify-end gap-2 border-t border-[var(--admin-line)] pt-3">
                   <button
                     type="button"
                     disabled={busy}
                     onClick={() => openEditForm(ev)}
-                    className="rounded border border-[#5c5266] bg-[#17151b] px-3 py-1 text-xs font-medium text-[#f4efe6] transition hover:border-amber-400 hover:text-amber-300"
+                    className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-1 text-xs font-medium text-[var(--admin-ink)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)]"
                   >
                     Chỉnh sửa / Đổi ảnh
                   </button>
@@ -625,13 +642,13 @@ export function AdminEvidencePage() {
                     type="button"
                     disabled={busy}
                     onClick={() => handleDelete(ev)}
-                    className="rounded border border-[#d9534f]/50 bg-[#d9534f]/10 px-3 py-1 text-xs font-medium text-[#f28b88] transition hover:bg-[#d9534f] hover:text-white"
+                    className="rounded border border-[var(--admin-danger-border)] bg-[var(--admin-danger-wash)] px-3 py-1 text-xs font-medium text-[var(--admin-danger)] transition hover:bg-[var(--admin-danger)] hover:text-white"
                   >
                     {deletingId === ev.id ? 'Đang xóa…' : 'Xóa'}
                   </button>
                 </div>
               ) : (
-                <p className="mt-4 border-t border-[#2f2937] pt-3 text-xs text-[#a89f94]">
+                <p className="mt-4 border-t border-[var(--admin-line)] pt-3 text-xs text-[var(--admin-muted)]">
                   Có trong danh mục chuẩn Chương 1; dùng nút nạp ở đầu trang để thêm vào CSDL.
                 </p>
               )}

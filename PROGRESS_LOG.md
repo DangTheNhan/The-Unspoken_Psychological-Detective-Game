@@ -7,17 +7,17 @@
 
 ## ĐIỂM KHÔI PHỤC (RESUME POINT) — luôn cập nhật mục này trước tiên
 
-> **T-070 hoàn tất chỉnh tiếp tỷ lệ phòng 204 theo phản hồi sau G5.** G4 hoàn tất T-068, G2 hoàn tất T-066, G0/G1 hoàn tất T-065; G3 chưa thực hiện. Hai checkpoint trước hợp nhất được lưu nguyên nội dung ở nhật ký T-065.
+> **T-072 hoàn tất thiết kế lại6 trang Admin** theo skill và phạm vi người dùng duyệt (DEC-035). Check248/build/lint/format qua; Chrome27/27 +12/12 sau tinh chỉnh cuối. QA: `docs/ADMIN_REDESIGN_QA.md`. G3 chưa được giao.
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 17/11/2026 — T-070 căn tỷ lệ nhân vật với cửa và thi thể |
-| Tác vụ đang làm | T-070 hoàn tất: +25% riêng204 theo cửa/thi thể, dời hai stand; tiêu chí mới kiểm alpha thật thay việc chỉ khớp chiều cao201 |
-| Đã xong gần nhất | Check248 + lint/format/build, validator6290, Chrome2043/3 và chapter1 3/3 (hai lượt tớiCH2_ENTRY) qua; đã xem ảnh cửa/cạnh body, visibleHeight388/395px |
-| Trạng thái dở dang | Nhánh Nhan; đã resolve hai file ghi nhớ, chưa tạo merge commit. Giữ các thay đổi/staging có sẵn và application.yml ngoài phạm vi |
-| Việc tiếp theo | Tải lại frontend và xem tỷ lệ204 bản mới; tiếp tục tác vụ được người dùng giao. G3 chưa thực hiện; không xóa save |
-| Đang bị chặn bởi | Không còn việc G5 bị chặn. Chrome dùng dữ liệu thật/API fixture và save local riêng; không ghi DB người dùng/live API |
-| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không có test đang chạy. QA hiện hành docs/ROOM204_PROPORTION_QA.md; ảnh/JSON calibrated ở frontend/node_modules/.cache/teets2-g5-qa/. Kết quả T-069 bằng chiều cao201 là lịch sử |
+| Cập nhật lần cuối | 17/11/2026 — T-072 hoàn tất redesign Admin |
+| Tác vụ đang làm | T-072 đã hoàn tất; chờ yêu cầu tiếp theo của người dùng |
+| Đã xong gần nhất | Redesign6trang Admin theo DEC-035; check248 + lint/format/build qua; Chrome27/27, chạy lại12/12 sau tinh chỉnh skip link;30layout không tràn trang. QA: docs/ADMIN_REDESIGN_QA.md |
+| Trạng thái dở dang | Nhánh Nhan; UI/docs/E2E chưa commit/push. Không merge/unmerged; không sửa backend/auth/API/DB/dependency. T-071 có sẵn trước T-072 được giữ |
+| Việc tiếp theo | Chờ người dùng xem Admin bằng tài khoản thật. Tác vụ thiết kế đã xong; chưa kiểm tích hợp live MySQL/thiết bị thật, không tự triển khai G3 hoặc commit/push |
+| Đang bị chặn bởi | Không. Giới hạn QA: fixture API, chưa giao dịch backend/MySQL thật; không ghi DB người dùng |
+| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không có tiến trình test/server của tác vụ còn chạy. Mã cuối check248 qua; 27Chrome qua +12Admin lặp sau CSScuối. Ảnh local ignored frontend/node_modules/.cache/admin-redesign-qa/ |
 | Ghi chú cho phiên sau | Không cần mở lại zip: đọc `docs/chapter1/CHAPTER1_MEMORY.md`. "Ông chủ trọ" có ảnh `landlord-*` = **HÒA** trong dữ liệu. Present: lấy route khớp **đầu tiên theo thứ tự mảng** (đúng validator). Máy: Java 21, Maven 3.10.0, MySQL 8.0.46 (`C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`), `DB_PASSWORD` ở biến môi trường User |
 
 ---
@@ -837,25 +837,25 @@ Nhánh Nhan:
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 16/11/2026 — T-054 sửa font dự phòng và menu theo bản lưu của tài khoản |
-| Tác vụ đang làm | T-054 hoàn tất sửa lỗi và kiểm thử. T-043 vẫn chờ ảnh 24 khung |
-| Đã xong gần nhất | T-054: bỏ đọc bản lưu chung khi đăng nhập, ẩn Tiếp tục nếu chưa có bản lưu; thay Georgia bằng Times New Roman trong font dự phòng để sửa dấu bị lệch |
-| Trạng thái dở dang | Nhánh Nhan tại 18b6aa1. T-052, T-053 và T-054 đang ở máy, chưa commit. Các phần S1–S4 ngoài phạm vi Dòng thời gian vẫn theo kế hoạch |
-| Việc tiếp theo | Nhóm thử menu/font đã sửa, bổ sung font thiết kế còn thiếu ở TD-43 khi có tệp. Tiếp tục nghiệm thu T-053 và S1/S2; chốt ISS-29 cho S3 |
-| Đang bị chặn bởi | ISS-29 (lưu server) |
-| Lệnh/kiểm tra cần chạy lại khi tiếp tục | `git status` · `cd frontend; npm run check` · `npm run test:e2e` · `python scripts/chapter1/validate.py` (tự chạy validator của gói trên bản sao tạm — KHÔNG chạy thẳng `docs/sources/.../validate_data.py` vì nó ghi đè `validation.results.json`) |
+| Cập nhật lần cuối | 17/11/2026 — T-072 hoàn tất redesign Admin |
+| Tác vụ đang làm | T-072 đã hoàn tất; chờ yêu cầu tiếp theo của người dùng |
+| Đã xong gần nhất | Redesign6trang Admin theo DEC-035; check248 + lint/format/build qua; Chrome27/27, chạy lại12/12 sau tinh chỉnh skip link;30layout không tràn trang. QA: docs/ADMIN_REDESIGN_QA.md |
+| Trạng thái dở dang | Nhánh Nhan; UI/docs/E2E chưa commit/push. Không merge/unmerged; không sửa backend/auth/API/DB/dependency. T-071 có sẵn trước T-072 được giữ |
+| Việc tiếp theo | Chờ người dùng xem Admin bằng tài khoản thật. Tác vụ thiết kế đã xong; chưa kiểm tích hợp live MySQL/thiết bị thật, không tự triển khai G3 hoặc commit/push |
+| Đang bị chặn bởi | Không. Giới hạn QA: fixture API, chưa giao dịch backend/MySQL thật; không ghi DB người dùng |
+| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không có tiến trình test/server của tác vụ còn chạy. Mã cuối check248 qua; 27Chrome qua +12Admin lặp sau CSScuối. Ảnh local ignored frontend/node_modules/.cache/admin-redesign-qa/ |
 
 Nhánh duy:
 
 | Trường | Giá trị |
 |---|---|
-| Cập nhật lần cuối | 16/11/2026 — T-063: kiểm tra và cung cấp lệnh commit/push lên duy |
-| Tác vụ đang làm | T-062 đã hoàn tất; T-063 cung cấp lệnh cho người dùng tự chạy. Nhánh hiện tại duy, chưa thực hiện commit/push |
-| Đã xong gần nhất | Frontend check 221/221 và build; backend clean test 26/26; Chrome 10/10; chapter validator 6290 assertion; 7 nhóm API và 3 nhóm reset đồng thời/hết hạn qua DB/SMTP localhost |
-| Trạng thái dở dang | Không còn. Đã áp dụng 5 bảng bổ sung vào detective_game; số dữ liệu cũ không đổi. Đã xem ảnh desktop/mobile/font/bảo trì, cập nhật tài liệu và dọn môi trường thử |
-| Việc tiếp theo | Người dùng cấu hình SMTP và Google Web Client ID theo docs/ACCOUNT_AND_OPERATIONS.md, khởi động lại ứng dụng rồi thử dịch vụ thật; tiếp tục tác vụ mới khi được giao |
-| Đang bị chặn bởi | Không có phần code/check bị chặn. SMTP/Google thật chưa được cung cấp theo xác nhận người dùng; đã chuẩn bị cấu hình/hướng dẫn và trạng thái chưa khả dụng trên UI |
-| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không có test đang chạy. DB thử detective_t062_20261116_f512 đã xóa sau kiểm tra fixture; server thử 18982/5196/25862 đã dừng, không còn listener. Kết quả chi tiết: docs/ACCOUNT_OPERATIONS_QA.md |
+| Cập nhật lần cuối | 17/11/2026 — T-072 hoàn tất redesign Admin |
+| Tác vụ đang làm | T-072 đã hoàn tất; chờ yêu cầu tiếp theo của người dùng |
+| Đã xong gần nhất | Redesign6trang Admin theo DEC-035; check248 + lint/format/build qua; Chrome27/27, chạy lại12/12 sau tinh chỉnh skip link;30layout không tràn trang. QA: docs/ADMIN_REDESIGN_QA.md |
+| Trạng thái dở dang | Nhánh Nhan; UI/docs/E2E chưa commit/push. Không merge/unmerged; không sửa backend/auth/API/DB/dependency. T-071 có sẵn trước T-072 được giữ |
+| Việc tiếp theo | Chờ người dùng xem Admin bằng tài khoản thật. Tác vụ thiết kế đã xong; chưa kiểm tích hợp live MySQL/thiết bị thật, không tự triển khai G3 hoặc commit/push |
+| Đang bị chặn bởi | Không. Giới hạn QA: fixture API, chưa giao dịch backend/MySQL thật; không ghi DB người dùng |
+| Lệnh/kiểm tra cần chạy lại khi tiếp tục | Không có tiến trình test/server của tác vụ còn chạy. Mã cuối check248 qua; 27Chrome qua +12Admin lặp sau CSScuối. Ảnh local ignored frontend/node_modules/.cache/admin-redesign-qa/ |
 
 ### T-066 — Thực thi G2: giờ Việt Nam trong Admin và lịch bảo trì
 - Ngày giao: 17/11/2026 — người dùng: "thực thi G2". Căn cứ: SRC-7 (TEETS2 M03), docs/TEETS2_FIX_PLAN.md §G2; DEC-031.
@@ -900,3 +900,39 @@ Nhánh duy:
 - B2: preview +25% qua1/1, đã xem ảnh cửa/cạnh body/giữa sàn. Chọn hệ số1.25 riêng depth204 (giữ near/farY201; nhân cả hai height nên speedFactor không đổi), giữ ảnh và phòng201. Căn stand khóa245→255 ở y580, thùng rác527/559→511/575 theo footprint lớn hơn. Unit20/20 qua tất cả cặp đích/path/va chạm/save cũ. Đổi QA đo visibleHeight bằng alpha frame thực; thêm kiểm tỷ lệ cửa80–90% và cạnh body350–405px, không chỉ assert chiều cao bằng201. Đang check/validator trước Chrome.
 - B3: bản áp dụng T-070 check **248/248** (37file), lint/format/build; validator **6290**; Chrome room204 **3/3 qua** gồm alpha/đi lại/save cũ qua Sổ tay. Alpha frame idle cho visibleHeight388.04px ở khóa255/580 (=85.47% khung cửa454px),395.39px cạnh body582/587; chiều cao logic tương ứng376.82/383.95. Đã xem ảnh calibrated ở cửa/cạnh Tùng. Đang chạy lại chapter1.spec.js vì footprint/stand thay đổi, không dùng kết quả T-069 làm kiểm tra mới.
 - Self-Check cuối: **T-070 hoàn tất sửa theo phản hồi**. chapter1.spec.js chạy lại **3/3 qua**, gồm hai lượt nguồn tùy chọn tớiCH2_ENTRY và ca nhép miệng; room204-scale **3/3 qua** trên cùng mã, không pageerror. Check248, validator6290; đã xem ảnh preview/calibrated ở cửa/cạnh thi thể, đo alpha thật. Cập nhật DEC-034/QA/kế hoạch, giữ ảnh/số đo T-069 làm lịch sử; không đổi201/atlas/ảnh/graph/nội dung/API/DB/schema. Giữ Nhan/staging/application.yml, không commit/push, diffcheck sạch/không unmerged. Chỉ chỉnh riêng204+test/tài liệu, G3 chưa thực hiện; tải lại frontend để áp dụng.
+
+### T-071 — Gợi ý nội dung commit theo phạm vi đang stage
+- Ngày giao: 17/11/2026 — người dùng hỏi "nên commit với nội dung gì gợi ý cho tôi"; chỉ tư vấn thông điệp, không giao thực hiện commit/push.
+- Đã đọc checkpoint/quyết định liên quan và kiểm tra Git chỉ đọc: Nhan, MERGE_HEAD còn, không unmerged; 164file đã stage gồm Admin/tài khoản/vận hành và các sửa game/UI/timezone/tỷ lệ204. Kế hoạch: đề xuất message tổng hợp phù hợp phạm vi, không dùng tiêu đề chỉ mô tả sửa204 cho toàn bộ index.
+- Kết quả: đề xuất tiêu đề tích hợp Admin và gameplay fixes, body nêu quản lý tài khoản/kịch bản/bảo trì, ESC/input, giờ Việt Nam, tinh giản UI và tỷ lệ204/save. Không chạy test mới vì không sửa code; không stage/commit/push, chỉ ghi nhật ký theo DEC-002.
+
+
+### T-072 — Thiết kế lại giao diện Admin theo design-taste-frontend
+- Ngày giao: 17/11/2026 — người dùng.
+- Yêu cầu: khảo sát và thiết kế lại toàn bộ Admin, giữ nguyên tính năng/dữ liệu/nghiệp vụ/quyền/route/API; không sửa backend/auth/database. Không áp dụng bố cục landing page; profile kiểm thử tạm riêng.
+- Căn cứ: yêu cầu hiện tại; DEC-024/026/027/031/032; quy tắc DEC-002/003.
+
+#### Kế hoạch (DEC-003)
+- Mục đích: tăng khả năng đọc và thao tác; thống nhất6 trang.
+- Ảnh hưởng: frontend/features/admin, e2e và hồ sơ tiến độ; không đổi API/backend/dữ liệu nguồn/dependency.
+- Rủi ro: CSS lọt ngoài Admin, contrast/mobile overflow/focus, vô tình đổi callback/payload. Đối chiếu source và fixture tách biệt DB.
+- Hướng phát triển: token/component trình bày trong phạm vi người dùng cho phép; không đề xuất đặc tả mới.
+
+#### Bước con & checkpoint
+| Bước | Nội dung | Trạng thái | File tạo/sửa | Kiểm tra đã chạy & kết quả |
+|---|---|---|---|---|
+| 1 | Đọc nguồn, khảo sát6 trang/luồng, kế hoạch và snapshot | Xong | docs/ADMIN_REDESIGN_PLAN.md; snapshot node_modules/.cache | Git Nhan, không migration/unmerged; đã đọc route/API/form/polling/editor |
+| 2 | Shell/token/nav/bảng/card/form/editor/modal keyboard | Xong | frontend/src/features/admin | Hoàn thiện theo QA; focus/contrast đã sửa và kiểm lại qua |
+| 3 | Check, source audit, Chrome và xem ảnh | Xong | frontend/e2e/admin-redesign.spec.js; cache QA | Check248/37file;27/27Chrome +12/12 sau CSScuối;30layout không tràn;7AST nghiệp vụ khớp |
+| 4 | Báo cáo và bộ nhớ/checkpoint | Xong | docs/ADMIN_REDESIGN_QA.md; PROJECT_MEMORY.md; PROGRESS_LOG.md | Giới hạn live DB/thiết bị thật đã ghi; không commit/push |
+
+#### Kết quả
+- Đã xong: khảo sát, thiết kế/triển khai đủ6 trang, kiểm tra và báo cáo QA.
+- Chưa xác minh: live backend/MySQL/thiết bị thật theo giới hạn QA.
+- Điểm cần xác nhận: không có trong phạm vi được giao.
+- Self-Check: đạt trong phạm vi thiết kế; xem checkpoint cuối.
+- Bước tiếp theo: chờ yêu cầu người dùng.
+
+- B3 checkpoint: đã đối chiếu AST6page + ChapterFunnelChart, chỉ loại class/ARIA/scroll focus/ref trả focus/whitespace; nghiệp vụ khớp snapshot trước sửa. Adapter/helper/auth/router/backend/dependency/source không có diff. Modal chỉ đổi lớp trình bày và xử lý focus/Escape.
+- B4 checkpoint: check248/37file + lint/format/build qua. Chrome lượt đầy đủ27/27 qua. QA phát hiện và đã sửa focus Tab, ref mở dialog sau tải async, tương phản chữ thiếu ảnh4.34:1; sau tinh chỉnh skip link/ảnh dừng transition đã chạy lại12/12 Admin và check cuối qua. 30layout (6trang×5width) không tràn tài liệu; 26ảnh và source-audit.json local ignored. Đã xem desktop/tablet/mobile cùng form/modal cuối.
+- Kết quả cuối / Self-Check: T-072 hoàn tất trong phạm vi thiết kế. Báo cáo docs/ADMIN_REDESIGN_QA.md nêu đủ thao tác/giới hạn; không báo marketing GATE PASS, không tự áp quy tắc landing page trái prompt. Không khẳng định toàn bộ live transaction đã kiểm; chưa MySQL/backend thật, thiết bị thật/trình duyệt khác. Không sửa backend/database/auth/API/content/dependency, không commit/push, không có điểm cần xác nhận. Bước tiếp theo: người dùng xem giao diện thực tế; G3 chờ giao việc.

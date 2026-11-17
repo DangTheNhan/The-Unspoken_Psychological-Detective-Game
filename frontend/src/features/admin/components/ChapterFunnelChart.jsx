@@ -3,23 +3,23 @@
  */
 export function ChapterFunnelChart({ chapterStats = [] }) {
   return (
-    <section className="rounded border border-[#5c5266]/60 bg-[#241f2b] p-6">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#3d3546] pb-4">
+    <section className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--admin-line)] pb-4">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
             Tiến độ cốt truyện
           </span>
-          <h2 className="mt-0.5 text-lg font-bold text-[#f4efe6]">
+          <h2 className="mt-0.5 text-lg font-bold text-[var(--admin-ink)]">
             Tỷ lệ người chơi tiếp cận & hoàn thành từng chương
           </h2>
         </div>
-        <div className="flex items-center gap-5 text-xs text-[#a89f94]">
+        <div className="flex items-center gap-5 text-xs text-[var(--admin-muted)]">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-xs bg-amber-400" />
+            <span className="inline-block h-2.5 w-2.5 rounded-xs bg-[var(--admin-accent)]" />
             Đã phá án (%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-xs bg-[#5c5266]" />
+            <span className="inline-block h-2.5 w-2.5 rounded-xs bg-[var(--admin-chart-track)]" />
             Đang điều tra (%)
           </span>
         </div>
@@ -33,26 +33,27 @@ export function ChapterFunnelChart({ chapterStats = [] }) {
           return (
             <div key={item.chapter} className="space-y-1.5">
               <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
-                <span className="font-medium text-[#f4efe6]">{item.title}</span>
+                <span className="font-medium text-[var(--admin-ink)]">{item.title}</span>
                 <div className="flex items-center gap-4 text-xs">
-                  <span className="text-[#a89f94]">
-                    Đang chơi: <strong className="text-[#f4efe6]">{item.reachedCount}</strong> (
+                  <span className="text-[var(--admin-muted)]">
+                    Đang chơi:{' '}
+                    <strong className="text-[var(--admin-ink)]">{item.reachedCount}</strong> (
                     {reachedPct}%)
                   </span>
-                  <span className="text-amber-300">
+                  <span className="text-[var(--admin-accent)]">
                     Hoàn thành: <strong>{item.completedCount}</strong> ({completedPct}%)
                   </span>
                 </div>
               </div>
 
-              <div className="relative h-3.5 w-full overflow-hidden rounded bg-[#17151b] ring-1 ring-[#3d3546]">
+              <div className="relative h-3.5 w-full overflow-hidden rounded bg-[var(--admin-surface-soft)] ring-1 ring-[var(--admin-line)]">
                 <div
-                  className="absolute inset-y-0 left-0 bg-[#5c5266]/70 transition-all duration-500"
+                  className="absolute inset-y-0 left-0 bg-[var(--admin-chart-track)] transition-all duration-500"
                   style={{ width: `${reachedPct}%` }}
                   title={`Đã tiếp cận: ${reachedPct}%`}
                 />
                 <div
-                  className="absolute inset-y-0 left-0 bg-amber-400 transition-all duration-500"
+                  className="absolute inset-y-0 left-0 bg-[var(--admin-accent)] transition-all duration-500"
                   style={{ width: `${completedPct}%` }}
                   title={`Đã hoàn thành: ${completedPct}%`}
                 />

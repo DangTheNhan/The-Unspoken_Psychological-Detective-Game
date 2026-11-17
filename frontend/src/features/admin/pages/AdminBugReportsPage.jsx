@@ -80,13 +80,13 @@ export function AdminBugReportsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="admin-page space-y-6">
+      <div className="admin-page-heading flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
             Hỗ trợ & Vận hành
           </span>
-          <h1 className="mt-0.5 text-2xl font-bold text-[#f4efe6]">
+          <h1 className="mt-0.5 text-2xl font-bold text-[var(--admin-ink)]">
             Quản lý Phản hồi Lỗi từ Người chơi
           </h1>
         </div>
@@ -96,15 +96,16 @@ export function AdminBugReportsPage() {
             <button
               type="button"
               onClick={() => setLivePoll((v) => !v)}
+              aria-pressed={livePoll}
               className={`flex items-center gap-2 rounded border px-3 py-1.5 text-xs font-medium transition ${
                 livePoll
-                  ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
-                  : 'border-[#5c5266] bg-[#241f2b] text-[#a89f94]'
+                  ? 'border-[var(--admin-success-border)] bg-[var(--admin-success-wash)] text-[var(--admin-success)]'
+                  : 'border-[var(--admin-line)] bg-[var(--admin-surface)] text-[var(--admin-muted)]'
               }`}
             >
               <span
                 className={`h-2 w-2 rounded-full ${
-                  livePoll ? 'animate-ping bg-emerald-400' : 'bg-[#6f6874]'
+                  livePoll ? 'bg-[var(--admin-success)]' : 'bg-[var(--admin-subtle)]'
                 }`}
               />
               {livePoll ? 'Tự động cập nhật: Bật' : 'Tự động cập nhật: Tắt'}
@@ -113,29 +114,30 @@ export function AdminBugReportsPage() {
             <button
               type="button"
               onClick={loadReports}
-              className="rounded border border-[#5c5266] bg-[#241f2b] px-3.5 py-1.5 text-xs font-medium text-[#f4efe6] transition hover:border-amber-400 hover:text-amber-300"
+              className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3.5 py-1.5 text-xs font-medium text-[var(--admin-ink)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)]"
             >
               ↻ Làm mới ngay
             </button>
           </div>
-          <details className="mt-2 text-xs text-[#a89f94]">
+          <details className="mt-2 text-xs text-[var(--admin-muted)]">
             <summary className="cursor-pointer">Cách cập nhật báo lỗi</summary>
             <p className="mt-2">Khi bật, danh sách tự cập nhật mỗi 5 giây.</p>
           </details>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded border border-[#5c5266]/60 bg-[#241f2b] p-4">
-        <div className="flex gap-2">
+      <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4">
+        <div className="flex flex-wrap gap-2">
           {['ALL', 'PENDING', 'RESOLVED'].map((st) => (
             <button
               key={st}
               type="button"
               onClick={() => setStatusFilter(st)}
+              aria-pressed={statusFilter === st}
               className={`rounded px-3.5 py-1.5 text-xs font-medium transition ${
                 statusFilter === st
-                  ? 'bg-amber-400 font-semibold text-[#17151b]'
-                  : 'border border-[#5c5266] bg-[#17151b] text-[#a89f94] hover:text-[#f4efe6]'
+                  ? 'bg-[var(--admin-accent)] font-semibold text-[var(--admin-on-accent)]'
+                  : 'border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-[var(--admin-muted)] hover:text-[var(--admin-ink)]'
               }`}
             >
               {filterLabels[st]}
@@ -143,23 +145,23 @@ export function AdminBugReportsPage() {
           ))}
         </div>
 
-        <span className="text-xs text-[#a89f94]">
+        <span className="text-xs text-[var(--admin-muted)]">
           Đồng bộ lúc (giờ Việt Nam):{' '}
-          <strong className="text-[#f4efe6]">{lastSyncedAt || '—'}</strong> · Tổng cộng:{' '}
-          <strong className="text-amber-300">{reports.length}</strong> phản hồi
+          <strong className="text-[var(--admin-ink)]">{lastSyncedAt || '—'}</strong> · Tổng cộng:{' '}
+          <strong className="text-[var(--admin-accent)]">{reports.length}</strong> phản hồi
         </span>
       </div>
 
       {error && (
-        <div className="rounded border border-[#d9534f] bg-[#d9534f]/10 p-4 text-xs text-[#f28b88]">
+        <div className="rounded border border-[var(--admin-danger-border)] bg-[var(--admin-danger-wash)] p-4 text-xs text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded border border-[#5c5266]/60 bg-[#241f2b]">
+      <div className="admin-table-shell" tabIndex={0} role="region" aria-label="Danh sách báo lỗi">
         <table className="w-full border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-[#3d3546] bg-[#17151b]/60 text-xs font-semibold uppercase text-[#a89f94]">
+            <tr className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-xs font-semibold uppercase text-[var(--admin-muted)]">
               <th className="px-4 py-3">Mã</th>
               <th className="px-4 py-3">Người gửi</th>
               <th className="px-4 py-3">Nội dung phản hồi</th>
@@ -168,33 +170,35 @@ export function AdminBugReportsPage() {
               <th className="px-4 py-3 text-right">Xử lý</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2f2937]">
+          <tbody className="divide-y divide-[var(--admin-line)]">
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-xs text-[#a89f94]">
+                <td colSpan={6} className="px-4 py-8 text-center text-xs text-[var(--admin-muted)]">
                   Đang tải danh sách báo cáo lỗi…
                 </td>
               </tr>
             ) : reports.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-xs text-[#a89f94]">
+                <td colSpan={6} className="px-4 py-8 text-center text-xs text-[var(--admin-muted)]">
                   Chưa có báo cáo lỗi nào trong mục này.
                 </td>
               </tr>
             ) : (
               reports.map((report) => (
-                <tr key={report.id} className="transition hover:bg-[#2f2937]/60">
-                  <td className="px-4 py-3 font-mono text-xs text-[#a89f94]">#{report.id}</td>
-                  <td className="px-4 py-3 text-xs font-medium text-[#f4efe6]">
+                <tr key={report.id} className="transition hover:bg-[var(--admin-hover)]">
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--admin-muted)]">
+                    #{report.id}
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium text-[var(--admin-ink)]">
                     {report.username}
                     {report.userId && (
-                      <span className="ml-1 text-[#a89f94]">(#{report.userId})</span>
+                      <span className="ml-1 text-[var(--admin-muted)]">(#{report.userId})</span>
                     )}
                   </td>
-                  <td className="max-w-md px-4 py-3 text-sm leading-relaxed text-[#f4efe6]">
+                  <td className="max-w-md px-4 py-3 text-sm leading-relaxed text-[var(--admin-ink)]">
                     {report.reportContent}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-[#a89f94]">
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--admin-muted)]">
                     {formatVietnamDateTime(report.createdAt)}
                   </td>
                   <td className="px-4 py-3">
@@ -206,7 +210,7 @@ export function AdminBugReportsPage() {
                         type="button"
                         disabled={updatingId === report.id}
                         onClick={() => handleToggleStatus(report)}
-                        className="rounded border border-emerald-500/60 bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-300 transition hover:bg-emerald-400 hover:text-[#17151b] disabled:opacity-50"
+                        className="rounded border border-[var(--admin-success-border)] bg-[var(--admin-success-wash)] px-3 py-1 text-xs font-medium text-[var(--admin-success)] transition hover:bg-[var(--admin-success)] hover:text-[var(--admin-on-accent)] disabled:opacity-50"
                       >
                         ✓ Đánh dấu đã sửa
                       </button>
@@ -215,7 +219,7 @@ export function AdminBugReportsPage() {
                         type="button"
                         disabled={updatingId === report.id}
                         onClick={() => handleToggleStatus(report)}
-                        className="rounded border border-[#5c5266] bg-[#17151b] px-3 py-1 text-xs text-[#a89f94] transition hover:border-amber-400 hover:text-amber-300 disabled:opacity-50"
+                        className="rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3 py-1 text-xs text-[var(--admin-muted)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)] disabled:opacity-50"
                       >
                         ↺ Mở lại báo cáo
                       </button>

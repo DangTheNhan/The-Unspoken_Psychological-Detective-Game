@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchAdminEvidence, fetchAdminUserSave, fetchAdminUsers } from '../api/adminApi'
 import { SaveJsonModal } from '../components/SaveJsonModal'
 import { StatusBadge } from '../components/StatusBadge'
@@ -15,6 +15,7 @@ export function AdminUsersPage() {
   const [error, setError] = useState('')
   const [selectedSave, setSelectedSave] = useState(null)
   const [inspectLoadingId, setInspectLoadingId] = useState(null)
+  const inspectTriggerRef = useRef(null)
 
   const loadUsers = useCallback(async () => {
     try {
@@ -78,49 +79,55 @@ export function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="admin-page space-y-6">
+      <div className="admin-page-heading flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--admin-accent)]">
             Quản lý tài khoản
           </span>
-          <h1 className="mt-0.5 text-2xl font-bold text-[#f4efe6]">
+          <h1 className="mt-0.5 text-2xl font-bold text-[var(--admin-ink)]">
             Danh sách Thám tử & Tiến trình Điều tra
           </h1>
         </div>
         <button
           type="button"
           onClick={loadUsers}
-          className="rounded border border-[#5c5266] bg-[#241f2b] px-3.5 py-1.5 text-xs font-medium text-[#f4efe6] transition hover:border-amber-400 hover:text-amber-300"
+          className="admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] px-3.5 py-1.5 text-xs font-medium text-[var(--admin-ink)] transition hover:border-[var(--admin-accent-border)] hover:text-[var(--admin-accent)]"
         >
           ↻ Làm mới danh sách
         </button>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded border border-[#5c5266]/60 bg-[#241f2b] p-4">
+      <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 admin-panel border border-[var(--admin-line)] bg-[var(--admin-surface)] p-4">
         <input
           type="search"
+          aria-label="Tìm tài khoản theo tên, email hoặc mã ID"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm theo tên tài khoản, email hoặc mã ID..."
-          className="w-full max-w-md rounded border border-[#5c5266] bg-[#17151b] px-3.5 py-2 text-sm text-[#f4efe6] placeholder-[#6f6874] focus:border-amber-400 focus:outline-none"
+          className="w-full max-w-md rounded border border-[var(--admin-line)] bg-[var(--admin-surface-soft)] px-3.5 py-2 text-sm text-[var(--admin-ink)] placeholder-[var(--admin-subtle)] focus:border-[var(--admin-accent-border)] "
         />
-        <span className="text-xs text-[#a89f94]">
-          Hiển thị <strong className="text-[#f4efe6]">{filteredUsers.length}</strong> /{' '}
+        <span className="text-xs text-[var(--admin-muted)]">
+          Hiển thị <strong className="text-[var(--admin-ink)]">{filteredUsers.length}</strong> /{' '}
           {users.length} tài khoản
         </span>
       </div>
 
       {error && (
-        <div className="rounded border border-[#d9534f] bg-[#d9534f]/10 p-4 text-xs text-[#f28b88]">
+        <div className="rounded border border-[var(--admin-danger-border)] bg-[var(--admin-danger-wash)] p-4 text-xs text-[var(--admin-danger)]">
           {error}
         </div>
       )}
 
-      <div className="overflow-x-auto rounded border border-[#5c5266]/60 bg-[#241f2b]">
+      <div
+        className="admin-table-shell"
+        tabIndex={0}
+        role="region"
+        aria-label="Danh sách tài khoản"
+      >
         <table className="w-full border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-[#3d3546] bg-[#17151b]/60 text-xs font-semibold uppercase text-[#a89f94]">
+            <tr className="border-b border-[var(--admin-line)] bg-[var(--admin-surface-soft)] text-xs font-semibold uppercase text-[var(--admin-muted)]">
               <th className="px-4 py-3">Mã</th>
               <th className="px-4 py-3">Tài khoản</th>
               <th className="px-4 py-3">Vai trò</th>
@@ -130,35 +137,37 @@ export function AdminUsersPage() {
               <th className="px-4 py-3 text-right">Hồ sơ điều tra</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2f2937]">
+          <tbody className="divide-y divide-[var(--admin-line)]">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-xs text-[#a89f94]">
+                <td colSpan={7} className="px-4 py-8 text-center text-xs text-[var(--admin-muted)]">
                   Đang tải danh sách tài khoản…
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-xs text-[#a89f94]">
+                <td colSpan={7} className="px-4 py-8 text-center text-xs text-[var(--admin-muted)]">
                   Không tìm thấy tài khoản phù hợp.
                 </td>
               </tr>
             ) : (
               filteredUsers.map((u) => (
-                <tr key={u.id} className="transition hover:bg-[#2f2937]/60">
-                  <td className="px-4 py-3 font-mono text-xs text-[#a89f94]">#{u.id}</td>
+                <tr key={u.id} className="transition hover:bg-[var(--admin-hover)]">
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--admin-muted)]">#{u.id}</td>
                   <td className="px-4 py-3">
-                    <div className="font-semibold text-[#f4efe6]">{u.username}</div>
-                    <div className="text-xs text-[#a89f94]">{u.email}</div>
+                    <div className="font-semibold text-[var(--admin-ink)]">{u.username}</div>
+                    <div className="text-xs text-[var(--admin-muted)]">{u.email}</div>
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={u.role} />
                   </td>
                   <td className="px-4 py-3 text-xs">
                     {u.hasSave ? (
-                      <span className="font-medium text-amber-300">Chương {u.currentChapter}</span>
+                      <span className="font-medium text-[var(--admin-accent)]">
+                        Chương {u.currentChapter}
+                      </span>
                     ) : (
-                      <span className="text-[#6f6874]">Chưa bắt đầu</span>
+                      <span className="text-[var(--admin-subtle)]">Chưa bắt đầu</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-xs">
@@ -166,17 +175,17 @@ export function AdminUsersPage() {
                       <span
                         className={
                           u.credibilityScore <= 30
-                            ? 'font-bold text-[#f28b88]'
-                            : 'font-semibold text-emerald-300'
+                            ? 'font-bold text-[var(--admin-danger)]'
+                            : 'font-semibold text-[var(--admin-success)]'
                         }
                       >
                         {u.credibilityScore} / 100
                       </span>
                     ) : (
-                      <span className="text-[#6f6874]">—</span>
+                      <span className="text-[var(--admin-subtle)]">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-[#a89f94]">
+                  <td className="px-4 py-3 font-mono text-xs text-[var(--admin-muted)]">
                     {formatVietnamDateTime(u.lastSavedAt)}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -184,13 +193,16 @@ export function AdminUsersPage() {
                       <button
                         type="button"
                         disabled={inspectLoadingId === u.id}
+                        onClickCapture={(event) => {
+                          inspectTriggerRef.current = event.currentTarget
+                        }}
                         onClick={() => handleInspectSave(u.id)}
-                        className="rounded border border-amber-400/60 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-300 transition hover:bg-amber-400 hover:text-[#17151b] disabled:opacity-50"
+                        className="rounded border border-[var(--admin-accent-border)] bg-[var(--admin-accent-wash)] px-3 py-1 text-xs font-medium text-[var(--admin-accent)] transition hover:bg-[var(--admin-accent-strong)] hover:text-[var(--admin-on-accent)] disabled:opacity-50"
                       >
                         {inspectLoadingId === u.id ? 'Đang mở…' : 'Xem sổ tay'}
                       </button>
                     ) : (
-                      <span className="text-xs text-[#6f6874]">Chưa có dữ liệu</span>
+                      <span className="text-xs text-[var(--admin-subtle)]">Chưa có dữ liệu</span>
                     )}
                   </td>
                 </tr>
@@ -203,6 +215,7 @@ export function AdminUsersPage() {
       <SaveJsonModal
         saveDetail={selectedSave}
         evidenceCatalog={evidenceCatalog}
+        returnFocusRef={inspectTriggerRef}
         onClose={() => setSelectedSave(null)}
       />
     </div>

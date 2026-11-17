@@ -1,83 +1,56 @@
+import { useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { ROUTES } from '@/app/router/routePaths'
-
-const NAV_ITEMS = [
-  {
-    to: ROUTES.ADMIN,
-    end: true,
-    code: '01',
-    label: 'Tổng quan & Phân tích',
-    sub: 'Thống kê người chơi & tiến độ',
-  },
-  {
-    to: ROUTES.ADMIN_USERS,
-    end: false,
-    code: '02',
-    label: 'Hồ sơ Thám tử',
-    sub: 'Quản lý tài khoản & sổ tay điều tra',
-  },
-  {
-    to: ROUTES.ADMIN_BUGS,
-    end: false,
-    code: '03',
-    label: 'Phản hồi & Báo lỗi',
-    sub: 'Theo dõi và xử lý lỗi từ người chơi',
-  },
-  {
-    to: ROUTES.ADMIN_EVIDENCE,
-    end: false,
-    code: '04',
-    label: 'Danh mục Chứng cứ',
-    sub: 'Thêm, sửa, xóa vật chứng các chương',
-  },
-  {
-    to: ROUTES.ADMIN_STORY,
-    end: false,
-    code: '05',
-    label: 'Nội dung kịch bản',
-    sub: 'Biên tập chữ · duyệt · xuất bản',
-  },
-  {
-    to: ROUTES.ADMIN_OPERATIONS,
-    end: false,
-    code: '06',
-    label: 'Kết nối & Bảo trì',
-    sub: 'Người đang online · lịch thông báo',
-  },
-]
-
+import { AdminIcon } from '../components/AdminIcon'
+import { ADMIN_NAV_ITEMS } from './adminNavigation'
 export function AdminSidebar() {
+  const [expanded, setExpanded] = useState(false)
+  const toggleRef = useRef(null)
+  const closeNavigation = () => {
+    setExpanded(false)
+    if (window.matchMedia('(max-width: 959px)').matches) toggleRef.current?.focus()
+  }
   return (
-    <aside className="w-full shrink-0 border-b border-[#3d3546] bg-[#241f2b] md:w-72 md:border-r md:border-b-0">
-      <div className="border-b border-[#3d3546] px-5 py-5">
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-400">
-          K-ESTATE ARCHIVE
+    <aside className="admin-sidebar">
+      <div className="admin-brand">
+        <span className="admin-brand-mark" aria-hidden="true">
+          U.
         </span>
-        <h1 className="mt-1 text-xl font-bold tracking-wide text-[#f4efe6]">THE UNSPOKEN</h1>
-        <p className="mt-0.5 text-xs text-[#a89f94]">Trung tâm Quản trị & Giám sát Điều tra</p>
+        <div>
+          <span className="admin-brand-kicker">K-ESTATE ARCHIVE</span>
+          <p className="admin-brand-name">THE UNSPOKEN</p>
+          <p className="admin-brand-description">Trung tâm Quản trị & Giám sát Điều tra</p>
+        </div>
+        <button
+          ref={toggleRef}
+          type="button"
+          className="admin-nav-toggle"
+          aria-expanded={expanded}
+          aria-controls="admin-navigation"
+          aria-label={expanded ? 'Đóng điều hướng quản trị' : 'Mở điều hướng quản trị'}
+          onClick={() => setExpanded((value) => !value)}
+        >
+          <AdminIcon name={expanded ? 'close' : 'menu'} />
+        </button>
       </div>
-
-      <nav className="flex flex-col gap-1.5 p-3">
-        {NAV_ITEMS.map((item) => (
+      <nav
+        id="admin-navigation"
+        aria-label="Điều hướng quản trị"
+        className={`admin-navigation${expanded ? ' is-open' : ''}`}
+      >
+        {ADMIN_NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.end}
-            className={({ isActive }) =>
-              `group flex flex-col rounded border px-3.5 py-2.5 transition ${
-                isActive
-                  ? 'border-amber-400/60 bg-[#17151b] text-amber-300 shadow-inner'
-                  : 'border-transparent text-[#f4efe6] hover:border-[#3d3546] hover:bg-[#2f2937]'
-              }`
-            }
+            onClick={closeNavigation}
+            className={({ isActive }) => `admin-nav-item${isActive ? ' is-active' : ''}`}
           >
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold">{item.label}</span>
-              <span className="font-mono text-xs text-[#a89f94] group-hover:text-amber-300">
-                {item.code}
-              </span>
-            </div>
-            <span className="mt-0.5 text-xs text-[#a89f94]">{item.sub}</span>
+            <AdminIcon name={item.icon} />
+            <span className="admin-nav-copy">
+              <span>{item.label}</span>
+              <small>{item.sub}</small>
+            </span>
+            <span className="admin-nav-code">{item.code}</span>
           </NavLink>
         ))}
       </nav>
