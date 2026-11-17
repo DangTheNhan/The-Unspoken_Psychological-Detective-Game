@@ -6,6 +6,7 @@ import { ROOM_MOVEMENT } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { FIRST_ROOM_ID, ROOMS, entrancePoint, roomBackground } from '../data/rooms'
 import { getInspectLines } from '../data/rooms/inspectContent'
 import { isStoryMapNode, openingMapObjective, storyMapHotspots } from '../data/storyMap'
@@ -128,7 +129,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     // this.events tồn tại qua các lần restart -> gỡ listener khi tắt scene để không bị gọi lặp
     const onResume = () => this.onResume()
     this.events.on(Phaser.Scenes.Events.RESUME, onResume)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    onSceneEnd(this, () => {
       this.events.off(Phaser.Scenes.Events.RESUME, onResume)
       this.player?.destroy()
     })
@@ -202,9 +203,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     const onCredibilityChanged = ({ value }) => credibilityBar.setValue(value)
     EventBus.on(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged)
     // Gỡ listener khi rời scene -> tránh rò rỉ và gọi vào object đã hủy
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
-      EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged),
-    )
+    onSceneEnd(this, () => EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged))
   }
 
   /** Phòng chưa có dữ liệu/asset (ISS-27) -> nền tạm như trước. */
@@ -239,7 +238,11 @@ export class RoomInvestigationScene extends Phaser.Scene {
         if (this.storyMap && !this.openingObjective && !this.isBusy())
           this.openStory({ mapMenu: true })
       })
-      keyboard.on('keydown-ESC', () => this.onEscape())
+      keyboard.on('keydown-ESC', (event) => {
+        if (event.repeat) return
+        event.stopPropagation()
+        this.onEscape()
+      })
       if (env.debug) keyboard.on('keydown-F8', () => this.toggleDebugOverlay())
     }
 
@@ -543,12 +546,17 @@ export class RoomInvestigationScene extends Phaser.Scene {
       this.advanceTutorial(TUTORIAL_EVENTS.REACHED_MARKER)
   }
 
+  handlesEscape() {
+    return Boolean(this.dialog || this.inspectBox)
+  }
+
   onEscape() {
     if (this.dialog) return
-    if (this.inspectBox) {
-      this.closeInspect()
-      return
-    }
+    if (this.inspectBox) this.closeInspect()
+  }
+
+  confirmSkipTutorial() {
+    if (this.dialog) return
     if (!isTutorialActive(this.runtime.session.tutorial)) return
     const t = (key) => this.runtime.t(key)
     this.player.stop()

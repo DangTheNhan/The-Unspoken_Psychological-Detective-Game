@@ -3,6 +3,7 @@ import { GAME_EVENTS } from '../constants/gameEvents'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { NOTEBOOK_TABS, notebookSourceKey } from '../systems/notebook'
 import {
   timelineGroups,
@@ -91,7 +92,11 @@ export class NotebookScene extends Phaser.Scene {
 
     this.createSaveControls()
     this.input.keyboard?.on('keydown-N', () => this.close())
-    this.input.keyboard?.on('keydown-ESC', () => this.back())
+    this.input.keyboard?.on('keydown-ESC', (event) => {
+      if (event.repeat) return
+      event.stopPropagation()
+      this.back()
+    })
     this.input.keyboard?.on('keydown-UP', () => this.menu?.move(-1))
     this.input.keyboard?.on('keydown-DOWN', () => this.menu?.move(1))
     this.input.keyboard?.on('keydown-ENTER', (event) => {
@@ -129,9 +134,7 @@ export class NotebookScene extends Phaser.Scene {
       this.saveStatus.setText(text)
     }
     EventBus.on(GAME_EVENTS.SAVE_RESULT, onResult)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
-      EventBus.off(GAME_EVENTS.SAVE_RESULT, onResult),
-    )
+    onSceneEnd(this, () => EventBus.off(GAME_EVENTS.SAVE_RESULT, onResult))
   }
 
   selectTab(tabId) {

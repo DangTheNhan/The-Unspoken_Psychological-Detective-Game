@@ -14,7 +14,11 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:watch": "vitest",
-    "check": "npm run lint && npm run format:check && npm run test && npm run build"
+    "check": "npm run lint && npm run format:check && npm run test && npm run build",
+    "prepare:story-content": "node ../scripts/chapter1/prepare-story-content.mjs",
+    "predev": "npm run prepare:story-content",
+    "pretest": "npm run prepare:story-content",
+    "prebuild": "npm run prepare:story-content"
   },
   "dependencies": {
     "axios": "^1.8.4",

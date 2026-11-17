@@ -41,7 +41,10 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
     )
     bodyText.setLineSpacing(4)
 
+    let finished = false
     const finish = (callback) => {
+      if (finished) return
+      finished = true
       this.destroy()
       callback?.()
     }
@@ -72,8 +75,16 @@ export class ConfirmDialog extends Phaser.GameObjects.Container {
     scene.add.existing(this)
 
     this.keyHandlers = {
-      'keydown-ENTER': () => finish(onConfirm),
-      'keydown-ESC': () => finish(onCancel),
+      'keydown-ENTER': (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        if (!event.repeat) finish(onConfirm)
+      },
+      'keydown-ESC': (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        if (!event.repeat) finish(onCancel)
+      },
     }
     for (const [event, handler] of Object.entries(this.keyHandlers)) {
       scene.input.keyboard?.on(event, handler)

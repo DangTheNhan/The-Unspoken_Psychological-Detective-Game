@@ -4,10 +4,11 @@ import { ROUTES } from '@/app/router/routePaths'
 import { AuthCard } from '@/shared/ui/AuthCard'
 import { FormField } from '@/shared/ui/FormField'
 import { useAuth } from '../state/useAuth'
+import { GoogleSignIn } from '../components/GoogleSignIn'
 
 /** Đăng nhập bằng username + password (Project.docx §4.3). */
 export function LoginPage() {
-  const { login } = useAuth()
+  const { login, notice } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [form, setForm] = useState({ username: '', password: '' })
@@ -19,8 +20,16 @@ export function LoginPage() {
     event.preventDefault()
     setStatus({ loading: true, error: '' })
     try {
-      await login(form)
-      navigate(location.state?.from ?? ROUTES.PLAY, { replace: true })
+      const session = await login(form)
+      const requested = location.state?.from
+      navigate(
+        session.role === 'ROLE_ADMIN'
+          ? typeof requested === 'string' && /^\/admin(?:\/|$)/.test(requested)
+            ? requested
+            : ROUTES.ADMIN
+          : ROUTES.PLAY,
+        { replace: true },
+      )
     } catch (error) {
       setStatus({ loading: false, error: error.message })
     }
@@ -28,6 +37,11 @@ export function LoginPage() {
 
   return (
     <AuthCard title="The Unspoken" subtitle="Psychological Detective Game">
+      {notice && (
+        <p role="status" className="mb-4 text-sm text-amber-300">
+          {notice}
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <FormField
           id="username"
@@ -61,6 +75,17 @@ export function LoginPage() {
           </p>
         )}
       </form>
+      <Link
+        to={ROUTES.FORGOT_PASSWORD}
+        className="mt-4 inline-block text-sm text-amber-400 hover:underline"
+      >
+        Quên mật khẩu?
+      </Link>
+      <GoogleSignIn
+        onSuccess={(session) =>
+          navigate(session.role === 'ROLE_ADMIN' ? ROUTES.ADMIN : ROUTES.PLAY, { replace: true })
+        }
+      />
       <p className="mt-6 text-sm text-stone-400">
         Chưa có tài khoản?{' '}
         <Link to={ROUTES.REGISTER} className="text-amber-400 hover:underline">

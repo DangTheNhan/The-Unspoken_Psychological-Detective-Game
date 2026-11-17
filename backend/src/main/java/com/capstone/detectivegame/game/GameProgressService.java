@@ -9,6 +9,7 @@ import com.capstone.detectivegame.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.capstone.detectivegame.security.CurrentUser;
 
 /**
  * Lưu / tải tiến trình (Project.docx §4.3, §1.2 Bước 4).
@@ -22,19 +23,20 @@ public class GameProgressService {
     private final GameSaveRepository gameSaveRepository;
     private final UserRepository userRepository;
     private final EntityManager entityManager;
+    private final CurrentUser current;
 
     public GameProgressService(GameSaveRepository gameSaveRepository, UserRepository userRepository,
-            EntityManager entityManager) {
+            EntityManager entityManager, CurrentUser current) {
         this.gameSaveRepository = gameSaveRepository;
         this.userRepository = userRepository;
         this.entityManager = entityManager;
+        this.current = current;
     }
 
     @Transactional
     public SaveProgressResponse save(SaveProgressRequest request) {
         validate(request);
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> ApiException.notFound("Không tìm thấy userId " + request.userId()));
+        User user = current.ownForWrite(request.userId());
 
         GameSave save = gameSaveRepository.findFirstByUser_IdOrderByUpdatedAtDescIdDesc(user.getId())
                 .orElseGet(() -> new GameSave(user));
@@ -47,6 +49,7 @@ public class GameProgressService {
 
     @Transactional(readOnly = true)
     public GameProgressResponse loadLatest(Long userId) {
+        current.own(userId);
         return gameSaveRepository.findFirstByUser_IdOrderByUpdatedAtDescIdDesc(userId)
                 .map(GameProgressResponse::from)
                 .orElseThrow(() -> ApiException.notFound("Chưa có bản lưu cho userId " + userId));

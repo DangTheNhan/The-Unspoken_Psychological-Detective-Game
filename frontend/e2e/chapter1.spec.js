@@ -1,6 +1,21 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/auth/session', (route) =>
+    route.fulfill({
+      json: {
+        maintenance: {
+          serverNow: new Date().toISOString(),
+          active: false,
+          scheduled: false,
+          revision: 0,
+        },
+      },
+    }),
+  )
+})
+
 const assets = new URL('../public/assets/chapters/chapter1/', import.meta.url)
 const read = (file) => JSON.parse(readFileSync(new URL(file, assets), 'utf8'))
 const graph = read('chapter1.json')
@@ -81,6 +96,20 @@ class ChapterPlaytest {
   }
 
   async start(withTutorial, { textSpeed = 'instant', stopAtOpening = false } = {}) {
+    await this.page.route('**/api/auth/session', (route) =>
+      route.fulfill({
+        json: {
+          maintenance: {
+            serverNow: new Date().toISOString(),
+            active: false,
+            scheduled: false,
+            startsAt: null,
+            message: '',
+            revision: 0,
+          },
+        },
+      }),
+    )
     // Phiên giả chỉ ở trình duyệt test. Luồng lưu cục bộ chạy qua React và Phaser thật.
     await this.page.addInitScript((speed) => {
       localStorage.setItem(
@@ -89,6 +118,20 @@ class ChapterPlaytest {
       )
       localStorage.setItem('theUnspoken.settings.v1', JSON.stringify({ textSpeed: speed }))
     }, textSpeed)
+    // These canvas-only playtests use a fake auth session; story text uses its untouched baseline.
+    // The separate Story Content E2E verifies the real protected API and publishing.
+    await this.page.route('**/api/game/chapters/*/story-text?*', (route) =>
+      route.fulfill({
+        json: {
+          chapterId: 1,
+          baseHash: new URL(route.request().url()).searchParams.get('baseHash'),
+          contractVersion: graph.contractVersion,
+          allowlistVersion: 1,
+          versionId: null,
+          overrides: [],
+        },
+      }),
+    )
     await this.page.goto('/play')
     await this.waitForScene('MainMenuScene')
     await this.key('Enter')
@@ -112,6 +155,7 @@ class ChapterPlaytest {
       await this.clickSpot('R201_DOOR')
     } else {
       await this.key('Escape')
+      await this.page.getByRole('button', { name: 'Bỏ qua hướng dẫn', exact: true }).click()
       await this.key('Enter')
     }
     await this.waitForScene('StoryScene')

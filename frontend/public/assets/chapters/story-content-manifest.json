@@ -1,0 +1,13 @@
+{
+  "allowlistVersion": 1,
+  "chapters": [
+    {
+      "chapterId": 1,
+      "contractVersion": "2.0.0",
+      "file": "chapter1/chapter1.json",
+      "baseHash": "929311e344062c48d2d96936c27f89a459875efaf856bff799f6d9ebefb095e9",
+      "nodeCount": 1264,
+      "editableFieldCount": 813
+    }
+  ]
+}

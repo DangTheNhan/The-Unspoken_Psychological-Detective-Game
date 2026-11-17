@@ -16,6 +16,7 @@ const REGISTRY_KEY = 'runtime'
 export function createRuntime() {
   let session = new GameSession()
   let runner = null
+  let storyContent = null
   let started = false
   // React báo qua SAVE_AVAILABILITY (useGameBridge); mặc định false tới khi nhận được tin
   let saveAvailable = false
@@ -38,8 +39,26 @@ export function createRuntime() {
   const autosave = createAutosaveScheduler({ onSave: requestSave })
 
   return {
+    get hasStarted() {
+      return started
+    },
+    setPaused(value) {
+      if (value) autosave.stop()
+      else if (started) autosave.start()
+    },
+    saveLocal(reason) {
+      if (started)
+        EventBus.emit(GAME_EVENTS.SAVE_REQUESTED, {
+          reason,
+          snapshot: session.toSaveSnapshot(),
+          localOnly: true,
+        })
+    },
     get session() {
       return session
+    },
+    get storyContent() {
+      return storyContent
     },
     get story() {
       return runner
@@ -54,10 +73,11 @@ export function createRuntime() {
     t(key, params) {
       return translate(settings.get().language, key, params)
     },
-    startNewGame(initialState) {
-      this.startSession(new GameSession(), initialState)
+    startNewGame(initialState, content = null) {
+      this.startSession(new GameSession(), initialState, content)
     },
-    startSession(nextSession, initialState) {
+    startSession(nextSession, initialState, content = null) {
+      storyContent = content
       session = nextSession
       runner = null
       if (!session.story && initialState) session.setStory(initialState)
@@ -66,7 +86,7 @@ export function createRuntime() {
     },
     startStory(graph) {
       if (runner) return runner
-      runner = createStoryRunner(graph, session.story, {
+      runner = createStoryRunner(storyContent?.graph ?? graph, session.story, {
         onChange(state, previous) {
           session.setStory(state)
           if (state.credibility !== previous.credibility) {

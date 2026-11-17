@@ -40,7 +40,8 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.json(dialogueCacheKey(FIRST_CHAPTER), dialogueUrl(FIRST_CHAPTER))
     for (const [name, file] of Object.entries(CHAPTER_DATA[FIRST_CHAPTER].files)) {
-      this.load.json(file.key, chapterFileUrl(FIRST_CHAPTER, name))
+      if (name === 'graph') this.load.text(`${file.key}-raw`, chapterFileUrl(FIRST_CHAPTER, name))
+      else this.load.json(file.key, chapterFileUrl(FIRST_CHAPTER, name))
     }
     loadCharacterAssets(this.load)
 
@@ -61,6 +62,8 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create() {
+    const graphKey = CHAPTER_DATA[FIRST_CHAPTER].files.graph.key
+    this.cache.json.add(graphKey, JSON.parse(this.cache.text.get(`${graphKey}-raw`)))
     const { key, frame, crop } = ROOM_204_NECK_PHOTO
     if (this.textures.exists(key)) this.textures.get(key).add(frame, 0, ...crop)
     for (const [id, { frames }] of Object.entries(SUSPECT_PORTRAITS)) {

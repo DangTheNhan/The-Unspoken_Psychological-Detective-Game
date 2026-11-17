@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { PasswordRecoveryPage } from '@/features/auth/pages/PasswordRecoveryPage'
+import { AdminRoute } from './AdminRoute'
 import { ProtectedRoute } from './ProtectedRoute'
 import { ROUTES } from './routePaths'
 
@@ -9,9 +11,38 @@ import { ROUTES } from './routePaths'
 const GamePlayPage = lazy(() =>
   import('@/features/play/pages/GamePlayPage').then((m) => ({ default: m.GamePlayPage })),
 )
-const AdminDashboardPage = lazy(() =>
-  import('@/features/admin/pages/AdminDashboardPage').then((m) => ({
-    default: m.AdminDashboardPage,
+const AdminLayout = lazy(() =>
+  import('@/features/admin/layout/AdminLayout').then((m) => ({ default: m.AdminLayout })),
+)
+const AdminOverviewPage = lazy(() =>
+  import('@/features/admin/pages/AdminOverviewPage').then((m) => ({
+    default: m.AdminOverviewPage,
+  })),
+)
+const AdminUsersPage = lazy(() =>
+  import('@/features/admin/pages/AdminUsersPage').then((m) => ({
+    default: m.AdminUsersPage,
+  })),
+)
+const AdminBugReportsPage = lazy(() =>
+  import('@/features/admin/pages/AdminBugReportsPage').then((m) => ({
+    default: m.AdminBugReportsPage,
+  })),
+)
+const AdminEvidencePage = lazy(() =>
+  import('@/features/admin/pages/AdminEvidencePage').then((m) => ({
+    default: m.AdminEvidencePage,
+  })),
+)
+
+const AdminStoryContentPage = lazy(() =>
+  import('@/features/admin/pages/AdminStoryContentPage').then((m) => ({
+    default: m.AdminStoryContentPage,
+  })),
+)
+const AdminOperationsPage = lazy(() =>
+  import('@/features/admin/pages/AdminOperationsPage').then((m) => ({
+    default: m.AdminOperationsPage,
   })),
 )
 
@@ -23,10 +54,21 @@ export function AppRouter() {
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<PasswordRecoveryPage />} />
+          <Route path={ROUTES.RESET_PASSWORD} element={<PasswordRecoveryPage reset />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path={ROUTES.PLAY} element={<GamePlayPage />} />
-            <Route path={ROUTES.ADMIN} element={<AdminDashboardPage />} />
+          </Route>
+          <Route element={<AdminRoute />}>
+            <Route path={ROUTES.ADMIN} element={<AdminLayout />}>
+              <Route index element={<AdminOverviewPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="operations" element={<AdminOperationsPage />} />
+              <Route path="bugs" element={<AdminBugReportsPage />} />
+              <Route path="evidence" element={<AdminEvidencePage />} />
+              <Route path="story-content" element={<AdminStoryContentPage />} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to={ROUTES.PLAY} replace />} />
         </Routes>

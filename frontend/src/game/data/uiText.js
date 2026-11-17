@@ -6,6 +6,19 @@
  */
 export const UI_TEXT = Object.freeze({
   vi: Object.freeze({
+    'menu.report': 'Báo lỗi',
+    'pause.title': 'Tạm dừng điều tra',
+    'pause.resume': 'Tiếp tục chơi',
+    'pause.settings': 'Cài đặt',
+    'pause.skipTutorial': 'Bỏ qua hướng dẫn',
+    'pause.menu': 'Về menu chính',
+    'pause.note': 'Tiến độ đang chơi được giữ trong phiên này. Lưu tiến trình nằm trong Sổ tay.',
+    'storyContent.loading': 'Đang lấy nội dung kịch bản…',
+    'storyContent.base': 'Đang dùng nội dung kịch bản gốc.',
+    'storyContent.published': 'Đã nạp nội dung kịch bản được xuất bản cho phiên chơi này.',
+    'storyContent.cached': 'Mất kết nối: đang dùng bản nội dung đã lưu trên máy.',
+    'storyContent.offlineBase': 'Mất kết nối: đang dùng nội dung gốc của trò chơi.',
+    'storyContent.rejected': 'Không thể áp dụng bản cập nhật nội dung; đang dùng bản gốc.',
     'menu.kicker': 'HỒ SƠ VỤ ÁN  ·  21:35  ·  ĐÊM MƯA',
     'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
     'menu.newGame': 'Ván mới',
@@ -54,7 +67,7 @@ export const UI_TEXT = Object.freeze({
     'dialogue.missing':
       'Chương {chapter}: chưa có lời thoại (chờ dữ liệu kịch bản). Bấm để tiếp tục.',
     'room.placeholder': 'Chương {chapter} — chờ dữ liệu hiện trường',
-    'room.hint': 'N: Sổ tay   E: Tương tác',
+    'room.hint': 'N: Sổ tay   E: Tương tác   Esc: Tạm dừng',
     'room.debugHint': 'F8: vùng đi được (debug)',
     'interact.inspect': 'Xem',
     'interact.exit': 'Ra ngoài',
@@ -66,7 +79,7 @@ export const UI_TEXT = Object.freeze({
     'room201.calendar': 'Lịch treo tường',
     'room201.coats': 'Móc áo',
     'room201.window': 'Cửa sổ',
-    'room201.exitLocked': 'Làm xong hướng dẫn trước khi ra ngoài (Esc để bỏ qua hướng dẫn).',
+    'room201.exitLocked': 'Làm xong hướng dẫn trước khi ra ngoài (Esc → Bỏ qua hướng dẫn).',
     'hallway.a201': 'Cửa phòng A201',
     'hallway.a202': 'Cửa phòng A202',
     'hallway.a203': 'Cửa phòng A203',
@@ -79,7 +92,7 @@ export const UI_TEXT = Object.freeze({
     'tutorial.notebook':
       'Nhấn N để mở Sổ tay — nơi ghi manh mối, lời khai và lưu tiến trình. Nhấn N hoặc Esc để đóng.',
     'tutorial.exit': 'Khi đã sẵn sàng, ra cửa và nhấn E.',
-    'tutorial.skipHint': 'Esc: bỏ qua hướng dẫn',
+    'tutorial.skipHint': 'Esc: tạm dừng / bỏ qua hướng dẫn',
     'tutorial.skip.title': 'Bỏ qua hướng dẫn?',
     'tutorial.skip.body':
       'Bạn vẫn tự khám phá phòng được. Hướng dẫn sẽ không hiện lại trong lượt chơi này.',
@@ -175,6 +188,19 @@ export const UI_TEXT = Object.freeze({
     'badEnding.reload': 'Tải lại checkpoint gần nhất',
   }),
   en: Object.freeze({
+    'menu.report': 'Report a bug',
+    'pause.title': 'Investigation paused',
+    'pause.resume': 'Resume game',
+    'pause.settings': 'Settings',
+    'pause.skipTutorial': 'Skip tutorial',
+    'pause.menu': 'Main menu',
+    'pause.note': 'Your current progress stays in this session. Save progress from the Notebook.',
+    'storyContent.loading': 'Loading story content…',
+    'storyContent.base': 'Using the original story text.',
+    'storyContent.published': 'Published story text loaded for this play session.',
+    'storyContent.cached': 'Offline: using previously saved published text.',
+    'storyContent.offlineBase': 'Offline: using the original game text.',
+    'storyContent.rejected': 'The text update could not be applied; using the original text.',
     'menu.kicker': 'CASE FILE  ·  21:35  ·  RAINY NIGHT',
     'menu.subtitle': 'PSYCHOLOGICAL DETECTIVE GAME',
     'menu.newGame': 'New Game',
@@ -223,7 +249,7 @@ export const UI_TEXT = Object.freeze({
     'dialogue.missing':
       'Chapter {chapter}: no dialogue yet (awaiting script data). Click to continue.',
     'room.placeholder': 'Chapter {chapter} — awaiting crime scene data',
-    'room.hint': 'N: Notebook   E: Interact',
+    'room.hint': 'N: Notebook   E: Interact   Esc: Pause',
     'room.debugHint': 'F8: walkable area (debug)',
     'interact.inspect': 'Inspect',
     'interact.exit': 'Leave',
@@ -235,7 +261,7 @@ export const UI_TEXT = Object.freeze({
     'room201.calendar': 'Wall calendar',
     'room201.coats': 'Coat rack',
     'room201.window': 'Window',
-    'room201.exitLocked': 'Finish the tutorial before leaving (Esc to skip the tutorial).',
+    'room201.exitLocked': 'Finish the tutorial before leaving (Esc → Skip tutorial).',
     'hallway.a201': 'Door A201',
     'hallway.a202': 'Door A202',
     'hallway.a203': 'Door A203',
@@ -248,7 +274,7 @@ export const UI_TEXT = Object.freeze({
     'tutorial.notebook':
       'Press N to open the Notebook — where clues, statements and saving live. Press N or Esc to close.',
     'tutorial.exit': 'When you are ready, go to the door and press E.',
-    'tutorial.skipHint': 'Esc: skip tutorial',
+    'tutorial.skipHint': 'Esc: pause / skip tutorial',
     'tutorial.skip.title': 'Skip the tutorial?',
     'tutorial.skip.body':
       'You can still explore the room freely. The tutorial will not show again in this playthrough.',

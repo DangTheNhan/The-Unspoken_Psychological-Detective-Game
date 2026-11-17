@@ -24,19 +24,19 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider tokenProvider;
+    private final SessionService sessions;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, SessionService sessions) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.tokenProvider = tokenProvider;
+        this.sessions = sessions;
     }
 
     @Transactional
     public void register(RegisterRequest request) {
         String username = requireText(request.username(), "username", USERNAME_MAX);
         String email = requireText(request.email(), "email", EMAIL_MAX);
-        String password = requireText(request.password(), "password", Integer.MAX_VALUE);
+        String password = requirePassword(request.password());
 
         if (userRepository.existsByUsername(username)) {
             throw ApiException.conflict("Tên đăng nhập đã tồn tại");
@@ -47,17 +47,16 @@ public class AuthService {
         userRepository.save(new User(username, email, passwordEncoder.encode(password)));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public JwtResponse login(LoginRequest request) {
         String username = requireText(request.username(), "username", USERNAME_MAX);
-        String password = requireText(request.password(), "password", Integer.MAX_VALUE);
+        String password = requirePassword(request.password());
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.lockByUsername(username)
                 .filter(found -> passwordEncoder.matches(password, found.getPasswordHash()))
                 .orElseThrow(() -> ApiException.unauthorized("Sai tên đăng nhập hoặc mật khẩu"));
 
-        String token = tokenProvider.generateToken(user.getUsername(), user.getRole());
-        return JwtResponse.bearer(token, user.getUsername(), user.getRole());
+        return sessions.issue(user);
     }
 
     private static String requireText(String value, String field, int maxLength) {
@@ -69,5 +68,10 @@ public class AuthService {
             throw ApiException.badRequest(field + " vượt quá " + maxLength + " ký tự");
         }
         return trimmed;
+    }
+
+    private static String requirePassword(String value) {
+        if(value==null || value.isBlank() || value.getBytes(java.nio.charset.StandardCharsets.UTF_8).length>72) throw ApiException.badRequest("Mật khẩu không hợp lệ hoặc vượt 72 byte UTF-8.");
+        return value;
     }
 }

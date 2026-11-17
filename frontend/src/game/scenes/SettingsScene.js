@@ -64,6 +64,7 @@ export class SettingsScene extends Phaser.Scene {
 
   init(data) {
     this.returnTo = data?.returnTo ?? null
+    this.onClose = data?.onClose
     this.tabIndex = 0
   }
 
@@ -75,7 +76,12 @@ export class SettingsScene extends Phaser.Scene {
     this.render()
 
     // Esc = đóng không lưu · ← → = đổi tab
-    this.input.keyboard?.on('keydown-ESC', () => this.close(false))
+    this.input.keyboard?.on('keydown-ESC', (event) => {
+      if (event.repeat) return
+      event.preventDefault()
+      event.stopPropagation()
+      this.close(false)
+    })
     this.input.keyboard?.on('keydown-LEFT', () => this.switchTab(Math.max(0, this.tabIndex - 1)))
     this.input.keyboard?.on('keydown-RIGHT', () =>
       this.switchTab(Math.min(TABS.length - 1, this.tabIndex + 1)),
@@ -283,5 +289,6 @@ export class SettingsScene extends Phaser.Scene {
     }
     this.scene.stop()
     if (this.returnTo) this.scene.resume(this.returnTo)
+    this.onClose?.()
   }
 }

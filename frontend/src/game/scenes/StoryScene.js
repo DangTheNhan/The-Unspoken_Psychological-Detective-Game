@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { TYPEWRITER } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { getRuntime } from '../core/runtime'
+import { onSceneEnd } from '../core/sceneLifecycle'
 import { CHAPTER_DATA } from '../data/chapters'
 import { ROOMS, roomBackground } from '../data/rooms'
 import { ROOM_204_NECK_PHOTO } from '../data/rooms/room204'
@@ -84,13 +85,20 @@ export class StoryScene extends Phaser.Scene {
     keyboard?.on('keydown-N', (event) => {
       if (!event.repeat) this.openNotebook()
     })
-    keyboard?.on('keydown-ESC', () => this.back())
+    keyboard?.on('keydown-ESC', (event) => {
+      if (event.repeat) return
+      event.stopPropagation()
+      this.back()
+    })
     this.input.on('pointerup', (_pointer, over) => {
       if (!over.length) this.advanceLine?.()
     })
-    this.events.on(Phaser.Scenes.Events.RESUME, this.render, this)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.events.off(Phaser.Scenes.Events.RESUME, this.render, this)
+    const onResume = (_systems, data) => {
+      if (!data?.preserveView) this.render()
+    }
+    this.events.on(Phaser.Scenes.Events.RESUME, onResume)
+    onSceneEnd(this, () => {
+      this.events.off(Phaser.Scenes.Events.RESUME, onResume)
       this.clearView()
     })
     this.render()
@@ -407,6 +415,10 @@ export class StoryScene extends Phaser.Scene {
   resetSelection() {
     this.statement = null
     this.pickingEvidence = false
+  }
+
+  handlesEscape() {
+    return Boolean(this.pickingEvidence || this.statement || this.activeSlot || this.mapMenu)
   }
 
   back() {

@@ -3,6 +3,22 @@ import { expect, test } from '@playwright/test'
 
 test.setTimeout(25_000)
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/auth/logout', (route) => route.fulfill({ json: {} }))
+  await page.route('**/api/auth/session', (route) =>
+    route.fulfill({
+      json: {
+        maintenance: {
+          serverNow: new Date().toISOString(),
+          active: false,
+          scheduled: false,
+          revision: 0,
+        },
+      },
+    }),
+  )
+})
+
 const initialState = JSON.parse(
   readFileSync(
     new URL('../public/assets/chapters/chapter1/game-state.definitions.json', import.meta.url),
@@ -87,6 +103,7 @@ test('tài khoản mới bỏ qua bản lưu chung và của người khác, và
   expect(items.map(({ label, number }) => [number, label])).toEqual([
     ['01', 'Ván mới'],
     ['02', 'Cài đặt'],
+    ['03', 'Báo lỗi'],
   ])
   expect(items[1].y - items[0].y).toBe(54)
   await page.screenshot({ path: info.outputPath('new-player-menu.png') })
@@ -111,6 +128,7 @@ test('người đã lưu có thể tiếp tục đúng tiến trình của mình
     'Ván mới',
     'Tiếp tục điều tra',
     'Cài đặt',
+    'Báo lỗi',
   ])
   await press(page, 'ArrowDown')
   await press(page, 'Enter')
@@ -157,7 +175,9 @@ test('đổi tài khoản trong cùng trình duyệt không mang theo tiến tr�
   page,
 }) => {
   await openMenu(page, 'returning-player', { [`${saveKey}.returning-player`]: snapshot })
+  page.once('dialog', (dialog) => dialog.accept())
   await page.getByRole('button', { name: 'Đăng xuất' }).click()
+  await expect(page).toHaveURL(/\/login$/)
   await page.evaluate(() => {
     localStorage.setItem(
       'theUnspoken.auth.v1',
@@ -166,7 +186,11 @@ test('đổi tài khoản trong cùng trình duyệt không mang theo tiến tr�
   })
   await page.goto('/play')
   await waitForScene(page, 'MainMenuScene')
-  expect((await visibleItems(page)).map(({ label }) => label)).toEqual(['Ván mới', 'Cài đặt'])
+  expect((await visibleItems(page)).map(({ label }) => label)).toEqual([
+    'Ván mới',
+    'Cài đặt',
+    'Báo lỗi',
+  ])
   await clickNewGame(page)
   await waitForScene(page, 'RoomInvestigationScene')
   // Lưu qua giao diện thật, sau đó tải lại menu.

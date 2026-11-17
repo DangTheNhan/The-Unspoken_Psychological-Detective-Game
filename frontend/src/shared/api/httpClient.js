@@ -48,7 +48,13 @@ httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status ?? null
-    if (status === 401) onUnauthorized()
+    const currentToken = tokenProvider()
+    if (
+      status === 401 &&
+      currentToken &&
+      error.config?.headers?.Authorization === `Bearer ${currentToken}`
+    )
+      onUnauthorized(error.response?.data?.message)
 
     const apiError = new ApiError({
       message: error.response?.data?.message || error.message || 'Lỗi không xác định',

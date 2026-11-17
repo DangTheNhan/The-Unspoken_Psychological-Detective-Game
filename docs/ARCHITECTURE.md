@@ -165,7 +165,11 @@ Tài nguyên:
 | `POST /api/auth/login` → 200 | AuthController | Permit All |
 | `POST /api/game/save` → 200 | GameProgressController | JWT |
 | `GET /api/game/load/{userId}` → 200 | GameProgressController | JWT |
-| `POST /api/reports/bug` → 201 | BugReportController | JWT (tạm — ISS-09) |
+| `POST /api/reports/bug` → 201 | BugReportController | Phiên JWT hiện hành, xác minh userId (DEC-027) |
+
+DEC-027 bổ sung `auth/{AccountController,SessionService,AccountStore,PasswordResetService,GoogleLoginService,GoogleTokenVerifier}`, `security/{CurrentUser,MaintenanceFilter}` và `common/{MaintenanceService,SystemStatusController}`, `admin/OperationsController`. Dữ liệu bổ sung qua `db/account-operations.sql` (5 bảng); schema.sql gốc giữ nguyên. Các bảng token/phiên dùng Spring transaction-bound JDBC, bảng users/game/report vẫn dùng Spring Data JPA. Spring Boot Mail theo BOM 3.4.4.
+
+Frontend: AuthProvider quản lý heartbeat và lịch bảo trì (revision/giờ server); Phaser chỉ tải khi vào /play. `game/core/{sceneLifecycle,gameControls}` dọn cả shutdown/destroy, pause/settings/memory resume và giữ local khi dừng. React chỉ điều khiển game qua EventBus. `/forgot-password`, `/reset-password` và Google GIS dùng API auth; `/admin/operations` dành cho ROLE_ADMIN. Danh sách API/cấu hình: [ACCOUNT_AND_OPERATIONS.md](ACCOUNT_AND_OPERATIONS.md).
 
 ## 3a. Ánh xạ với Project.docx bản mới §3.1 / §4.1 (DEC-009)
 
@@ -217,3 +221,10 @@ Tìm `PENDING(ISS-` trong mã nguồn để thấy toàn bộ điểm chờ xác
 ```powershell
 git grep -n "PENDING(ISS-"
 ```
+
+
+## Story Content (DEC-026)
+
+`features/admin/pages/AdminStoryContentPage` và `api/storyContentApi` → `/api/admin/story/chapters/**` → `admin.story` (catalog, lifecycle service, draft/version/pointer repositories). ROLE_ADMIN bắt buộc; game chỉ đọc published qua `/api/game/chapters/{id}/story-text`.
+
+`CHAPTER_DATA` → script prepare manifest → frontend raw graph + Maven classpath bản graph đúng byte. New/Continue → EventBus request ID → React Axios/cache → pure `game/narrative/storyText.js` merge → runtime graph riêng cho phiên. Graph cache nguồn và state v2 giữ nguyên. SQL bổ sung 3 bảng ở `db/story-content.sql`; schema.sql gốc không thay. Chi tiết contract và vận hành: [STORY_CONTENT.md](STORY_CONTENT.md).
