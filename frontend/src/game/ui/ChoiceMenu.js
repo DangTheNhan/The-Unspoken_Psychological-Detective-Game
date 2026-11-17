@@ -6,12 +6,18 @@ const ROWS_PER_PAGE = 6
 
 /** Danh sách lựa chọn dài dùng chung cho hội thoại, lời khai, vật chứng và nguồn suy luận. */
 export class ChoiceMenu {
-  constructor(scene, rows, { x = 80, y = 270, width = 1120 } = {}) {
+  constructor(
+    scene,
+    rows,
+    { x = 80, y = 270, width = 1120, rowHeight = 48, rowsPerPage = ROWS_PER_PAGE } = {},
+  ) {
     this.scene = scene
     this.rows = rows
     this.x = x
     this.y = y
     this.width = width
+    this.rowHeight = rowHeight
+    this.rowsPerPage = rowsPerPage
     this.index = 0
     this.objects = []
     this.draw()
@@ -19,13 +25,19 @@ export class ChoiceMenu {
 
   draw() {
     this.destroy()
-    const { scene, x, y, width, rows, index } = this
-    const first = Math.floor(index / ROWS_PER_PAGE) * ROWS_PER_PAGE
-    for (const [offset, row] of rows.slice(first, first + ROWS_PER_PAGE).entries()) {
+    const { scene, x, y, width, rows, index, rowHeight, rowsPerPage } = this
+    const first = Math.floor(index / rowsPerPage) * rowsPerPage
+    for (const [offset, row] of rows.slice(first, first + rowsPerPage).entries()) {
       const rowIndex = first + offset
-      const top = y + offset * 48
+      const top = y + offset * rowHeight
       const background = scene.add
-        .rectangle(x, top, width, 43, rowIndex === index ? COLORS.panelBorder : COLORS.panel)
+        .rectangle(
+          x,
+          top,
+          width,
+          rowHeight - 5,
+          rowIndex === index ? COLORS.panelBorder : COLORS.panel,
+        )
         .setOrigin(0)
         .setDepth(DEPTH.OVERLAY)
         .setInteractive({ useHandCursor: true })
@@ -35,9 +47,9 @@ export class ChoiceMenu {
         .setDepth(DEPTH.OVERLAY + 1)
       this.objects.push(background, text)
     }
-    const end = Math.min(first + ROWS_PER_PAGE, rows.length)
-    if (rows.length > ROWS_PER_PAGE) {
-      const top = y + ROWS_PER_PAGE * 48
+    const end = Math.min(first + rowsPerPage, rows.length)
+    if (rows.length > rowsPerPage) {
+      const top = y + rowsPerPage * rowHeight
       for (const [offset, label, next] of [
         [0, '‹', first - 1],
         [145, '›', end],

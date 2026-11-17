@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { footAt } from '../../systems/depthScale'
 import { buildGrid, findPath } from '../../systems/pathfinding'
 import { isFootClear } from '../../systems/walkArea'
-import { ROOMS, entrancePoint } from '.'
+import { ROOMS, entrancePoint, roomBackground } from '.'
 import { ROOM_204, ROOM_204_HOTSPOTS } from './room204'
 
 it('các vùng bấm phòng 204 nằm trong ảnh và có lối đi giữa mọi điểm đứng', () => {
   const foot = ([, y]) => footAt(ROOM_204.depth, y)
   const grid = buildGrid(ROOM_204, foot)
+  expect(isFootClear(ROOM_204, [830, 544], foot([830, 544]))).toBe(false)
   const hotspots = Object.entries(ROOM_204_HOTSPOTS)
   const starts = [
     ROOM_204.spawn,
@@ -48,6 +49,15 @@ it('các vùng bấm phòng 204 nằm trong ảnh và có lối đi giữa mọi
       expect(overlap, `${id} / ${otherId}`).toBe(false)
     }
   }
+})
+
+it('phòng 204 hiện ảnh Tùng trong lúc được khám hiện trường', () => {
+  expect(roomBackground(ROOM_204)).toBe(ROOM_204.background)
+  const flags = { inspect_permission: true, samples_submitted: false }
+  expect(roomBackground(ROOM_204, { flags })).toBe(ROOM_204.backgroundWithTung)
+  expect(roomBackground(ROOM_204, { flags: { ...flags, samples_submitted: true } })).toBe(
+    ROOM_204.background,
+  )
 })
 
 /** Kiểm tra chung cho MỌI phòng 2.5D (T-024): không kẹt nhân vật, cửa nối hai chiều. */

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { chapterFileUrl } from '../data/chapters'
 import { notebookSourceKey } from '../systems/notebook'
 import { createStoryRunner } from './storyRunner'
+import { applyStoryText, storyTextFields } from './storyText'
 
 const load = (name) =>
   JSON.parse(
@@ -10,6 +11,17 @@ const load = (name) =>
   )
 const graph = load('graph')
 const { initialState } = load('state')
+const textEditedGraph = applyStoryText(
+  graph,
+  graph.nodes.flatMap((node) =>
+    storyTextFields(node).map((field) => ({
+      nodeId: node.id,
+      field: field.field,
+      ...(field.choiceIndex === undefined ? {} : { choiceIndex: field.choiceIndex }),
+      value: field.baseText + '\n',
+    })),
+  ),
+)
 
 function readThrough(runner) {
   for (let i = 0; i < 150 && runner.node?.next && runner.node.type !== 'checklist'; i += 1) {
@@ -42,8 +54,18 @@ function present(runner, statement, evidence) {
 }
 
 // Lộ trình chính và lộ trình thu nguồn tùy chọn của validate_data.py, qua API người chơi.
-function play(optional) {
-  const runner = createStoryRunner(graph, initialState)
+function play(optional, storyGraph = graph) {
+  const runner = createStoryRunner(storyGraph, initialState)
+  expect(readThrough(runner)).toBe('P1_HALL_204')
+  expect(runner.choices().map(({ targetNode }) => targetNode)).toEqual(['P1_ENTER_204'])
+  choose(runner, 'P1_ENTER_204')
+  expect(runner.state.scene_location).toBe('room204')
+  expect(runner.state.flags.victim_seen_from_door).toBe(false)
+  choose(runner, 'P1_SEE_TUNG')
+  expect(runner.state.flags.victim_seen_from_door).toBe(true)
+  expect(runner.state.statements).toEqual({})
+  expect(runner.state.evidence_collected).toEqual([])
+  choose(runner, 'P1_LEAVE_204')
   expect(readThrough(runner)).toBe('P1_HOA_MENU')
   choose(
     runner,
@@ -153,8 +175,13 @@ function fillBoard(runner, who) {
 }
 
 describe('Chương 1 — Data Contract 2.0', () => {
-  it.each([false, true])('đi từ phòng 201 tới CH2_ENTRY (nguồn tùy chọn sớm: %s)', (optional) => {
-    const runner = play(optional)
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ])('đi từ phòng 201 tới CH2_ENTRY (nguồn sớm: %s, sửa chữ: %s)', (optional, edited) => {
+    const runner = play(optional, edited ? textEditedGraph : graph)
     if (!optional) {
       choose(runner, 'FD_SUBMIT')
       expect(runner.state.credibility).toBe(85)
@@ -211,13 +238,15 @@ describe('Chương 1 — Data Contract 2.0', () => {
   })
 
   it('tiếp tục đúng câu đang đọc và bỏ qua thao tác từ màn hình cũ', () => {
-    const runner = createStoryRunner(graph, initialState)
-    expect(runner.node.id).toBe('P1_001__001')
+    const runner = createStoryRunner(graph, { ...initialState, current_node: 'P1_001__001' })
+    expect(runner.node.id).toBe('P1_001__002')
     const version = runner.version
     expect(runner.advance(version)).toBe(true)
     expect(runner.advance(version)).toBe(false)
     const resumed = createStoryRunner(graph, JSON.parse(JSON.stringify(runner.state)))
     expect(resumed.state).toEqual(runner.state)
+    expect(readThrough(resumed)).toBe('P1_HALL_204')
+    choose(resumed, 'P1_ENTER_204', 'P1_SEE_TUNG', 'P1_LEAVE_204')
     expect(readThrough(resumed)).toBe('P1_HOA_MENU')
     expect(resumed.state.statements).toHaveProperty('ST_P1_HOA_INITIAL')
     expect(Object.keys(resumed.state.statements)).toHaveLength(1)

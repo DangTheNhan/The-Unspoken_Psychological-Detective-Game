@@ -3,6 +3,13 @@
  * Quy ước: '<miền>:<hành động>'. Payload ghi trong comment để bên nghe biết dữ liệu nhận được.
  */
 export const GAME_EVENTS = Object.freeze({
+  CONTROL_REQUEST: 'game:control-request',
+  CONTROL_STATE: 'game:control-state',
+  REPORT_REQUESTED: 'game:report-requested',
+  /** Phaser -> React: { requestId, chapterId, baseHash, contractVersion, graph, language }. */
+  STORY_TEXT_REQUESTED: 'story-text:requested',
+  /** React -> Phaser: { requestId, graph, versionId, status }; only the matching session accepts it. */
+  STORY_TEXT_RESULT: 'story-text:result',
   /** Phaser -> React. payload: { reason: string, snapshot: SaveSnapshot } */
   SAVE_REQUESTED: 'save:requested',
   /** Phaser -> React. payload: none — người chơi bấm Load Game ở MainMenu */
@@ -18,8 +25,8 @@ export const GAME_EVENTS = Object.freeze({
   /** React -> Phaser. payload: { message: string } — hiện thông báo ngắn trong game */
   TOAST: 'ui:toast',
   /**
-   * React -> Phaser. payload: { hasSave: boolean } — trình duyệt đang có bản lưu hay không
-   * (useGameBridge gửi khi mở trang và sau mỗi lần lưu). MainMenu dùng để mờ "Tiếp tục điều tra"
+   * React -> Phaser. payload: { hasSave: boolean } — tài khoản hiện tại có bản lưu hay không
+   * (useGameBridge gửi khi mở trang và sau mỗi lần lưu). MainMenu dùng để hiện "Tiếp tục điều tra"
    * và hỏi xác nhận trước khi bắt đầu ván mới (DEC-012).
    */
   SAVE_AVAILABILITY: 'save:availability',

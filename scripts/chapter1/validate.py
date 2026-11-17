@@ -15,6 +15,7 @@ Validator cần data/*.json (gồm chapter.schema.json, source-map.json của g�
 Validator KHÔNG so lời thoại trong game với kịch bản gốc; dòng "khác bản gốc" (so SHA-256 với MANIFEST) chỉ để thông tin.
 """
 import hashlib
+import argparse
 import json
 import shutil
 import subprocess
@@ -28,7 +29,7 @@ GAME_DATA = ROOT / 'frontend' / 'public' / 'assets' / 'chapters' / 'chapter1'
 RUNTIME_FILES = ['chapter1.json', 'evidence.json', 'people.json', 'statements.json', 'game-state.definitions.json']
 
 
-def main(use_source: bool) -> int:
+def main(use_source: bool, overrides: Path | None = None) -> int:
     with tempfile.TemporaryDirectory(prefix='ch1-validate-') as tmp:
         work = Path(tmp)
         (work / 'validation').mkdir()
@@ -38,8 +39,20 @@ def main(use_source: bool) -> int:
         if not use_source:
             for name in RUNTIME_FILES:
                 shutil.copy2(GAME_DATA / name, work / 'data' / name)
+        if overrides is not None:
+            merge = subprocess.run(
+                ['node', str(ROOT / 'scripts' / 'chapter1' / 'merge-story-text.mjs'),
+                 str(work / 'data' / 'chapter1.json'), str(overrides.resolve())],
+                capture_output=True, text=True, encoding='utf-8')
+            if merge.returncode != 0:
+                print('FAIL — overrides không hợp lệ:')
+                print(merge.stderr[-4000:])
+                return 1
+            (work / 'data' / 'chapter1.json').write_text(merge.stdout, encoding='utf-8')
         script = work / 'validation' / 'validate_data.py'
         shutil.copy2(PACKAGE / 'validation' / 'validate_data.py', script)
+        if not use_source:
+            adapt_opening_walkthrough(script)
         # -X utf8: validator đọc file bằng read_text() không ghi encoding -> trên Windows phải ép UTF-8
         run = subprocess.run([sys.executable, '-I', '-X', 'utf8', str(script)],
                              capture_output=True, text=True, encoding='utf-8')
@@ -52,11 +65,29 @@ def main(use_source: bool) -> int:
         data = json.loads(results.read_text(encoding='utf-8'))
         label = 'docs/sources/chapter1 (bản gốc)' if use_source else 'frontend/public/assets/chapters/chapter1 (bản game)'
         print(f"{data['status'].upper()} — {label}")
+        if overrides is not None:
+            print('  text overrides: merged and invariant-checked in temporary data only')
         print(f"  assertions: {data['assertions']} · nodes: {data['nodes']} · statements: {data['statements']}")
         print(f"  broken targets: {data['brokenTargets']} · unreachable: {data['unreachableNodes']}")
         if not use_source:
             report_changes()
         return 0 if data['status'] == 'passed' else 1
+
+
+def adapt_opening_walkthrough(script: Path) -> None:
+    """Đi qua ba thao tác mở đầu của bản game. Giữ nguyên validator trong gói nguồn."""
+    text = script.read_text(encoding='utf-8')
+    source_step = " r=Runner();check(r.run('P1_001')=='P1_HOA_MENU','P1 starts in 201 then Hòa')"
+    game_steps = "\n".join([
+        " r=Runner();check(r.run('P1_001')=='P1_HALL_204','P1 Hòa directs player to room 204')",
+        " check(r.choose('P1_ENTER_204')=='P1_ROOM_204_VIEW','P1 enter room before interviewing')",
+        " check(r.choose('P1_SEE_TUNG')=='P1_ROOM_204_EXIT','P1 acknowledge Tùng before leaving')",
+        " check(r.s['flags']['victim_seen_from_door'] and not r.s['evidence_collected'],'P1 observation without evidence')",
+        " check(r.choose('P1_LEAVE_204')=='P1_HOA_MENU','P1 return to hallway then interview Hòa')",
+    ])
+    if text.count(source_step) != 1:
+        raise RuntimeError('Không tìm thấy bước mở đầu chuẩn trong validator của gói.')
+    script.write_text(text.replace(source_step, game_steps, 1), encoding='utf-8')
 
 
 def report_changes() -> None:
@@ -74,4 +105,10 @@ def report_changes() -> None:
 if __name__ == '__main__':
     # In tiếng Việt an toàn cả khi PowerShell chuyển hướng output ra file (mặc định không phải UTF-8)
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-    sys.exit(main('--source' in sys.argv[1:]))
+    parser = argparse.ArgumentParser(description='Validate chapter data without changing source files.')
+    parser.add_argument('--source', action='store_true')
+    parser.add_argument('--overrides', type=Path, help='Override fixture array or published-text response JSON')
+    args = parser.parse_args()
+    if args.source and args.overrides:
+        parser.error('--overrides applies to the runtime baseline, not --source')
+    sys.exit(main(args.source, args.overrides))

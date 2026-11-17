@@ -19,18 +19,18 @@ const log = createLogger('SaveService')
  */
 export async function persistProgress(
   snapshot,
-  { userId = null, username, reason = 'unknown' } = {},
+  { userId = null, username, reason = 'unknown', localOnly = false } = {},
 ) {
+  if (!username) throw new Error('Không xác định được tài khoản để lưu tiến trình.')
   const local = storage.set(backupKey(username), {
     ...snapshot,
     reason,
     savedAt: new Date().toISOString(),
   })
 
-  if (userId === null || userId === undefined) {
+  if (localOnly || userId === null || userId === undefined) {
     if (!local) throw new Error('Không ghi được bản lưu trên trình duyệt.')
-    log.warn('Chưa có userId (ISS-29) -> chỉ lưu localStorage')
-    return { remote: false, reason: 'missing-user-id' }
+    return { remote: false, reason: localOnly ? 'local-only' : 'missing-user-id' }
   }
 
   try {
@@ -38,7 +38,7 @@ export async function persistProgress(
     log.debug('Đã lưu lên server', reason, data)
     return { remote: true, data }
   } catch (error) {
-    if (error.isNetworkError && local) {
+    if ((error.isNetworkError || error.data?.code === 'MAINTENANCE_ACTIVE') && local) {
       log.warn('Mất kết nối -> chế độ offline, giữ bản localStorage')
       return { remote: false, reason: 'offline' }
     }
@@ -47,10 +47,11 @@ export async function persistProgress(
 }
 
 function backupKey(username) {
-  const key = STORAGE_KEYS.LOCAL_SAVE_BACKUP
-  return username ? `${key}.${encodeURIComponent(username)}` : key
+  return `${STORAGE_KEYS.LOCAL_SAVE_BACKUP}.${encodeURIComponent(username)}`
 }
 
 export function readLocalBackup(username) {
-  return storage.get(backupKey(username)) ?? storage.get(STORAGE_KEYS.LOCAL_SAVE_BACKUP)
+  // Bản lưu chung cũ không có chủ sở hữu: không gán nhầm cho tài khoản vừa đăng nhập.
+  if (!username) return null
+  return storage.get(backupKey(username))
 }

@@ -6,9 +6,11 @@ import { ROOM_MOVEMENT } from '../constants/gameplay'
 import { SCENE_KEYS } from '../constants/sceneKeys'
 import { EventBus } from '../core/EventBus'
 import { getRuntime } from '../core/runtime'
-import { FIRST_ROOM_ID, ROOMS, entrancePoint } from '../data/rooms'
+import { onSceneEnd } from '../core/sceneLifecycle'
+import { FIRST_ROOM_ID, ROOMS, entrancePoint, roomBackground } from '../data/rooms'
 import { getInspectLines } from '../data/rooms/inspectContent'
-import { isStoryMapNode, storyMapHotspots } from '../data/storyMap'
+import { isStoryMapNode, openingMapObjective, storyMapHotspots } from '../data/storyMap'
+import { suspectPortrait } from '../data/suspectPortraits'
 import { Player } from '../entities/Player'
 import { footAt } from '../systems/depthScale'
 import { buildGrid, findPath, smoothPath } from '../systems/pathfinding'
@@ -72,8 +74,9 @@ export class RoomInvestigationScene extends Phaser.Scene {
     }
 
     const { width, height } = this.scale
+    const background = roomBackground(this.room, this.runtime.session.story)
     this.add
-      .image(0, 0, this.room.background.key)
+      .image(0, 0, background.key)
       .setOrigin(0)
       .setDisplaySize(width, height)
       .setDepth(DEPTH.BACKGROUND)
@@ -113,6 +116,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     this.nearHotspot = null
     this.notebookOpen = false
     this.storyMap = isStoryMapNode(this.runtime.story?.node)
+    this.openingObjective = openingMapObjective(this.runtime.story?.node)
     const storySpots = storyMapHotspots(this.runtime.story ?? {})
     this.hotspots = this.storyMap ? storySpots : this.room.hotspots
     if (this.storyMap) this.createStoryMapControls(storySpots)
@@ -125,7 +129,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     // this.events tồn tại qua các lần restart -> gỡ listener khi tắt scene để không bị gọi lặp
     const onResume = () => this.onResume()
     this.events.on(Phaser.Scenes.Events.RESUME, onResume)
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+    onSceneEnd(this, () => {
       this.events.off(Phaser.Scenes.Events.RESUME, onResume)
       this.player?.destroy()
     })
@@ -135,6 +139,18 @@ export class RoomInvestigationScene extends Phaser.Scene {
   createStoryMapControls(spots) {
     for (const spot of spots) {
       if (!spot.name) continue
+      if (spot.suspect) {
+        const { portrait, portraitFrame } = suspectPortrait(spot.suspect)
+        const [x, y] = spot.stand
+        this.add
+          .rectangle(x, y - 83, 52, 52, COLORS.panel)
+          .setStrokeStyle(2, COLORS.panelBorder)
+          .setDepth(DEPTH.HUD)
+        this.add
+          .image(x, y - 83, portrait, portraitFrame)
+          .setDisplaySize(48, 48)
+          .setDepth(DEPTH.HUD + 1)
+      }
       this.add
         .text(spot.stand[0], spot.stand[1] - 55, spot.name, {
           ...TEXT_STYLES.body,
@@ -145,6 +161,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(DEPTH.HUD)
     }
+    if (this.openingObjective) return
     const button = new PanelButton(this, {
       y: 62,
       label: this.runtime.t('story.investigate'),
@@ -186,9 +203,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
     const onCredibilityChanged = ({ value }) => credibilityBar.setValue(value)
     EventBus.on(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged)
     // Gỡ listener khi rời scene -> tránh rò rỉ và gọi vào object đã hủy
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () =>
-      EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged),
-    )
+    onSceneEnd(this, () => EventBus.off(GAME_EVENTS.CREDIBILITY_CHANGED, onCredibilityChanged))
   }
 
   /** Phòng chưa có dữ liệu/asset (ISS-27) -> nền tạm như trước. */
@@ -220,9 +235,14 @@ export class RoomInvestigationScene extends Phaser.Scene {
         if (!this.isBusy()) this.openNotebook()
       })
       keyboard.on('keydown-M', () => {
-        if (this.storyMap && !this.isBusy()) this.openStory({ mapMenu: true })
+        if (this.storyMap && !this.openingObjective && !this.isBusy())
+          this.openStory({ mapMenu: true })
       })
-      keyboard.on('keydown-ESC', () => this.onEscape())
+      keyboard.on('keydown-ESC', (event) => {
+        if (event.repeat) return
+        event.stopPropagation()
+        this.onEscape()
+      })
       if (env.debug) keyboard.on('keydown-F8', () => this.toggleDebugOverlay())
     }
 
@@ -279,9 +299,11 @@ export class RoomInvestigationScene extends Phaser.Scene {
 
     const tutorial = this.runtime.session.tutorial
     const showAll = isTutorialActive(tutorial) && tutorial.step === 'interact'
-    const rects = showAll
-      ? this.room.hotspots.filter((h) => h.action === 'inspect').map((h) => h.rect)
-      : []
+    const rects = this.openingObjective
+      ? this.hotspots.map((hotspot) => hotspot.rect)
+      : showAll
+        ? this.room.hotspots.filter((h) => h.action === 'inspect').map((h) => h.rect)
+        : []
     this.outline.draw(rects, this.nearHotspot?.rect ?? null, time)
 
     if (this.nearHotspot) {
@@ -315,10 +337,19 @@ export class RoomInvestigationScene extends Phaser.Scene {
       zone.on('pointerup', () => {
         if (this.isBusy()) return
         const [sx, sy] = hotspot.stand
-        this.walkToPoint({ x: sx, y: sy }, () => {
+        const interact = () => {
           this.player.face(hotspot.face)
           this.activateHotspot(hotspot)
-        })
+        }
+        if (
+          hotspot.choiceIndex !== undefined &&
+          Math.hypot(this.player.x - sx, this.player.y - sy) <= ROOM_MOVEMENT.INTERACT_RADIUS
+        ) {
+          this.player.stop()
+          interact()
+          return
+        }
+        this.walkToPoint({ x: sx, y: sy }, interact)
       })
     }
   }
@@ -342,7 +373,7 @@ export class RoomInvestigationScene extends Phaser.Scene {
   activateHotspot(hotspot) {
     if (hotspot.choiceIndex !== undefined) {
       this.rememberPosition()
-      if (this.runtime.story.choose(hotspot.choiceIndex)) this.openStory()
+      if (this.runtime.story.choose(hotspot.choiceIndex)) this.openStory({ entrance: this.roomId })
       return
     }
     if (hotspot.action === 'exit') {
@@ -478,7 +509,18 @@ export class RoomInvestigationScene extends Phaser.Scene {
     const tutorial = this.runtime.session.tutorial
     const t = (key) => this.runtime.t(key)
     if (!isTutorialActive(tutorial)) {
-      this.tutorialHint.hide()
+      const objective =
+        this.openingObjective ??
+        (this.runtime.story?.node?.id === 'P1_HUB_MENU' ? 'story.objective.interviews' : null)
+      if (objective) {
+        this.tutorialHint.show({
+          title: t('story.objective.title'),
+          body: t(objective),
+          footer: t('story.objective.interact'),
+        })
+      } else {
+        this.tutorialHint.hide()
+      }
       this.marker?.destroy()
       this.marker = null
       return
@@ -504,12 +546,17 @@ export class RoomInvestigationScene extends Phaser.Scene {
       this.advanceTutorial(TUTORIAL_EVENTS.REACHED_MARKER)
   }
 
+  handlesEscape() {
+    return Boolean(this.dialog || this.inspectBox)
+  }
+
   onEscape() {
     if (this.dialog) return
-    if (this.inspectBox) {
-      this.closeInspect()
-      return
-    }
+    if (this.inspectBox) this.closeInspect()
+  }
+
+  confirmSkipTutorial() {
+    if (this.dialog) return
     if (!isTutorialActive(this.runtime.session.tutorial)) return
     const t = (key) => this.runtime.t(key)
     this.player.stop()

@@ -1,0 +1,51 @@
+import { ROUTES } from '@/app/router/routePaths'
+export const ADMIN_NAV_ITEMS = [
+  {
+    to: ROUTES.ADMIN,
+    end: true,
+    code: '01',
+    icon: 'overview',
+    label: 'Tổng quan & Phân tích',
+    sub: 'Thống kê người chơi & tiến độ',
+  },
+  {
+    to: ROUTES.ADMIN_USERS,
+    end: false,
+    code: '02',
+    icon: 'users',
+    label: 'Hồ sơ Thám tử',
+    sub: 'Quản lý tài khoản & sổ tay điều tra',
+  },
+  {
+    to: ROUTES.ADMIN_BUGS,
+    end: false,
+    code: '03',
+    icon: 'bugs',
+    label: 'Phản hồi & Báo lỗi',
+    sub: 'Theo dõi và xử lý lỗi từ người chơi',
+  },
+  {
+    to: ROUTES.ADMIN_EVIDENCE,
+    end: false,
+    code: '04',
+    icon: 'evidence',
+    label: 'Danh mục Chứng cứ',
+    sub: 'Thêm, sửa, xóa vật chứng các chương',
+  },
+  {
+    to: ROUTES.ADMIN_STORY,
+    end: false,
+    code: '05',
+    icon: 'story',
+    label: 'Nội dung kịch bản',
+    sub: 'Biên tập chữ · duyệt · xuất bản',
+  },
+  {
+    to: ROUTES.ADMIN_OPERATIONS,
+    end: false,
+    code: '06',
+    icon: 'operations',
+    label: 'Kết nối & Bảo trì',
+    sub: 'Người đang online · lịch thông báo',
+  },
+]

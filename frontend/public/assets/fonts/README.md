@@ -6,8 +6,10 @@ Ba họ chữ trong bản thiết kế đã chốt — đều có đủ dấu ti
 | Họ chữ | Dùng cho | File cần có trong thư mục này | Trạng thái |
 |---|---|---|---|
 | JetBrains Mono | Nhãn nhỏ kiểu đánh máy, số phòng, phím tắt | `JetBrainsMono-Regular.woff` + `OFL-JetBrainsMono.txt` | **Đã có** (bản rút gọn: Latin + tiếng Việt, 29 KB) |
-| Playfair Display | Tiêu đề "THE UNSPOKEN", tiêu đề bảng | `PlayfairDisplay-Bold.ttf` + `OFL-PlayfairDisplay.txt` | **Cần thêm** |
-| Be Vietnam Pro | Chữ thường, mục menu, nút | `BeVietnamPro-Regular.ttf`, `BeVietnamPro-Medium.ttf`, `BeVietnamPro-SemiBold.ttf` + `OFL-BeVietnamPro.txt` | **Cần thêm** |
+| Playfair Display | Tiêu đề "THE UNSPOKEN", tiêu đề bảng | `PlayfairDisplay-Bold.ttf` + `OFL-PlayfairDisplay.txt` | **Đã có (T-062)** — font variable chính thức, dùng weight 700 |
+| Be Vietnam Pro | Chữ thường, mục menu, nút | `BeVietnamPro-Regular.ttf`, `BeVietnamPro-Medium.ttf`, `BeVietnamPro-SemiBold.ttf` + `OFL-BeVietnamPro.txt` | **Đã có (T-062)** |
+
+T-062 lấy nguyên file từ kho `google/fonts` chính thức: `ofl/playfairdisplay/PlayfairDisplay[wght].ttf` (đặt tên file phục vụ theo @font-face hiện có), `ofl/bevietnampro/BeVietnamPro-{Regular,Medium,SemiBold}.ttf` và OFL của từng họ. Không sửa dữ liệu font.
 
 ## Cách thêm 2 font còn thiếu
 1. Mở https://fonts.google.com/specimen/Playfair+Display → **Get font** → **Download all**. Trong file zip lấy
@@ -17,6 +19,10 @@ Ba họ chữ trong bản thiết kế đã chốt — đều có đủ dấu ti
    (đổi tên thành `OFL-BeVietnamPro.txt`).
 3. Chép vào thư mục này (`frontend/public/assets/fonts/`), giữ đúng tên file ở bảng trên → tải lại trang (Ctrl+F5).
 
-Chưa thêm thì game **vẫn chạy**: tiêu đề dùng Georgia, chữ thường dùng font hệ thống (khai báo trong
+Chưa thêm thì game **vẫn chạy**: tiêu đề dùng Times New Roman, chữ thường dùng font hệ thống (khai báo trong
 `src/game/ui/theme.js` → `FONTS`); console trình duyệt có thể báo 404 cho 2 file còn thiếu.
 `@font-face` khai báo trong `src/styles/index.css`; game chờ font tải xong ở `src/game/core/fonts.js`.
+
+T-054 (16/11/2026): bỏ Georgia khỏi chuỗi dự phòng vì kiểm thử trên Chrome/Windows tái hiện dấu tiếng Việt
+bị lệch trong tiêu đề “Bắt đầu ván mới?”. Ảnh kiểm thử sau khi dùng Times New Roman hiển thị đúng dấu.
+Các tệp Playfair Display và Be Vietnam Pro ở bảng trên vẫn chưa được bổ sung (TD-43).

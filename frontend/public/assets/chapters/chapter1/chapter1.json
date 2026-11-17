@@ -12797,6 +12797,79 @@
       "id": "P1_002__004",
       "type": "action",
       "text": "Hòa chỉ về cuối hành lang. Bạn tránh người lão, bước ra ngoài.",
+      "next": "P1_GUIDE_204"
+    },
+    {
+      "id": "P1_GUIDE_204",
+      "type": "transition",
+      "effects": [
+        {
+          "op": "set",
+          "path": "/scene_location",
+          "before": { "ref": "/state/scene_location" },
+          "after": { "literal": "hallway" }
+        }
+      ],
+      "next": "P1_HALL_204"
+    },
+    {
+      "id": "P1_HALL_204",
+      "type": "choice",
+      "choices": [
+        { "text": "Vào phòng 204", "targetNode": "P1_ENTER_204" }
+      ]
+    },
+    {
+      "id": "P1_ENTER_204",
+      "type": "transition",
+      "effects": [
+        {
+          "op": "set",
+          "path": "/scene_location",
+          "before": { "ref": "/state/scene_location" },
+          "after": { "literal": "room204" }
+        }
+      ],
+      "next": "P1_ROOM_204_VIEW"
+    },
+    {
+      "id": "P1_ROOM_204_VIEW",
+      "type": "choice",
+      "choices": [
+        { "text": "Quan sát Tùng", "targetNode": "P1_SEE_TUNG" }
+      ]
+    },
+    {
+      "id": "P1_SEE_TUNG",
+      "type": "router",
+      "effects": [
+        {
+          "op": "set",
+          "path": "/flags/victim_seen_from_door",
+          "before": { "ref": "/state/flags/victim_seen_from_door" },
+          "after": { "literal": true }
+        }
+      ],
+      "next": "P1_ROOM_204_EXIT"
+    },
+    {
+      "id": "P1_ROOM_204_EXIT",
+      "type": "choice",
+      "choices": [
+        { "text": "Ra hành lang", "targetNode": "P1_LEAVE_204" }
+      ]
+    },
+    {
+      "id": "P1_LEAVE_204",
+      "type": "transition",
+      "effects": [
+        {
+          "op": "set",
+          "path": "/scene_location",
+          "before": { "ref": "/state/scene_location" },
+          "after": { "literal": "hallway" }
+        }
+      ],
       "next": "P1_002__005"
     },
     {
@@ -14547,8 +14620,8 @@
     },
     {
       "id": "P1_WAIT_LOCKED__001",
-      "type": "narration",
-      "text": "Bạn nhìn lại hành lang. Còn người chưa được hỏi về tối nay.",
+      "type": "ui",
+      "text": "Còn người chưa được hỏi. Hãy lấy đủ lời khai trước khi kết thúc lượt hỏi.",
       "next": "P1_WAIT_LOCKED__COMMIT"
     },
     {
@@ -14626,7 +14699,7 @@
     {
       "id": "P1_901__005",
       "type": "dialogue",
-      "text": "Tôi ở phòng 201. Ông Hòa sang gọi tôi. Tôi chưa vào trong.",
+      "text": "Tôi ở phòng 201. Ông Hòa sang gọi tôi.",
       "next": "P1_901__006",
       "speaker": "DETECTIVE",
       "expression": "Calm"
@@ -15380,7 +15453,7 @@
     {
       "id": "P2_ENTRY__003",
       "type": "dialogue",
-      "text": "Tôi đã hỏi họ vài câu. Tôi chưa vào phòng.",
+      "text": "Tôi đã hỏi họ vài câu.",
       "next": "P2_ENTRY__004",
       "speaker": "DETECTIVE",
       "expression": "Calm"
